@@ -1,3 +1,4 @@
+@props(['nav' => null])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -13,8 +14,16 @@
 
         @livewireStyles
     </head>
-    <body>
-        {{ $slot }}
+    <body class="bg-slate-100 font-sans text-ink antialiased">
+        <div class="mx-auto min-h-screen max-w-[420px] bg-white {{ $nav ? 'pb-24' : '' }}">
+            {{ $header ?? '' }}
+
+            {{ $slot }}
+        </div>
+
+        @if ($nav)
+            <x-bottom-nav :active="$nav" />
+        @endif
 
         @livewireScripts
     </body>
