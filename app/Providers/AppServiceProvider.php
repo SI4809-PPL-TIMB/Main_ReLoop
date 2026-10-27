@@ -11,7 +11,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->extend('migrator', function ($migrator, $app) {
+            return new \App\Support\CustomMigrator(
+                $app['migration.repository'],
+                $app['db'],
+                $app['files'],
+                $app['events']
+            );
+        });
     }
 
     /**
