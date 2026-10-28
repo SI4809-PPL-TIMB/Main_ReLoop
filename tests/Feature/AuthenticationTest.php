@@ -22,19 +22,22 @@ class AuthenticationTest extends TestCase
     {
         $this->get('/masuk')->assertOk()
             ->assertSee('data-password-toggle', false)
+            ->assertSee('data-eye-show', false)
+            ->assertSee('type="email"', false)
             ->assertDontSee('Google')
             ->assertDontSee('Atau lanjut dengan');
     }
 
-    public function test_email_and_phone_can_be_used_to_login(): void
+    public function test_only_email_can_be_used_to_login(): void
     {
         $user = User::factory()->create(['phone' => '081234567890']);
-        foreach ([$user->email, $user->phone] as $identifier) {
-            $this->post('/masuk', ['identifier' => $identifier, 'password' => 'password'])
-                ->assertRedirect('/profil');
-            $this->assertAuthenticatedAs($user);
-            $this->post('/keluar');
-        }
+        $this->post('/masuk', ['identifier' => $user->email, 'password' => 'password'])
+            ->assertRedirect('/profil');
+        $this->assertAuthenticatedAs($user);
+        $this->post('/keluar');
+        $this->post('/masuk', ['identifier' => $user->phone, 'password' => 'password'])
+            ->assertSessionHasErrors('identifier');
+        $this->assertGuest();
     }
 
     public function test_wrong_password_and_unknown_account_have_the_same_error(): void
@@ -42,7 +45,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
         foreach ([$user->email, 'unknown@example.com'] as $identifier) {
             $this->post('/masuk', ['identifier' => $identifier, 'password' => 'wrong'])
-                ->assertSessionHasErrors(['identifier' => 'Email/nomor HP atau kata sandi salah.']);
+                ->assertSessionHasErrors(['identifier' => 'Email atau kata sandi salah.']);
             $this->assertGuest();
             $this->assertArrayNotHasKey('password', session()->getOldInput());
         }

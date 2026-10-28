@@ -19,7 +19,7 @@ class AuthController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'identifier' => ['required', 'string', 'max:255'],
+            'identifier' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'max:1024'],
         ]);
 
@@ -32,11 +32,10 @@ class AuthController extends Controller
         }
 
         $identifier = trim($data['identifier']);
-        $field = str_contains($identifier, '@') ? 'email' : 'phone';
-        if (! Auth::attempt([$field => $identifier, 'password' => $data['password']])) {
+        if (! Auth::attempt(['email' => $identifier, 'password' => $data['password']])) {
             RateLimiter::hit($key, 60);
             throw ValidationException::withMessages([
-                'identifier' => 'Email/nomor HP atau kata sandi salah.',
+                'identifier' => 'Email atau kata sandi salah.',
             ]);
         }
 

@@ -13,9 +13,9 @@
                 </div>
             @endif
             <div>
-                <label for="identifier" class="text-sm font-semibold">Email atau nomor HP</label>
-                <input id="identifier" name="identifier" type="text" required maxlength="255" autocomplete="username"
-                       value="{{ old('identifier') }}" placeholder="nama@email.com / 08xx"
+                <label for="identifier" class="text-sm font-semibold">Email</label>
+                <input id="identifier" name="identifier" type="email" required maxlength="255" autocomplete="username"
+                       value="{{ old('identifier') }}" placeholder="nama@email.com"
                        @if ($errors->any()) aria-invalid="true" aria-describedby="login-error" @endif
                        class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-ink aria-[invalid=true]:border-red-500">
             </div>
@@ -26,7 +26,10 @@
                            placeholder="Kata sandimu" class="min-w-0 flex-1 bg-transparent py-3 outline-none"
                            @if ($errors->any()) aria-invalid="true" aria-describedby="login-error" @endif>
                     <button type="button" data-password-toggle aria-controls="password" aria-label="Tampilkan kata sandi" aria-pressed="false"
-                            class="rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 focus-visible:outline-2 focus-visible:outline-ink">Tampilkan</button>
+                            class="group grid size-10 place-items-center text-slate-400 focus-visible:outline-2 focus-visible:outline-ink">
+                        <svg data-eye-show class="size-5 group-aria-pressed:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg data-eye-hide class="hidden size-5 group-aria-pressed:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 3 18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.9 8.3 2 12 2 12s3.5 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                    </button>
                 </div>
             </div>
             <div class="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[420px] border-t border-slate-200 bg-white px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))]">

@@ -9,5 +9,4 @@ document.addEventListener('click', (event) => {
     input.type = visible ? 'text' : 'password';
     button.setAttribute('aria-pressed', String(visible));
     button.setAttribute('aria-label', `${visible ? 'Sembunyikan' : 'Tampilkan'} kata sandi`);
-    button.textContent = visible ? 'Sembunyikan' : 'Tampilkan';
 });
