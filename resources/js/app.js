@@ -10,3 +10,7 @@ document.addEventListener('click', (event) => {
     button.setAttribute('aria-pressed', String(visible));
     button.setAttribute('aria-label', `${visible ? 'Sembunyikan' : 'Tampilkan'} kata sandi`);
 });
+
+document.querySelectorAll('form input[aria-invalid="true"]').forEach((input) => {
+    input.addEventListener('input', () => input.removeAttribute('aria-invalid'), { once: true });
+});
