@@ -20,6 +20,13 @@ class AuthController extends Controller
         $data = $request->validate([
             'identifier' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'max:1024'],
+        ], [
+            'identifier.required' => 'Email wajib diisi.',
+            'identifier.email' => 'Masukkan alamat email yang valid.',
+            'identifier.max' => 'Email maksimal 255 karakter.',
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.string' => 'Kata sandi harus berupa teks.',
+            'password.max' => 'Kata sandi maksimal 1024 karakter.',
         ]);
 
         $identifier = trim($data['identifier']);
