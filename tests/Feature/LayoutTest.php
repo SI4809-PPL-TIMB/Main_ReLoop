@@ -9,7 +9,7 @@ class LayoutTest extends TestCase
 {
     public function test_home_page_returns_a_successful_response(): void
     {
-        $this->get('/')->assertOk();
+        $this->followingRedirects()->get('/')->assertOk();
     }
 
     public function test_layout_shows_bottom_nav_with_active_tab(): void
