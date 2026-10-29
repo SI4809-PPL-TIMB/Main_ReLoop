@@ -1,5 +1,16 @@
 import './bootstrap';
 
+document.querySelectorAll('[data-resend-countdown]').forEach((button) => {
+    const deadline = Date.now() + Number(button.dataset.resendCountdown) * 1000;
+    const update = () => {
+        const seconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+        button.disabled = seconds > 0;
+        button.textContent = seconds > 0 ? `Kirim ulang dalam ${seconds} dtk` : 'Kirim ulang';
+        if (seconds > 0) window.setTimeout(update, 1000);
+    };
+    update();
+});
+
 document.addEventListener('click', (event) => {
     const button = event.target.closest('[data-password-toggle]');
     if (!button) return;

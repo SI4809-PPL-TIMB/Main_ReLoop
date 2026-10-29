@@ -43,6 +43,42 @@ class AuthenticationTest extends TestCase
         }
     }
 
+    public function test_existing_account_can_see_login_and_forgot_password_actions(): void
+    {
+        User::factory()->create(['email' => 'existing@example.com']);
+
+        $this->get('/masuk')->assertOk()
+            ->assertSee('href="'.route('password.request').'"', false)
+            ->assertSee('Lupa kata sandi?')
+            ->assertSee('type="submit" data-login-submit', false);
+        $this->assertGuest();
+        $this->get('/lupa-sandi')->assertOk()->assertSee('Kirim kode');
+    }
+
+    public function test_failed_login_for_existing_account_keeps_both_actions_available(): void
+    {
+        $user = User::factory()->create();
+        $this->from('/masuk')->followingRedirects()->post('/masuk', [
+            'identifier' => $user->email,
+            'password' => 'wrong-password',
+        ])->assertOk()
+            ->assertSee('Email atau kata sandi salah.')
+            ->assertSee('href="'.route('password.request').'"', false)
+            ->assertSee('Lupa kata sandi?')
+            ->assertSee('type="submit" data-login-submit', false);
+        $this->assertGuest();
+    }
+
+    public function test_logout_returns_existing_user_to_login_with_both_actions(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $this->followingRedirects()->post('/keluar')->assertOk()
+            ->assertSee('href="'.route('password.request').'"', false)
+            ->assertSee('Lupa kata sandi?')
+            ->assertSee('type="submit" data-login-submit', false);
+        $this->assertGuest();
+    }
+
     public function test_login_form_posts_to_backend_with_csrf_protection(): void
     {
         $this->get('/masuk')->assertOk()

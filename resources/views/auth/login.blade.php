@@ -1,6 +1,9 @@
-@component('layouts.app', ['title' => 'ReLoop · Masuk'])
-    @slot('bodyClass', 'bg-[#e9ebe8]')
-    <div class="relative min-h-screen overflow-x-hidden pb-36">
+@component('layouts.app', [
+    'title' => 'Reloop · Masuk',
+    'language' => 'id',
+    'shellClass' => 'relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white pb-36',
+])
+    @slot('bodyClass', 'reloop-login bg-[#e9ebe8]')
         <header class="sticky top-0 z-20 flex items-center justify-between gap-3 bg-white px-4 py-4">
             <a href="{{ url('/') }}" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
@@ -15,16 +18,16 @@
             @if ($errors->any())
                 <div id="login-error" role="alert" class="flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm">
                     <svg class="size-5 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
-                    <p class="text-red-700"><b>{{ $errors->first() }}</b></p>
+                    <p class="text-red-700"><b>{{ $errors->first() }}</b>@if ($errors->first() === 'Email atau kata sandi salah.') Cek lagi, atau atur ulang lewat Lupa kata sandi.@endif</p>
                 </div>
             @endif
-            <div>
-                <label for="identifier" class="text-sm font-semibold">Email</label>
+            <label for="identifier" class="block">
+                <span class="text-sm font-semibold">Email</span>
                 <input id="identifier" name="identifier" type="email" required maxlength="255" autocomplete="username"
                        value="{{ old('identifier') }}" placeholder="nama@email.com"
                        @error('identifier') aria-invalid="true" aria-describedby="login-error" @enderror
                        class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-ink aria-[invalid=true]:border-red-500">
-            </div>
+            </label>
             <div>
                 <label for="password" class="text-sm font-semibold">Kata sandi</label>
                 <div class="mt-2 flex items-center rounded-xl border border-slate-200 pl-4 pr-1 focus-within:border-ink has-[[aria-invalid=true]]:border-red-500">
@@ -40,16 +43,15 @@
                 @if ($errors->any())
                     <span class="mt-2 block text-xs font-medium text-red-600">{{ $errors->first() }}</span>
                 @endif
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="mt-2 inline-block text-sm font-semibold text-brand-600">Lupa kata sandi?</a>
-                @endif
+                <a href="{{ route('password.request') }}" class="mt-2 inline-block text-sm font-semibold text-brand-600">Lupa kata sandi?</a>
             </div>
-            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[420px] border-t border-slate-200 bg-white px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))]">
+            <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
                 <button type="submit" data-login-submit class="w-full rounded-full bg-ink py-3.5 font-semibold text-white disabled:cursor-wait disabled:opacity-60">Masuk</button>
                 @if (Route::has('register'))
                     <p class="mt-3 text-center text-sm text-slate-500">Belum punya akun? <a href="{{ route('register') }}" class="font-semibold text-ink underline">Daftar</a></p>
+                @else
+                    <p class="mt-3 text-center text-sm text-slate-500">Belum punya akun? <a role="link" aria-disabled="true" class="cursor-not-allowed font-semibold text-ink underline">Daftar</a></p>
                 @endif
             </div>
         </form>
-    </div>
 @endcomponent
