@@ -12,6 +12,15 @@ class WilayahKelurahan extends Model
 
     protected $fillable = ['kecamatan_id', 'nama', 'kode'];
 
+    /** "Kelurahan, Kecamatan, Kabupaten, Provinsi" — hanya nama daerah, tidak pernah alamat lengkap (BR-07). */
+    public function breadcrumb(): string
+    {
+        $kec = $this->kecamatan;
+        $kab = $kec->kabupaten;
+
+        return implode(', ', [$this->nama, $kec->nama, $kab->nama, $kab->provinsi->nama]);
+    }
+
     public function kecamatan(): BelongsTo
     {
         return $this->belongsTo(WilayahKecamatan::class, 'kecamatan_id');

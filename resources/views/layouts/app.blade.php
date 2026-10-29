@@ -1,9 +1,10 @@
 @props(['nav' => null])
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ $language ?? str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+        <meta name="theme-color" content="#ffffff">
 
         <title>{{ $title ?? config('app.name') }}</title>
 
@@ -15,7 +16,7 @@
         @livewireStyles
     </head>
     <body class="{{ $bodyClass ?? 'bg-slate-100' }} font-sans text-ink antialiased">
-        <div class="mx-auto min-h-screen max-w-[420px] bg-white {{ $nav ? 'pb-24' : '' }}">
+        <div class="{{ $shellClass ?? 'mx-auto min-h-screen max-w-[420px] bg-white'.($nav ? ' pb-24' : '') }}">
             {{ $header ?? '' }}
 
             {{ $slot }}
@@ -26,5 +27,6 @@
         @endif
 
         @livewireScripts
+        @stack('scripts')
     </body>
 </html>

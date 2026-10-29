@@ -10,6 +10,9 @@ class Profile extends Model
     protected $fillable = [
         'user_id',
         'kelurahan_id',
+        'latitude',
+        'longitude',
+        'patokan',
         'avatar',
         'bio',
         'avg_rating',
@@ -24,6 +27,8 @@ class Profile extends Model
     {
         return [
             'avg_rating'     => 'decimal:2',
+            'latitude'       => 'float',
+            'longitude'      => 'float',
             'streak_last_at' => 'date',
         ];
     }
