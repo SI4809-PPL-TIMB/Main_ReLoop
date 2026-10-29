@@ -8,7 +8,7 @@
             <p class="mt-2 max-w-[300px] text-slate-500">Mulai jual barang bekas atau setor sampah dari desamu. Streak pertamamu menunggu.</p>
         </main>
 
-        <a href="{{ route('home') }}" id="btn-lanjut-lokasi" class="rounded-full bg-ink py-3.5 text-center font-semibold text-white transition hover:bg-ink/90 active:scale-[.98]">
+        <a href="{{ route('lokasi') }}" id="btn-lanjut-lokasi" class="rounded-full bg-ink py-3.5 text-center font-semibold text-white transition hover:bg-ink/90 active:scale-[.98]">
             Lanjut
         </a>
     </div>

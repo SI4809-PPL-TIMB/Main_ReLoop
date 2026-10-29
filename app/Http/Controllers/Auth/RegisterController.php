@@ -151,8 +151,8 @@ class RegisterController extends Controller
             'otp_expires_at',
         ]);
 
-        // 11. Arahkan pengguna ke halaman selesai
-        return redirect()->route('selesai');
+        // 11. Langkah 2 dari 2: atur lokasi
+        return redirect()->route('lokasi');
     }
 
     public function resendVerification(): RedirectResponse

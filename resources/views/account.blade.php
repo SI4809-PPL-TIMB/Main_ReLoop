@@ -4,6 +4,10 @@
         <div>
             <h2 class="text-xl font-bold">{{ auth()->user()->name }}</h2>
             <p class="text-sm text-slate-500">{{ auth()->user()->email ?? auth()->user()->phone }}</p>
+            @php($kel = auth()->user()->profile?->kelurahan)
+            <a href="{{ route('lokasi', ['from' => 'profil']) }}" id="breadcrumb-lokasi" class="mt-2 inline-block text-sm font-medium text-brand-700">
+                {{ $kel ? $kel->breadcrumb() : 'Atur lokasi' }}
+            </a>
         </div>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
