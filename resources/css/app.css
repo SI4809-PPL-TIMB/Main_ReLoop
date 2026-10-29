@@ -34,3 +34,25 @@
 
     --shadow-card: 0 8px 24px -12px rgba(16, 40, 24, 0.22);
 }
+
+/* masuk.html uses the Tailwind 3 palette; preserve it on the compiled login view. */
+.reloop-login {
+    --color-slate-200: #e2e8f0;
+    --color-slate-400: #94a3b8;
+    --color-slate-500: #64748b;
+    --color-red-50: #fef2f2;
+    --color-red-200: #fecaca;
+    --color-red-500: #ef4444;
+    --color-red-600: #dc2626;
+    --color-red-700: #b91c1c;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.reloop-login input::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+}
+
+.reloop-login input:user-invalid {
+    border-color: #ef4444 !important;
+}
