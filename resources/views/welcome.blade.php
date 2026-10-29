@@ -55,7 +55,7 @@
             <a href="{{ route('daftar') }}" id="btn-daftar-onboarding" class="rounded-full bg-ink py-3.5 text-center font-semibold text-white transition hover:bg-ink/90 active:scale-[.98]">
                 Daftar
             </a>
-            <a href="{{ route('masuk') }}" class="rounded-full border border-slate-200 py-3.5 text-center font-semibold transition hover:bg-slate-50 active:scale-[.98]">
+            <a href="{{ route('login') }}" class="rounded-full border border-slate-200 py-3.5 text-center font-semibold transition hover:bg-slate-50 active:scale-[.98]">
                 Saya sudah punya akun
             </a>
             <p class="mt-1 text-center text-xs text-slate-500">

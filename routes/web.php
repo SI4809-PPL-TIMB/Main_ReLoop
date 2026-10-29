@@ -1,9 +1,20 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 // 1. Halaman Welcome
+Route::middleware('guest')->group(function () {
+    Route::get('/masuk', [AuthController::class, 'create'])->name('login');
+    Route::post('/masuk', [AuthController::class, 'store'])->middleware('throttle:login')->name('login.store');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::view('/profil', 'account')->name('account');
+    Route::post('/keluar', [AuthController::class, 'destroy'])->name('logout');
+});
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -19,15 +30,3 @@ Route::post('/verifikasi/resend', [RegisterController::class, 'resendVerificatio
 
 // 4. Halaman Selesai (Akun Siap)
 Route::get('/selesai', [RegisterController::class, 'showComplete'])->name('selesai');
-
-// Placeholder masuk & logout
-Route::get('/masuk', function () {
-    return redirect()->route('daftar');
-})->name('masuk');
-
-Route::any('/keluar', function () {
-    \Illuminate\Support\Facades\Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect()->route('daftar');
-})->name('logout');

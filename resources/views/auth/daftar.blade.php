@@ -39,7 +39,7 @@
                     </svg>
                     <p class="text-red-700">
                         <b>Email atau nomor HP ini sudah terdaftar.</b>
-                        <a href="{{ route('masuk') }}" class="font-semibold underline">Masuk saja</a>
+                        <a href="{{ route('login') }}" class="font-semibold underline">Masuk saja</a>
                         atau pakai yang lain.
                     </p>
                 </div>
@@ -175,7 +175,7 @@
         </button>
         <p class="mt-3 text-center text-sm text-slate-500">
             Sudah punya akun?
-            <a href="{{ route('masuk') }}" id="link-masuk" class="font-semibold text-ink underline">Masuk</a>
+            <a href="{{ route('login') }}" id="link-masuk" class="font-semibold text-ink underline">Masuk</a>
         </p>
     </div>
 

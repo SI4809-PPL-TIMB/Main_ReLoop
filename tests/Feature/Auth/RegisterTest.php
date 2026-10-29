@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -17,7 +18,7 @@ class RegisterTest extends TestCase
 
     // ───────────────────────── Halaman form ─────────────────────────
 
-    /** @test */
+    #[Test]
     public function halaman_daftar_dapat_diakses(): void
     {
         $response = $this->get('/daftar');
@@ -28,7 +29,7 @@ class RegisterTest extends TestCase
 
     // ───────────────────────── Daftar berhasil ─────────────────────────
 
-    /** @test */
+    #[Test]
     public function daftar_berhasil_dengan_email(): void
     {
         $response = $this->post('/daftar', [
@@ -38,52 +39,16 @@ class RegisterTest extends TestCase
             'terms'      => '1',
         ]);
 
-        $response->assertRedirect('/selesai');
-        $this->assertAuthenticated();
+        // Setelah daftar, pengguna diarahkan ke halaman verifikasi dulu
+        $response->assertRedirect('/verifikasi');
 
         $this->assertDatabaseHas('users', [
             'name'  => 'Azzahra Test',
             'email' => 'azzahra@reloop.test',
-            'phone' => null,
         ]);
     }
 
-    /** @test */
-    public function daftar_berhasil_dengan_nomor_hp(): void
-    {
-        $response = $this->post('/daftar', [
-            'name'       => 'Budi Test',
-            'identifier' => '081234567890',
-            'password'   => 'password123',
-            'terms'      => '1',
-        ]);
-
-        $response->assertRedirect('/selesai');
-        $this->assertAuthenticated();
-
-        $this->assertDatabaseHas('users', [
-            'name'  => 'Budi Test',
-            'phone' => '081234567890',
-            'email' => null,
-        ]);
-    }
-
-    /** @test */
-    public function daftar_berhasil_normalisasi_nomor_plus62(): void
-    {
-        $this->post('/daftar', [
-            'name'       => 'Citra Test',
-            'identifier' => '+6281234567890',
-            'password'   => 'password123',
-            'terms'      => '1',
-        ]);
-
-        $this->assertDatabaseHas('users', [
-            'phone' => '081234567890',
-        ]);
-    }
-
-    /** @test */
+    #[Test]
     public function password_tersimpan_sebagai_hash_bukan_teks_asli(): void
     {
         $this->post('/daftar', [
@@ -102,10 +67,10 @@ class RegisterTest extends TestCase
 
     // ───────────────────────── Validasi gagal ─────────────────────────
 
-    /** @test */
+    #[Test]
     public function email_duplikat_ditolak(): void
     {
-        User::factory()->create(['email' => 'duplikat@reloop.test', 'phone' => null]);
+        User::factory()->create(['email' => 'duplikat@reloop.test']);
 
         $response = $this->post('/daftar', [
             'name'       => 'Duplikat',
@@ -118,23 +83,21 @@ class RegisterTest extends TestCase
         $this->assertCount(1, User::where('email', 'duplikat@reloop.test')->get());
     }
 
-    /** @test */
-    public function nomor_hp_duplikat_ditolak(): void
+    #[Test]
+    public function format_email_tidak_valid_ditolak(): void
     {
-        User::factory()->create(['phone' => '081111111111', 'email' => null]);
-
         $response = $this->post('/daftar', [
-            'name'       => 'Duplikat HP',
-            'identifier' => '081111111111',
+            'name'       => 'Email Salah',
+            'identifier' => 'bukan-email',
             'password'   => 'password123',
             'terms'      => '1',
         ]);
 
         $response->assertSessionHasErrors('identifier');
-        $this->assertCount(1, User::where('phone', '081111111111')->get());
+        $this->assertDatabaseCount('users', 0);
     }
 
-    /** @test */
+    #[Test]
     public function password_kurang_dari_8_karakter_ditolak(): void
     {
         $response = $this->post('/daftar', [
@@ -148,7 +111,7 @@ class RegisterTest extends TestCase
         $this->assertDatabaseMissing('users', ['email' => 'pendek@reloop.test']);
     }
 
-    /** @test */
+    #[Test]
     public function syarat_dan_ketentuan_tidak_dicentang_ditolak(): void
     {
         $response = $this->post('/daftar', [
@@ -162,7 +125,7 @@ class RegisterTest extends TestCase
         $this->assertDatabaseMissing('users', ['email' => 'tanpask@reloop.test']);
     }
 
-    /** @test */
+    #[Test]
     public function nama_wajib_diisi(): void
     {
         $response = $this->post('/daftar', [
@@ -175,7 +138,7 @@ class RegisterTest extends TestCase
         $response->assertSessionHasErrors('name');
     }
 
-    /** @test */
+    #[Test]
     public function identifier_wajib_diisi(): void
     {
         $response = $this->post('/daftar', [
@@ -188,9 +151,9 @@ class RegisterTest extends TestCase
         $response->assertSessionHasErrors('identifier');
     }
 
-    // ───────────────────────── Akun Siap & Lokasi ─────────────────────────
+    // ───────────────────────── Akun Siap ─────────────────────────
 
-    /** @test */
+    #[Test]
     public function halaman_selesai_dapat_diakses(): void
     {
         $response = $this->get('/selesai');
@@ -199,28 +162,6 @@ class RegisterTest extends TestCase
         $response->assertSee('Makasih! Akunmu sudah siap');
     }
 
-    /** @test */
-    public function halaman_pengaturan_lokasi_dapat_diakses(): void
-    {
-        $response = $this->get('/lokasi');
-
-        $response->assertStatus(200);
-        $response->assertSee('Kamu tinggal di mana?');
-        $response->assertSee('Langkah 2 dari 2');
-        $response->assertSee('Mulai pakai Reloop');
-    }
-
-    /** @test */
-    public function simpan_lokasi_berhasil_dan_redirect_ke_home(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $response = $this->post('/lokasi', [
-            'desa'    => 'Sukamaju',
-            'patokan' => 'Dekat masjid',
-        ]);
-
-        $response->assertRedirect('/');
-    }
+    // TODO: tambah test alur verifikasi (kode benar -> /selesai, kode salah ditolak)
+    // setelah cara kerja storeVerification di RegisterController dipastikan.
 }

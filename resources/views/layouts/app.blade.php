@@ -3,7 +3,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
         <title>{{ $title ?? config('app.name') }}</title>
 
@@ -14,7 +14,7 @@
 
         @livewireStyles
     </head>
-    <body class="bg-slate-100 font-sans text-ink antialiased">
+    <body class="{{ $bodyClass ?? 'bg-slate-100' }} font-sans text-ink antialiased">
         <div class="mx-auto min-h-screen max-w-[420px] bg-white {{ $nav ? 'pb-24' : '' }}">
             {{ $header ?? '' }}
 
