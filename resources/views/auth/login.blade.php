@@ -6,7 +6,7 @@
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
             </a>
         </header>
-        <form method="POST" action="{{ route('login.store') }}" class="space-y-5 px-4 pt-2">
+        <form method="POST" action="{{ route('login.store') }}" data-login-form class="space-y-5 px-4 pt-2">
             @csrf
             <div>
                 <h1 class="text-[28px] font-bold leading-tight">Masuk</h1>
@@ -22,7 +22,7 @@
                 <label for="identifier" class="text-sm font-semibold">Email</label>
                 <input id="identifier" name="identifier" type="email" required maxlength="255" autocomplete="username"
                        value="{{ old('identifier') }}" placeholder="nama@email.com"
-                       @if ($errors->any()) aria-invalid="true" aria-describedby="login-error" @endif
+                       @error('identifier') aria-invalid="true" aria-describedby="login-error" @enderror
                        class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-ink aria-[invalid=true]:border-red-500">
             </div>
             <div>
@@ -30,7 +30,7 @@
                 <div class="mt-2 flex items-center rounded-xl border border-slate-200 pl-4 pr-1 focus-within:border-ink has-[[aria-invalid=true]]:border-red-500">
                     <input id="password" name="password" type="password" required maxlength="1024" autocomplete="current-password"
                            placeholder="Kata sandimu" class="min-w-0 flex-1 bg-transparent py-3 outline-none"
-                           @if ($errors->any()) aria-invalid="true" aria-describedby="login-error" @endif>
+                           @if ($errors->has('password') || $errors->has('identifier')) aria-invalid="true" aria-describedby="login-error" @endif>
                     <button type="button" data-password-toggle aria-controls="password" aria-label="Tampilkan kata sandi" aria-pressed="false"
                             class="group grid size-9 shrink-0 place-items-center text-slate-400 focus-visible:outline-2 focus-visible:outline-ink">
                         <svg data-eye-show class="size-5 group-aria-pressed:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -45,7 +45,7 @@
                 @endif
             </div>
             <div class="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[420px] border-t border-slate-200 bg-white px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))]">
-                <button type="submit" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Masuk</button>
+                <button type="submit" data-login-submit class="w-full rounded-full bg-ink py-3.5 font-semibold text-white disabled:cursor-wait disabled:opacity-60">Masuk</button>
                 @if (Route::has('register'))
                     <p class="mt-3 text-center text-sm text-slate-500">Belum punya akun? <a href="{{ route('register') }}" class="font-semibold text-ink underline">Daftar</a></p>
                 @endif

@@ -43,6 +43,36 @@ class AuthenticationTest extends TestCase
         }
     }
 
+    public function test_login_form_posts_to_backend_with_csrf_protection(): void
+    {
+        $this->get('/masuk')->assertOk()
+            ->assertSee('method="POST"', false)
+            ->assertSee('action="'.route('login.store').'"', false)
+            ->assertSee('name="_token"', false)
+            ->assertSee('data-login-form', false)
+            ->assertSee('data-login-submit', false);
+    }
+
+    public function test_failed_login_shows_error_and_retains_email_without_password(): void
+    {
+        $this->from('/masuk')->followingRedirects()->post('/masuk', [
+            'identifier' => 'unknown@example.com',
+            'password' => 'wrong-secret-value',
+        ])->assertOk()
+            ->assertSee('Email atau kata sandi salah.')
+            ->assertSee('value="unknown@example.com"', false)
+            ->assertSee('aria-invalid="true"', false)
+            ->assertDontSee('wrong-secret-value');
+    }
+
+    public function test_missing_fields_show_indonesian_validation_messages(): void
+    {
+        $this->post('/masuk')->assertSessionHasErrors([
+            'identifier' => 'Email wajib diisi.',
+            'password' => 'Kata sandi wajib diisi.',
+        ]);
+    }
+
     public function test_wrong_password_and_unknown_account_have_the_same_error(): void
     {
         $user = User::factory()->create();
