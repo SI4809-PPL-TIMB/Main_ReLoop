@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -15,7 +15,7 @@ class AuthenticationTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite();
-        RateLimiter::clear('login:'.hash('sha256', '127.0.0.1'));
+        Cache::flush();
     }
 
     public function test_login_page_has_password_toggle_and_no_social_login(): void
@@ -24,6 +24,7 @@ class AuthenticationTest extends TestCase
             ->assertSee('data-password-toggle', false)
             ->assertSee('data-eye-show', false)
             ->assertSee('type="email"', false)
+            ->assertDontSee('Nomor HP')
             ->assertDontSee('Google')
             ->assertDontSee('Atau lanjut dengan');
     }
@@ -35,9 +36,11 @@ class AuthenticationTest extends TestCase
             ->assertRedirect('/profil');
         $this->assertAuthenticatedAs($user);
         $this->post('/keluar');
-        $this->post('/masuk', ['identifier' => $user->phone, 'password' => 'password'])
-            ->assertSessionHasErrors('identifier');
-        $this->assertGuest();
+        foreach (['081234567890', '6281234567890', '+6281234567890'] as $phone) {
+            $this->post('/masuk', ['identifier' => $phone, 'password' => 'password'])
+                ->assertSessionHasErrors('identifier');
+            $this->assertGuest();
+        }
     }
 
     public function test_wrong_password_and_unknown_account_have_the_same_error(): void
@@ -58,7 +61,7 @@ class AuthenticationTest extends TestCase
             $this->post('/masuk', ['identifier' => "unknown{$i}@example.com", 'password' => 'wrong']);
         }
         $this->post('/masuk', ['identifier' => $user->email, 'password' => 'password'])
-            ->assertSessionHasErrors('identifier');
+            ->assertStatus(429)->assertHeader('Retry-After');
         $this->assertGuest();
         $this->travel(61)->seconds();
         $this->post('/masuk', ['identifier' => $user->email, 'password' => 'password'])
@@ -81,5 +84,40 @@ class AuthenticationTest extends TestCase
     public function test_logout_does_not_accept_get_requests(): void
     {
         $this->get('/keluar')->assertStatus(405);
+    }
+
+    public function test_invalid_input_is_rate_limited_too(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $this->post('/masuk', ['identifier' => 'invalid'])
+                ->assertSessionHasErrors(['identifier', 'password']);
+        }
+        $this->post('/masuk')->assertStatus(429);
+    }
+
+    public function test_authenticated_users_are_redirected_away_from_login(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $this->get('/masuk')->assertRedirect('/profil');
+        $this->post('/masuk')->assertRedirect('/profil');
+    }
+
+    public function test_json_guest_cannot_access_protected_routes(): void
+    {
+        $this->getJson('/profil')->assertUnauthorized();
+        $this->postJson('/keluar')->assertUnauthorized();
+    }
+
+    public function test_login_rotates_session_and_logout_clears_session_data(): void
+    {
+        $user = User::factory()->create();
+        $this->withSession(['private' => 'value', '_token' => 'old-token']);
+        $previousId = session()->getId();
+        $this->post('/masuk', ['identifier' => $user->email, 'password' => 'password'])
+            ->assertRedirect('/profil');
+        $this->assertNotSame($previousId, session()->getId());
+        $this->post('/keluar')->assertSessionMissing('private');
+        $this->assertNotSame('old-token', session()->token());
+        $this->assertGuest();
     }
 }
