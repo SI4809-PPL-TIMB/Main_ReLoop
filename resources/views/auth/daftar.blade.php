@@ -10,7 +10,7 @@
                 <path d="m15 18-6-6 6-6"/>
             </svg>
         </a>
-        <p class="text-xs font-semibold text-loop">Langkah 1 dari 2</p>
+        <p class="text-xs font-semibold text-brand-700">Langkah 1 dari 2</p>
     </header>
 
     <main>

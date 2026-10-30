@@ -98,17 +98,34 @@ class LokasiController extends Controller
                 'lat' => $c['latitude'], 'lon' => $c['longitude'],
             ])->json('address', []);
 
-        // shortcut: cocokkan nama desa+kecamatan saja, belum pakai jarak ke titik pusat desa. Upgrade bila tabel wilayah punya koordinat.
-        $desa = $alamat['village'] ?? $alamat['suburb'] ?? $alamat['neighbourhood'] ?? null;
-        $kec = $alamat['city_district'] ?? $alamat['municipality'] ?? $alamat['county'] ?? null;
-        $kel = $desa ? WilayahKelurahan::with('kecamatan.kabupaten.provinsi')
-            ->where('nama', $desa)
-            ->when($kec, fn ($q) => $q->whereHas('kecamatan', fn ($k) => $k->where('nama', 'like', '%'.preg_replace('/^(Kecamatan|Kec\.)\s*/i', '', $kec).'%')))
-            ->first() : null;
+        $kel = $this->cocokkan($alamat);
 
         return $kel
             ? response()->json($this->hasil($kel))
             : response()->json(['message' => 'Daerah belum terdaftar. Pilih manual.'], 404);
+    }
+
+    /**
+     * OSM di Indonesia tidak konsisten: nama desa bisa ada di village/suburb/city_district/hamlet,
+     * dan kadang berejaan beda ("Catur Tunggal"). Jadi semua nilai alamat jadi kandidat, dibandingkan
+     * tanpa spasi/huruf besar, lalu dipilih desa yang kecamatan atau kab/kotanya juga ikut cocok.
+     * shortcut: tanpa jarak ke titik pusat desa; upgrade bila tabel wilayah punya koordinat.
+     */
+    private function cocokkan(array $alamat): ?WilayahKelurahan
+    {
+        $norm = fn ($s) => preg_replace('/[^a-z0-9]/', '', mb_strtolower((string) $s));
+        $kand = array_values(array_unique(array_filter(array_map($norm, array_diff_key($alamat, array_flip(['road', 'postcode', 'country', 'country_code', 'state', 'ISO3166-2-lvl4']))))));
+        if (! $kand) {
+            return null;
+        }
+        $county = $norm($alamat['county'] ?? $alamat['city'] ?? $alamat['regency'] ?? '');
+
+        $skor = fn (WilayahKelurahan $k) => (int) in_array($norm($k->kecamatan->nama), $kand, true)
+            + (int) ($county !== '' && str_contains($norm($k->kecamatan->kabupaten->nama), $county));
+
+        return WilayahKelurahan::with('kecamatan.kabupaten.provinsi')
+            ->whereRaw("REPLACE(LOWER(nama), ' ', '') in (".implode(',', array_fill(0, count($kand), '?')).')', $kand)
+            ->get()->filter(fn ($k) => $skor($k) > 0)->sortByDesc($skor)->first();
     }
 
     private function opsi($m): array

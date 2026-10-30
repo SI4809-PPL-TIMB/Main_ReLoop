@@ -8,7 +8,7 @@
         <a href="{{ route('login') }}" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
         </a>
-        @if ($step < 4)<p class="text-xs font-semibold text-slate-500">Langkah {{ $step }} dari 3</p>@endif
+        @if ($step < 4)<p class="text-xs font-semibold text-brand-700">Langkah {{ $step }} dari 3</p>@endif
     </header>
     @if ($step < 4)
         <div class="flex gap-1.5 px-4" aria-hidden="true">

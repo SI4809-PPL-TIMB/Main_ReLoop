@@ -8,7 +8,7 @@
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
             </a>
             @unless ($dariProfil)
-                <p class="text-xs font-semibold text-brand-600">Langkah 2 dari 2</p>
+                <p class="text-xs font-semibold text-brand-700">Langkah 2 dari 2</p>
             @endunless
         </header>
     </x-slot>

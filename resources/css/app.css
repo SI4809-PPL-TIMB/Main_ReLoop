@@ -56,3 +56,24 @@
 .reloop-login input:user-invalid {
     border-color: #ef4444 !important;
 }
+
+/* Animasi halus untuk interaksi. Opacity/warna saja pada pembungkus, supaya elemen fixed tidak bergeser. */
+@keyframes reloop-fade-in { from { opacity: 0; } }
+@keyframes reloop-reveal { from { opacity: 0; transform: translateY(-4px); } }
+
+body > div:first-child { animation: reloop-fade-in .25s ease-out; }
+
+button, a, summary {
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease, opacity .15s ease, transform .15s ease;
+}
+button:not(:disabled):active,
+a[class*='rounded-full']:active { transform: scale(.98); }
+
+input, textarea, select { transition: border-color .15s ease, box-shadow .15s ease; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { box-shadow: 0 0 0 3px rgb(21 24 28 / .08); }
+
+[role='alert'], #cari-hasil:not([hidden]), #daerah > div > div:not([hidden]) { animation: reloop-reveal .18s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
