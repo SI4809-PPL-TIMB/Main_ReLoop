@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ProfilController;
 use Illuminate\Support\Facades\Route;
 
 // 1. Halaman Welcome
@@ -21,7 +21,11 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::view('/profil', 'account')->name('account');
+    Route::get('/profil', [ProfilController::class, 'show'])->name('account');
+    Route::get('/profil/ubah', [ProfilController::class, 'edit'])->name('account.edit');
+    Route::match(['post', 'put'], '/profil', [ProfilController::class, 'update'])->name('account.update');
+    Route::post('/profil/avatar', [ProfilController::class, 'uploadAvatar'])->name('account.avatar.upload');
+    Route::delete('/profil/avatar', [ProfilController::class, 'hapusAvatar'])->name('account.avatar.delete');
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');
