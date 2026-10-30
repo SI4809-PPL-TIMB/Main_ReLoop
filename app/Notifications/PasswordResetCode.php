@@ -2,12 +2,18 @@
 
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class PasswordResetCode extends Notification
 {
-    public function __construct(public string $code) {}
+    use Queueable;
+
+    /**
+     * Kode OTP 6 digit untuk atur ulang kata sandi.
+     */
+    public function __construct(private readonly string $code) {}
 
     public function via(object $notifiable): array
     {
@@ -17,11 +23,13 @@ class PasswordResetCode extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Kode atur ulang kata sandi ReLoop')
+            ->subject('Kode Atur Ulang Kata Sandi ReLoop')
             ->greeting('Halo!')
-            ->line('Kode verifikasi untuk mengatur ulang kata sandimu:')
-            ->line($this->code)
-            ->line('Kode berlaku 10 menit. Jangan bagikan kode ini kepada siapa pun.')
-            ->line('Jika kamu tidak meminta perubahan ini, abaikan email ini.');
+            ->line('Kami menerima permintaan untuk mengatur ulang kata sandi akunmu.')
+            ->line('Gunakan kode verifikasi berikut:')
+            ->line('**' . $this->code . '**')
+            ->line('Kode ini berlaku selama **10 menit** dan hanya bisa dipakai sekali.')
+            ->line('Jika kamu tidak merasa melakukan permintaan ini, abaikan saja email ini. Akunmu tetap aman.')
+            ->salutation('Salam, Tim ReLoop');
     }
 }
