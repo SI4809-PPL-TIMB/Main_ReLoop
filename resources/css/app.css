@@ -72,8 +72,12 @@ a[class*='rounded-full']:active { transform: scale(.98); }
 input, textarea, select { transition: border-color .15s ease, box-shadow .15s ease; }
 input:focus-visible, textarea:focus-visible, select:focus-visible { box-shadow: 0 0 0 3px rgb(21 24 28 / .08); }
 
-[role='alert'], #cari-hasil:not([hidden]), #daerah > div > div:not([hidden]) { animation: reloop-reveal .18s ease-out; }
+[role='alert'], #cari-hasil:not([hidden]), #sheet-daftar { animation: reloop-reveal .18s ease-out; }
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+@keyframes reloop-sheet { from { transform: translateY(24px); opacity: 0; } }
+dialog[open] { animation: reloop-sheet .22s ease-out; }
+dialog[open]::backdrop { animation: reloop-fade-in .22s ease-out; }
