@@ -52,8 +52,8 @@ class ProfilTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Akun Pengguna Asli');
-        $response->assertSee('pengguna@example.com');
-        $response->assertSee('081234567890');
+        $response->assertSee('Ubah profil');
+        $response->assertSee('Keluar dari Reloop?');
     }
 
     public function test_halaman_form_ubah_profil_dapat_diakses_oleh_pengguna_login(): void
@@ -63,7 +63,9 @@ class ProfilTest extends TestCase
         $response->assertOk();
         $response->assertSee('Ubah Profil');
         $response->assertSee('Akun Pengguna Asli');
-        $response->assertSee('Informasi Akun');
+        $response->assertSee('pengguna@example.com');
+        $response->assertSee('081234567890');
+        $response->assertSee('Ganti foto');
     }
 
     public function test_pengguna_dapat_memperbarui_nama_bio_dan_nomor_hp(): void

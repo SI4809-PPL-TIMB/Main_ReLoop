@@ -31,7 +31,7 @@
                 <span class="text-sm font-semibold">Email</span>
                 <input name="email" type="email" required maxlength="255" autocomplete="email" value="{{ old('email') }}" placeholder="nama@email.com" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-ink">
             </label>
-            <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
                 <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Kirim kode</button>
                 <p class="mt-3 text-center text-sm text-slate-500">Ingat kata sandimu? <a href="{{ route('login') }}" class="font-semibold text-ink underline">Masuk</a></p>
             </div>
@@ -53,7 +53,7 @@
                 <a href="{{ route('password.request') }}" class="font-semibold text-slate-500 underline">Ganti email</a>
                 <button type="submit" form="resend-code" data-resend-countdown="{{ $retryAfter }}" @disabled($retryAfter > 0) class="font-semibold text-brand-600 disabled:text-slate-400">{{ $retryAfter > 0 ? 'Kirim ulang dalam '.$retryAfter.' dtk' : 'Kirim ulang' }}</button>
             </div>
-            <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
                 <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Verifikasi</button>
                 <a href="{{ route('login') }}" class="mt-2 block rounded-full border border-slate-200 py-3 text-center font-semibold">Kembali ke Masuk</a>
             </div>
@@ -78,7 +78,7 @@
             @if ($errors->has('email') || $errors->has('token'))
                 <a href="{{ route('password.request') }}" class="text-sm font-semibold text-brand-600 underline">Minta kode baru</a>
             @endif
-            <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
                 <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Simpan kata sandi</button>
             </div>
         </form>
@@ -87,7 +87,7 @@
             <img src="{{ asset('assets/illust/auth/account-ready.png') }}" alt="Kata sandi berhasil diperbarui" width="128" height="96" class="mx-auto size-28 object-contain">
             <h1 class="mt-4 text-[28px] font-bold leading-tight">Kata sandi diperbarui</h1>
             <p class="mt-1 text-sm text-slate-500">Silakan masuk pakai kata sandi barumu.</p>
-            <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
                 <a href="{{ route('login') }}" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Masuk sekarang</a>
             </div>
         </section>
