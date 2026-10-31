@@ -56,3 +56,12 @@
 .reloop-login input:user-invalid {
     border-color: #ef4444 !important;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
