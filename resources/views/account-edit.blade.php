@@ -1,15 +1,16 @@
-@component('layouts.app', ['title' => 'ReLoop · Ubah Profil', 'nav' => 'user'])
+@php
+    $kel = $profil?->kelurahan;
+    $lokasi = $kel ? $kel->nama.', '.$kel->kecamatan->nama.', '.$kel->kecamatan->kabupaten->nama : 'Atur lokasi';
+    $kolom = 'mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-3 font-medium outline-none focus:border-ink';
+    $tipeFoto = 'image/jpeg,image/png,image/webp';
+@endphp
+
+@component('layouts.app', ['title' => 'ReLoop · Ubah Profil', 'nav' => null])
     <x-top-bar title="Ubah Profil" :back="route('account')" />
 
-    <section class="space-y-5 px-4 pb-12 pt-2">
-        {{-- Flash Notification --}}
+    <main class="space-y-4 px-4 pb-28 pt-5">
         @if (session('sukses'))
-            <div role="alert" class="flex items-center gap-2.5 rounded-2xl border border-brand-200 bg-brand-50 p-4 text-sm text-brand-800 shadow-sm">
-                <svg class="size-5 shrink-0 text-brand-600" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-                <span class="font-medium">{{ session('sukses') }}</span>
-            </div>
+            <div role="alert" class="rounded-2xl border border-brand-200 bg-brand-50 p-4 text-sm font-medium text-brand-800">{{ session('sukses') }}</div>
         @endif
 
         @if ($errors->any())
@@ -22,132 +23,108 @@
             </div>
         @endif
 
-        {{-- Kartu Foto Profil --}}
-        <div class="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-white p-5 text-center shadow-card">
-            <div class="relative">
-                @if ($user->avatarUrl())
-                    <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="size-24 rounded-full border-2 border-brand-500 object-cover shadow-sm">
-                @else
-                    <div class="flex size-24 items-center justify-center rounded-full border-2 border-brand-500 bg-brand-100 text-2xl font-bold uppercase tracking-wider text-brand-800 shadow-sm" aria-label="Avatar inisial: {{ $user->initials() }}">
-                        {{ $user->initials() }}
-                    </div>
-                @endif
-            </div>
+        <div class="flex flex-col items-center">
+            @if ($user->avatarUrl())
+                <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="size-24 rounded-full object-cover">
+            @else
+                <div class="flex size-24 items-center justify-center rounded-full bg-brand-100 text-2xl font-bold uppercase text-brand-800" aria-label="Avatar inisial: {{ $user->initials() }}">
+                    {{ $user->initials() }}
+                </div>
+            @endif
+            <button type="button" data-open="foto" class="mt-2 text-sm font-semibold text-brand-600">Ganti foto</button>
+        </div>
+
+        <form id="form-profil" method="POST" action="{{ route('account.update') }}" class="space-y-4">
+            @csrf
+            @method('PUT')
+
+            <label class="block">
+                <span class="text-sm font-semibold">Nama</span>
+                <input type="text" name="name" value="{{ old('name', $user->name) }}" required minlength="3" maxlength="150" autocomplete="name" class="{{ $kolom }}">
+            </label>
+
+            <label class="block">
+                <span class="text-sm font-semibold">Email</span>
+                <input type="email" value="{{ $user->email }}" disabled class="{{ $kolom }} cursor-not-allowed bg-slate-50 text-slate-500">
+            </label>
+
+            <label class="block">
+                <span class="text-sm font-semibold">Nomor HP</span>
+                <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}" minlength="11" maxlength="12" inputmode="numeric" pattern="[0-9]{11,12}"
+                       title="Isi 11 sampai 12 angka, tanpa spasi" autocomplete="tel" placeholder="08xxxxxxxxxx"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="{{ $kolom }}">
+            </label>
 
             <div>
-                <h2 class="text-base font-bold text-ink">{{ $user->name }}</h2>
-                <p class="text-xs text-slate-400">Pilih foto yang jelas agar mudah dikenali pembeli & penjual</p>
+                <p class="text-sm font-semibold">Lokasi</p>
+                <a href="{{ route('lokasi', ['from' => 'profil']) }}" class="mt-1.5 flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-3">
+                    <svg class="size-5 shrink-0 text-slate-500" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+                    <span class="flex-1 font-medium">{{ $lokasi }}</span>
+                    <svg class="size-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+                </a>
             </div>
 
-            {{-- Tombol Aksi Avatar --}}
-            <div class="flex flex-wrap items-center justify-center gap-2">
-                <form method="POST" action="{{ route('account.avatar.upload') }}" enctype="multipart/form-data" id="form-avatar">
+            <label class="block">
+                <span class="text-sm font-semibold">Bio <span class="font-normal text-slate-400">(opsional)</span></span>
+                <textarea name="bio" rows="3" maxlength="160" placeholder="Ceritakan sedikit tentang kamu"
+                          class="mt-1.5 w-full resize-none rounded-xl border border-slate-200 px-3 py-3 outline-none focus:border-ink">{{ old('bio', $profil?->bio) }}</textarea>
+            </label>
+
+            <p class="flex gap-2 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
+                <svg class="size-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                Alamat lengkap tidak pernah ditampilkan ke publik. Orang lain hanya melihat nama area dan perkiraan jarak.
+            </p>
+
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+                <button type="submit" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Simpan</button>
+            </div>
+        </form>
+    </main>
+
+    <dialog id="foto" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
+        <div class="p-5">
+            <div class="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200"></div>
+            <h2 class="text-lg font-bold">Foto profil</h2>
+            <div class="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 text-sm font-medium">
+                <form method="POST" action="{{ route('account.avatar.upload') }}" enctype="multipart/form-data">
                     @csrf
-                    <label for="avatar-input" class="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 active:scale-95">
-                        <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                            <circle cx="12" cy="13" r="4"/>
-                        </svg>
-                        <span>{{ $profil?->avatar ? 'Ganti Foto' : 'Unggah Foto' }}</span>
-                        <input id="avatar-input" type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/jpg" class="hidden" onchange="document.getElementById('form-avatar').submit()">
+                    <label class="flex w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left">
+                        <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                        Ambil foto
+                        <input type="file" name="avatar" accept="{{ $tipeFoto }}" capture="environment" class="sr-only" onchange="this.form.submit()">
                     </label>
                 </form>
-
+                <form method="POST" action="{{ route('account.avatar.upload') }}" enctype="multipart/form-data">
+                    @csrf
+                    <label class="flex w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left">
+                        <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>
+                        Pilih dari galeri
+                        <input type="file" name="avatar" accept="{{ $tipeFoto }}" class="sr-only" onchange="this.form.submit()">
+                    </label>
+                </form>
                 @if ($profil?->avatar)
-                    <form method="POST" action="{{ route('account.avatar.delete') }}" id="form-hapus-avatar">
+                    <form method="POST" action="{{ route('account.avatar.delete') }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-white px-4 py-2 text-xs font-semibold text-red-600 shadow-sm transition hover:bg-red-50 active:scale-95" onclick="return confirm('Apakah Anda yakin ingin menghapus foto profil?')">
-                            <svg class="size-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                            </svg>
-                            <span>Hapus Foto</span>
+                        <button type="submit" class="flex w-full items-center gap-3 px-4 py-3.5 text-left text-red-500">
+                            <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+                            Hapus foto
                         </button>
                     </form>
                 @endif
             </div>
-            <p class="text-[11px] text-slate-400">Format yang didukung: JPG, PNG, WEBP (maks. 2 MB)</p>
+            <button type="button" data-close class="mt-3 w-full rounded-full border border-slate-300 py-3 font-semibold">Batal</button>
         </div>
+    </dialog>
 
-        {{-- Form Ubah Data Diri --}}
-        <form method="POST" action="{{ route('account.update') }}" class="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-card">
-            @csrf
-            @method('PUT')
-
-            <div class="border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-ink">Informasi Akun</h3>
-                <p class="text-xs text-slate-500">Perbarui data diri dan kontak yang dapat dihubungi</p>
-            </div>
-
-            {{-- Nama Tampilan --}}
-            <div>
-                <label for="name" class="block text-xs font-semibold text-slate-700">Nama Tampilan <span class="text-red-500">*</span></label>
-                <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required maxlength="150"
-                       placeholder="Masukkan nama tampilan kamu"
-                       class="mt-1.5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
-                @error('name')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            {{-- Bio / Tentang Saya --}}
-            <div>
-                <label for="bio" class="block text-xs font-semibold text-slate-700">Bio Singkat</label>
-                <textarea id="bio" name="bio" rows="3" maxlength="500"
-                          placeholder="Contoh: Sering jual perabot kayu jati bekas terawat & botol kaca siap setor."
-                          class="mt-1.5 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 resize-none">{{ old('bio', $profil?->bio) }}</textarea>
-                <div class="mt-1 flex items-center justify-between text-[11px] text-slate-400">
-                    <span>Akan tampil di profil publikmu</span>
-                    <span>Maks. 500 karakter</span>
-                </div>
-                @error('bio')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            {{-- Nomor WhatsApp / Telepon --}}
-            <div>
-                <label for="phone" class="block text-xs font-semibold text-slate-700">Nomor WhatsApp / HP</label>
-                <div class="relative mt-1.5">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-semibold text-slate-400">ID</span>
-                    <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" maxlength="12" minlength="11"
-                           inputmode="numeric" pattern="[0-9]{11,12}"
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                           placeholder="08xxxxxxxxxx"
-                           class="w-full rounded-xl border border-slate-200 pl-10 pr-4 py-3 text-sm outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
-                </div>
-                <p class="mt-1 text-[11px] text-slate-400">Hanya Boleh Diisi angka</p>
-                @error('phone')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            {{-- Alamat Email (Read-only) --}}
-            <div>
-                <div class="flex items-center justify-between">
-                    <label for="email" class="block text-xs font-semibold text-slate-700">Alamat Email</label>
-                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-brand-700">
-                        <svg class="size-3 text-brand-600" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        Akun Utama
-                    </span>
-                </div>
-                <input type="email" id="email" value="{{ $user->email }}" disabled
-                       class="mt-1.5 w-full cursor-not-allowed rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-500">
-                <p class="mt-1 text-[11px] text-slate-400">Alamat email digunakan untuk login dan pengiriman kode verifikasi.</p>
-            </div>
-
-            {{-- Tombol Submit Form --}}
-            <div class="pt-2 space-y-2">
-                <button type="submit" class="w-full rounded-full bg-ink py-3.5 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-ink/90 active:scale-[.98]">
-                    Simpan Perubahan
-                </button>
-                <a href="{{ route('account') }}" class="block text-center text-xs font-semibold text-slate-500 hover:text-ink py-2 transition">
-                    Batal & Kembali ke Akun
-                </a>
-            </div>
-        </form>
-    </section>
+    @push('scripts')
+        <script>
+            document.querySelectorAll('[data-open]').forEach((tombol) =>
+                tombol.addEventListener('click', () => document.getElementById(tombol.dataset.open)?.showModal()));
+            document.querySelectorAll('dialog').forEach((dialog) =>
+                dialog.addEventListener('click', (e) => {
+                    if (e.target === dialog || e.target.closest('[data-close]')) dialog.close();
+                }));
+        </script>
+    @endpush
 @endcomponent
-
