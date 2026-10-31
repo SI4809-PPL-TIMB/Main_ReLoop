@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class LokasiController extends Controller
@@ -92,13 +93,17 @@ class LokasiController extends Controller
     {
         $c = $request->validate(['latitude' => ['required', 'numeric', 'between:-90,90'], 'longitude' => ['required', 'numeric', 'between:-180,180']]);
 
-        $alamat = Http::timeout(5)->withHeaders(['User-Agent' => config('app.name').' (reloop)'])
+        $res = Http::timeout(5)->withHeaders(['User-Agent' => config('app.name').' (reloop)'])
             ->get('https://nominatim.openstreetmap.org/reverse', [
                 'format' => 'jsonv2', 'zoom' => 16, 'accept-language' => 'id',
                 'lat' => $c['latitude'], 'lon' => $c['longitude'],
-            ])->json('address', []);
+            ]);
+        $alamat = $res->json('address', []);
 
         $kel = $this->cocokkan($alamat);
+        if (! $kel) {
+            Log::info('GPS tidak cocok dengan wilayah', ['status' => $res->status(), 'koordinat' => $c, 'alamat' => $alamat]);
+        }
 
         return $kel
             ? response()->json($this->hasil($kel))
@@ -123,9 +128,14 @@ class LokasiController extends Controller
         $skor = fn (WilayahKelurahan $k) => (int) in_array($norm($k->kecamatan->nama), $kand, true)
             + (int) ($county !== '' && str_contains($norm($k->kecamatan->kabupaten->nama), $county));
 
+        // tag paling spesifik dulu: nama desa yang sama dengan kecamatan ("Dayeuhkolot") kalah dari village
+        $urut = array_map($norm, array_filter(array_map(fn ($t) => $alamat[$t] ?? null, ['village', 'suburb', 'neighbourhood', 'quarter', 'hamlet', 'city_district', 'town', 'municipality'])));
+        $prioritas = fn (WilayahKelurahan $k) => (int) array_search($norm($k->nama), array_values($urut), true);
+
         return WilayahKelurahan::with('kecamatan.kabupaten.provinsi')
             ->whereRaw("REPLACE(LOWER(nama), ' ', '') in (".implode(',', array_fill(0, count($kand), '?')).')', $kand)
-            ->get()->filter(fn ($k) => $skor($k) > 0)->sortByDesc($skor)->first();
+            ->get()->filter(fn ($k) => $skor($k) > 0)
+            ->sortByDesc(fn ($k) => $skor($k) * 100 - $prioritas($k))->first();
     }
 
     private function opsi($m): array
