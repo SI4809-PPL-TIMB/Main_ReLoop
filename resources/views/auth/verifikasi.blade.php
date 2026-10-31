@@ -93,7 +93,7 @@
                 </button>
             </p>
 
-            <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
                 <button id="lanjut"
                         type="submit"
                         class="w-full rounded-full bg-ink py-3.5 font-semibold text-white disabled:opacity-40"
