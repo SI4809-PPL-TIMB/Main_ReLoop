@@ -13,7 +13,7 @@ class PasswordResetCode extends Notification
     /**
      * Kode OTP 6 digit untuk atur ulang kata sandi.
      */
-    public function __construct(private readonly string $code) {}
+    public function __construct(public readonly string $code) {}
 
     public function via(object $notifiable): array
     {
