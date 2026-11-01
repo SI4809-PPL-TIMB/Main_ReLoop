@@ -57,6 +57,14 @@
     border-color: #ef4444 !important;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
 /* Animasi halus untuk interaksi. Opacity/warna saja pada pembungkus, supaya elemen fixed tidak bergeser. */
 @keyframes reloop-fade-in { from { opacity: 0; } }
 @keyframes reloop-reveal { from { opacity: 0; transform: translateY(-4px); } }

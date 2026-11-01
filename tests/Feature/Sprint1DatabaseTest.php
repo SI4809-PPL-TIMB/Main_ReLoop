@@ -100,13 +100,13 @@ class Sprint1DatabaseTest extends TestCase
     }
 
     /**
-     * Uji 3: CategorySeeder mengisi tepat 7 kategori barang bekas sesuai kriteria penerimaan.
+     * Uji 3: CategorySeeder mengisi 7 kategori barang bekas dan 5 kategori sampah daur ulang.
      */
     public function test_category_seeder_populates_seven_categories(): void
     {
         $this->seed(CategorySeeder::class);
 
-        $expectedCategories = [
+        $expectedBekas = [
             'perabot'    => 'Perabot',
             'pakaian'    => 'Pakaian',
             'buku'       => 'Buku',
@@ -116,14 +116,37 @@ class Sprint1DatabaseTest extends TestCase
             'gadget'     => 'Gadget',
         ];
 
-        $this->assertSame(7, Category::count());
+        $expectedDaurUlang = [
+            'plastik'          => 'Plastik',
+            'kertas'           => 'Kertas',
+            'logam'            => 'Logam',
+            'kaca'             => 'Kaca',
+            'elektronik-bekas' => 'Elektronik bekas',
+        ];
 
-        foreach ($expectedCategories as $slug => $name) {
+        $this->assertSame(7, Category::bekas()->count());
+        $this->assertSame(5, Category::daurUlang()->count());
+        $this->assertSame(12, Category::count());
+
+        foreach ($expectedBekas as $slug => $name) {
             $this->assertDatabaseHas('categories', [
                 'slug' => $slug,
                 'name' => $name,
+                'type' => 'bekas',
             ]);
         }
+
+        foreach ($expectedDaurUlang as $slug => $name) {
+            $this->assertDatabaseHas('categories', [
+                'slug' => $slug,
+                'name' => $name,
+                'type' => 'daur_ulang',
+            ]);
+        }
+
+        // Uji keidempotensian: jalankan ulang seeder, jumlah data harus tetap 12
+        $this->seed(CategorySeeder::class);
+        $this->assertSame(12, Category::count());
     }
 
     /**

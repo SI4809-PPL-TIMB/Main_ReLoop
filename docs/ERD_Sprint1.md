@@ -66,14 +66,15 @@
 | `created_at` / `updated_at` | TIMESTAMP |                           |
 
 ### 7. `categories`
-| Kolom      | Tipe          | Keterangan               |
-|------------|---------------|--------------------------|
-| `id`       | BIGINT PK AI  |                          |
-| `name`     | VARCHAR(100)  |                          |
-| `slug`     | VARCHAR(100)  | UNIQUE                   |
-| `icon`     | VARCHAR(255)  | path ikon, nullable      |
-| `sort_order` | TINYINT     | DEFAULT 0                |
-| `created_at` / `updated_at` | TIMESTAMP |             |
+| Kolom      | Tipe          | Keterangan                             |
+|------------|---------------|----------------------------------------|
+| `id`       | BIGINT PK AI  |                                        |
+| `name`     | VARCHAR(100)  |                                        |
+| `slug`     | VARCHAR(100)  | UNIQUE                                 |
+| `type`     | ENUM          | 'bekas', 'daur_ulang', DEFAULT 'bekas' |
+| `icon`     | VARCHAR(255)  | nama/path ikon, nullable               |
+| `sort_order` | TINYINT     | DEFAULT 0                              |
+| `created_at` / `updated_at` | TIMESTAMP |                            |
 
 ### 8. `listings`
 | Kolom            | Tipe           | Keterangan                                             |
