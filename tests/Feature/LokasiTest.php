@@ -58,12 +58,18 @@ class LokasiTest extends TestCase
         $kel = WilayahKelurahan::where('nama', 'Katulampa')->first();
 
         $this->actingAs($this->user)->post('/lokasi', [
-            'kelurahan_id' => $kel->id, 'latitude' => -6.6, 'longitude' => 106.82, 'patokan' => 'Gg. Melati',
+            'kelurahan_id' => $kel->id, 'latitude' => -6.6, 'longitude' => 106.82, 'patokan' => 'Gg. Melati', 'from' => 'profil',
         ])->assertRedirect('/profil');
 
         $this->assertDatabaseHas('profiles', ['user_id' => $this->user->id, 'kelurahan_id' => $kel->id, 'latitude' => -6.6, 'patokan' => 'Gg. Melati']);
         $this->get('/profil')->assertSee('Katulampa, Bogor Timur');
         $this->get('/profil/ubah')->assertSee('Katulampa, Bogor Timur, Kabupaten Bogor');
+    }
+
+    public function test_simpan_lokasi_onboarding_ke_beranda(): void
+    {
+        $kel = WilayahKelurahan::first();
+        $this->actingAs($this->user)->post('/lokasi', ['kelurahan_id' => $kel->id])->assertRedirect('/beranda');
     }
 
     public function test_simpan_lokasi_dua_kali_memperbarui_profil(): void
