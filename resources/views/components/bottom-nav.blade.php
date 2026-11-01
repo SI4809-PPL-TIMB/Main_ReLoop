@@ -3,7 +3,7 @@
 @php
     // Ikon dan gaya mengikuti ui/js/app.js (NAV_ICONS). Aktif = stroke hijau Reloop, label gelap.
     $tabs = [
-        'home' => ['label' => 'Beranda', 'href' => '/', 'icon' => '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>'],
+        'home' => ['label' => 'Beranda', 'href' => '/beranda', 'icon' => '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>'],
         'search' => ['label' => 'Cari', 'href' => '/cari', 'icon' => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'],
         'list' => ['label' => 'Aktivitas', 'href' => '/aktivitas', 'icon' => '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/>'],
         'chat' => ['label' => 'Pesan', 'href' => '/pesan', 'icon' => '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>'],

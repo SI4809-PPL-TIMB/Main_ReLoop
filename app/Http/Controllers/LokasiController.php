@@ -35,6 +35,7 @@ class LokasiController extends Controller
                 'kelurahan' => $this->opsi($kel),
             ] : null,
             'dariProfil' => $request->query('from') === 'profil',
+            'from'       => $request->query('from'),
         ]);
     }
 
@@ -52,7 +53,8 @@ class LokasiController extends Controller
 
         $request->user()->profile()->updateOrCreate([], $data);
 
-        return redirect()->route('account')->with('success', 'Lokasi tersimpan.');
+        // dari profil kembali ke profil; onboarding dan beranda ke beranda
+        return redirect()->route($request->input('from') === 'profil' ? 'account' : 'beranda')->with('success', 'Lokasi tersimpan.');
     }
 
     /** Daftar anak satu level, untuk kaskade provinsi > kab/kota > kecamatan > desa. */

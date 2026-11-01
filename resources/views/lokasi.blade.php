@@ -3,7 +3,7 @@
 
     <x-slot name="header">
         <header class="sticky top-0 z-20 flex items-center justify-between gap-3 bg-white px-4 py-4">
-            <a href="{{ $dariProfil ? route('account') : route('selesai') }}" aria-label="Kembali"
+            <a href="{{ $dariProfil ? route('account') : ($from === 'beranda' ? route('beranda') : route('selesai')) }}" aria-label="Kembali"
                class="grid size-10 place-items-center rounded-full border border-slate-200">
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
             </a>
@@ -17,6 +17,7 @@
           data-url-anak="{{ url('/wilayah') }}" data-url-cari="{{ route('wilayah.cari') }}" data-url-gps="{{ route('lokasi.gps') }}"
           data-pilihan='@json($pilihan)'>
         @csrf
+        <input type="hidden" name="from" value="{{ $from }}">
 
         <div>
             <img src="{{ asset('assets/illust/auth/location.png') }}" alt="Temukan barang dan pengepul di sekitar lokasi" width="128" height="96" class="mb-4 h-24 w-full object-contain">
