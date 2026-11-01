@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class LokasiController extends Controller
@@ -92,23 +93,49 @@ class LokasiController extends Controller
     {
         $c = $request->validate(['latitude' => ['required', 'numeric', 'between:-90,90'], 'longitude' => ['required', 'numeric', 'between:-180,180']]);
 
-        $alamat = Http::timeout(5)->withHeaders(['User-Agent' => config('app.name').' (reloop)'])
+        $res = Http::timeout(5)->withHeaders(['User-Agent' => config('app.name').' (reloop)'])
             ->get('https://nominatim.openstreetmap.org/reverse', [
                 'format' => 'jsonv2', 'zoom' => 16, 'accept-language' => 'id',
                 'lat' => $c['latitude'], 'lon' => $c['longitude'],
-            ])->json('address', []);
+            ]);
+        $alamat = $res->json('address', []);
 
-        // shortcut: cocokkan nama desa+kecamatan saja, belum pakai jarak ke titik pusat desa. Upgrade bila tabel wilayah punya koordinat.
-        $desa = $alamat['village'] ?? $alamat['suburb'] ?? $alamat['neighbourhood'] ?? null;
-        $kec = $alamat['city_district'] ?? $alamat['municipality'] ?? $alamat['county'] ?? null;
-        $kel = $desa ? WilayahKelurahan::with('kecamatan.kabupaten.provinsi')
-            ->where('nama', $desa)
-            ->when($kec, fn ($q) => $q->whereHas('kecamatan', fn ($k) => $k->where('nama', 'like', '%'.preg_replace('/^(Kecamatan|Kec\.)\s*/i', '', $kec).'%')))
-            ->first() : null;
+        $kel = $this->cocokkan($alamat);
+        if (! $kel) {
+            Log::info('GPS tidak cocok dengan wilayah', ['status' => $res->status(), 'koordinat' => $c, 'alamat' => $alamat]);
+        }
 
         return $kel
             ? response()->json($this->hasil($kel))
             : response()->json(['message' => 'Daerah belum terdaftar. Pilih manual.'], 404);
+    }
+
+    /**
+     * OSM di Indonesia tidak konsisten: nama desa bisa ada di village/suburb/city_district/hamlet,
+     * dan kadang berejaan beda ("Catur Tunggal"). Jadi semua nilai alamat jadi kandidat, dibandingkan
+     * tanpa spasi/huruf besar, lalu dipilih desa yang kecamatan atau kab/kotanya juga ikut cocok.
+     * shortcut: tanpa jarak ke titik pusat desa; upgrade bila tabel wilayah punya koordinat.
+     */
+    private function cocokkan(array $alamat): ?WilayahKelurahan
+    {
+        $norm = fn ($s) => preg_replace('/[^a-z0-9]/', '', mb_strtolower((string) $s));
+        $kand = array_values(array_unique(array_filter(array_map($norm, array_diff_key($alamat, array_flip(['road', 'postcode', 'country', 'country_code', 'state', 'ISO3166-2-lvl4']))))));
+        if (! $kand) {
+            return null;
+        }
+        $county = $norm($alamat['county'] ?? $alamat['city'] ?? $alamat['regency'] ?? '');
+
+        $skor = fn (WilayahKelurahan $k) => (int) in_array($norm($k->kecamatan->nama), $kand, true)
+            + (int) ($county !== '' && str_contains($norm($k->kecamatan->kabupaten->nama), $county));
+
+        // tag paling spesifik dulu: nama desa yang sama dengan kecamatan ("Dayeuhkolot") kalah dari village
+        $urut = array_map($norm, array_filter(array_map(fn ($t) => $alamat[$t] ?? null, ['village', 'suburb', 'neighbourhood', 'quarter', 'hamlet', 'city_district', 'town', 'municipality'])));
+        $prioritas = fn (WilayahKelurahan $k) => (int) array_search($norm($k->nama), array_values($urut), true);
+
+        return WilayahKelurahan::with('kecamatan.kabupaten.provinsi')
+            ->whereRaw("REPLACE(LOWER(nama), ' ', '') in (".implode(',', array_fill(0, count($kand), '?')).')', $kand)
+            ->get()->filter(fn ($k) => $skor($k) > 0)
+            ->sortByDesc(fn ($k) => $skor($k) * 100 - $prioritas($k))->first();
     }
 
     private function opsi($m): array

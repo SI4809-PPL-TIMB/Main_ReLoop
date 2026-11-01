@@ -10,7 +10,7 @@
                 <path d="m15 18-6-6 6-6"/>
             </svg>
         </a>
-        <p class="text-xs font-semibold text-loop">Langkah 1 dari 2</p>
+        <p class="text-xs font-semibold text-brand-700">Langkah 1 dari 2</p>
     </header>
 
     <main>
@@ -162,7 +162,7 @@
     </main>
 
     {{-- Tombol fixed di bawah (persis mockup) --}}
-    <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white
+    <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white
                 px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))]">
         <button
             id="btn-daftar"

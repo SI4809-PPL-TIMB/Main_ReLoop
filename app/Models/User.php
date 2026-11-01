@@ -42,6 +42,30 @@ class User extends Authenticatable
         return $this->hasOne(Profile::class);
     }
 
+    // --- Helper Profil & Avatar ---
+
+    /**
+     * Ambil inisial nama pengguna (maksimal 2 karakter huruf kapital).
+     */
+    public function initials(): string
+    {
+        $words = preg_split('/\s+/', trim($this->name ?? ''));
+        $initials = '';
+        foreach (array_slice($words, 0, 2) as $word) {
+            $initials .= mb_substr($word, 0, 1);
+        }
+
+        return mb_strtoupper($initials ?: 'U');
+    }
+
+    /**
+     * Ambil URL publik avatar pengguna jika ada.
+     */
+    public function avatarUrl(): ?string
+    {
+        return $this->profile?->avatar ? asset('storage/' . $this->profile->avatar) : null;
+    }
+
     public function listings(): HasMany
     {
         return $this->hasMany(Listing::class);

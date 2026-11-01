@@ -62,7 +62,8 @@ class LokasiTest extends TestCase
         ])->assertRedirect('/profil');
 
         $this->assertDatabaseHas('profiles', ['user_id' => $this->user->id, 'kelurahan_id' => $kel->id, 'latitude' => -6.6, 'patokan' => 'Gg. Melati']);
-        $this->get('/profil')->assertSee('Katulampa, Bogor Timur, Kabupaten Bogor, Jawa Barat');
+        $this->get('/profil')->assertSee('Katulampa, Bogor Timur');
+        $this->get('/profil/ubah')->assertSee('Katulampa, Bogor Timur, Kabupaten Bogor');
     }
 
     public function test_simpan_lokasi_dua_kali_memperbarui_profil(): void
@@ -89,6 +90,14 @@ class LokasiTest extends TestCase
         Http::fake(['nominatim.openstreetmap.org/*' => Http::response(['address' => ['suburb' => 'Katulampa', 'city_district' => 'Bogor Timur']])]);
         $this->actingAs($this->user)->postJson('/lokasi/gps', ['latitude' => -6.6, 'longitude' => 106.82])
             ->assertOk()->assertJsonPath('kelurahan.nama', 'Katulampa');
+    }
+
+    public function test_gps_mengenali_ejaan_dan_tag_osm_yang_berbeda(): void
+    {
+        $this->artisan('wilayah:impor', ['file' => database_path('data/wilayah.csv')]);
+        Http::fake(['nominatim.openstreetmap.org/*' => Http::response(['address' => ['city_district' => 'Catur Tunggal', 'village' => 'Depok', 'county' => 'Sleman', 'state' => 'Daerah Istimewa Yogyakarta']])]);
+        $this->actingAs($this->user)->postJson('/lokasi/gps', ['latitude' => -7.77, 'longitude' => 110.37])
+            ->assertOk()->assertJsonPath('kelurahan.nama', 'Caturtunggal')->assertJsonPath('kabupaten.nama', 'Kabupaten Sleman');
     }
 
     public function test_gps_di_luar_data_wilayah_minta_pilih_manual(): void
