@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>ReLoop · Pilih Kategori</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white pb-44">
+  <!-- Header, kartu radio, dan tombol mengikuti mockup pasang-barang.html. -->
+  <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-100 bg-white px-4 py-4">
+    <a href="beranda.html" aria-label="Kembali ke beranda" class="grid size-10 place-items-center rounded-full border border-slate-200">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <h1 class="flex-1 text-xl font-bold">Pilih Kategori</h1>
+  </header>
+  <form id="pilih-kategori" class="space-y-5 px-4 pt-4">
+    <p class="text-sm text-slate-500">Mau jual barang atau setor daur ulang?</p>
+    <fieldset><legend class="text-sm font-semibold">Pilih jenis barang</legend><div class="mt-3 grid grid-cols-2 gap-3"><label class="relative cursor-pointer"><input type="radio" name="tipe" value="bekas" required class="peer sr-only"><span class="flex h-full flex-col items-center gap-2 rounded-2xl border border-slate-200 px-3 pb-4 pt-5 text-center peer-checked:border-ink peer-checked:bg-slate-50 peer-checked:ring-1 peer-checked:ring-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink"><img src="../public/assets/illust/categories/perabot.png" class="mb-1 size-16 object-contain" width="64" height="64" alt=""><span class="text-sm font-semibold">Barang Bekas</span><span class="text-xs leading-relaxed text-slate-500">Jual barang yang masih layak pakai.</span></span></label>
+<label class="relative cursor-pointer"><input type="radio" name="tipe" value="daur_ulang" required class="peer sr-only"><span class="flex h-full flex-col items-center gap-2 rounded-2xl border border-slate-200 px-3 pb-4 pt-5 text-center peer-checked:border-ink peer-checked:bg-slate-50 peer-checked:ring-1 peer-checked:ring-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink"><img src="../public/assets/illust/categories/plastik.png" class="mb-1 size-16 object-contain" width="64" height="64" alt=""><span class="text-sm font-semibold">Daur Ulang</span><span class="text-xs leading-relaxed text-slate-500">Setor material ke mitra pengepul.</span></span></label></div><p class="mt-4 text-xs leading-relaxed text-slate-500">Kategori detail dipilih di langkah berikutnya.</p></fieldset>
+    <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+      <p id="ringkasan" aria-live="polite" class="mb-3 text-xs text-slate-500">Pilih jenis barang untuk melanjutkan.</p>
+      <button id="lanjut" disabled class="w-full rounded-full bg-ink px-4 py-3.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">Lanjutkan</button>
+    </div>
+  </form>
+</div>
+<script src="js/pilih-kategori.js"></script>
+</body>
+</html>
