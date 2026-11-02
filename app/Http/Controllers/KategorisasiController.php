@@ -6,12 +6,16 @@ use App\Http\Requests\PilihTipeKategoriRequest;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class KategorisasiController extends Controller
 {
-    // Kontrak data sementara; halaman Livewire disambungkan pada 4.1.3.
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse|View
     {
+        if (! $request->expectsJson()) {
+            return view('kategori.index');
+        }
         $counts = Category::query()
             ->selectRaw('type, COUNT(*) AS total')
             ->whereIn('type', array_keys(Category::types()))
@@ -38,19 +42,22 @@ class KategorisasiController extends Controller
     }
 
     // Titik integrasi form 4.2.5. Tidak membuat listing atau menyimpan draft.
-    public function pasangBarang(): JsonResponse
+    public function pasangBarang(Request $request): JsonResponse|View
     {
-        return $this->tujuan(Category::TYPE_BEKAS, 'menunggu_form_4_2');
+        return $this->tujuan($request, Category::TYPE_BEKAS, 'menunggu_form_4_2');
     }
 
     // Pencarian mitra lengkap dikerjakan di 8.3.
-    public function pengepul(): JsonResponse
+    public function pengepul(Request $request): JsonResponse|View
     {
-        return $this->tujuan(Category::TYPE_DAUR_ULANG, 'pencarian_belum_tersedia');
+        return $this->tujuan($request, Category::TYPE_DAUR_ULANG, 'pencarian_belum_tersedia');
     }
 
-    private function tujuan(string $type, string $status): JsonResponse
+    private function tujuan(Request $request, string $type, string $status): JsonResponse|View
     {
+        if (! $request->expectsJson()) {
+            return view('kategori.tujuan', ['tipe' => $type, 'label' => Category::types()[$type]]);
+        }
         // Tipe ditentukan oleh endpoint, bukan parameter URL dari pengguna.
         return response()->json([
             'tipe' => $type,

@@ -58,7 +58,7 @@
             </a>
             @php($aksi = fn ($ikon, $label) => '<span class="grid size-10 place-items-center rounded-full border border-slate-200 bg-white shadow-sm"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$ikon.'</svg></span>'.$label)
             <div data-mode="jual" class="flex gap-4 text-center text-xs font-medium">
-                <a href="#" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M12 5v14M5 12h14"/>', 'Jual') !!}</a>
+                <a href="{{ route('kategori.index') }}" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M12 5v14M5 12h14"/>', 'Jual') !!}</a>
                 <a href="#" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/>', 'Pesanan') !!}</a>
             </div>
             <div data-mode="daur" hidden class="flex gap-4 text-center text-xs font-medium">
