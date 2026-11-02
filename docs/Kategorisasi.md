@@ -23,4 +23,12 @@ Nama tipe berasal dari `Category::types()` dan ketersediaannya dari database 1.3
 
 Alur A menampilkan halaman tunggu sampai form 4.2.5 tersedia, bukan form palsu yang seolah dapat memasang barang. Alur B menampilkan halaman sementara sampai 8.3. Keduanya mempertahankan tipe, bukan kategori detail, sesuai revisi pengguna. Gaya halaman mengikuti mockup 4.1.1 dengan layout Figtree/Tailwind proyek, dua kolom dan shell maksimum 420px.
 
-Tes integrasi: `php artisan test --filter=PilihAlurTest`. Review responsif dan uji silang reviewer tetap perlu dicatat pada 4.1.4.
+Tes integrasi: `php artisan test --filter=PilihAlurTest`. Hasil 4.1.4, batas pengujian, dan panduan uji silang dicatat di `KategorisasiTesting.md`.
+
+## PPLTIMB-58 — Ringkasan fitur 4.1
+
+Alur yang tersedia: Beranda → Jual → pilih Barang Bekas atau Daur Ulang → validasi backend → halaman tujuan sesuai tipe. Kembali ke pilihan mempertahankan tipe. Kategori detail dari story 1.3 dipilih pada fitur tujuan, sesuai revisi desain pengguna menjadi dua pilihan tipe.
+
+Desain 4.1.1, backend 4.1.2, dan integrasi Livewire 4.1.3 tersedia. Pengujian otomatis 4.1.4 lulus: 14 tes khusus (98 assertions), seluruh suite 108 tes (648 assertions). Bukti dan permintaan uji silang ada di `KategorisasiTesting.md` (PPLTIMB-73).
+
+Status story belum dinyatakan selesai: uji silang reviewer masih pending, form Pasang Barang asli menunggu 4.2.5, sedangkan pencarian pengepul penuh tetap lingkup 8.3. Alur A saat ini hanya halaman tunggu dan Alur B halaman sementara. Kriteria awal tentang kategori detail terbawa ke form diganti dengan tipe terbawa sesuai arahan pengguna; perubahan ini perlu tercermin dalam review story.
