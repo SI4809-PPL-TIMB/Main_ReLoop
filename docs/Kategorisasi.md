@@ -14,3 +14,13 @@ Semua endpoint memakai middleware `auth` dan `web` (termasuk CSRF untuk POST).
 Pada 4.1.3, respons data dihubungkan ke halaman Livewire sesuai mockup dan tombol Jual beranda disambungkan ke `kategori.index`. Nama route tujuan dipertahankan saat form 4.2 dan halaman sementara diimplementasikan. Query URL tidak dapat mengganti tipe yang ditentukan endpoint tujuan. Respons validasi mengikuti Laravel: redirect dengan error untuk form biasa, HTTP 422 untuk permintaan JSON.
 
 Validasi backend: `php artisan test --filter=KategorisasiTest`. Tes menggunakan SQLite in-memory; tidak mengubah database aplikasi. Testing UI dan uji silang 4.1.4 belum dikerjakan.
+
+## Integrasi 4.1.3
+
+Permintaan browser sekarang menampilkan halaman Blade dengan komponen Livewire `PilihAlur`. Permintaan JSON tetap mendapat kontrak data 4.1.2. Tombol Jual beranda menuju `kategori.index`. Pilihan radio Livewire memperbarui label tombol; form POST dengan CSRF tetap menggunakan validasi dan redirect backend 4.1.2.
+
+Nama tipe berasal dari `Category::types()` dan ketersediaannya dari database 1.3. Tipe tanpa kategori dinonaktifkan; backend memeriksa ulang ketika form dikirim. Kembali dari tujuan mempertahankan tipe melalui query yang divalidasi saat komponen dimuat.
+
+Alur A menampilkan halaman tunggu sampai form 4.2.5 tersedia, bukan form palsu yang seolah dapat memasang barang. Alur B menampilkan halaman sementara sampai 8.3. Keduanya mempertahankan tipe, bukan kategori detail, sesuai revisi pengguna. Gaya halaman mengikuti mockup 4.1.1 dengan layout Figtree/Tailwind proyek, dua kolom dan shell maksimum 420px.
+
+Tes integrasi: `php artisan test --filter=PilihAlurTest`. Review responsif dan uji silang reviewer tetap perlu dicatat pada 4.1.4.
