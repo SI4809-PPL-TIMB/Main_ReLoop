@@ -1,0 +1,12 @@
+body { -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; } /* utility `flex`/`block` jangan menimpa atribut hidden */
+fieldset { min-width: 0; } /* default min-content melebarkan fieldset dan memecah chip yang bisa di-scroll */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+dialog[open] { animation: sheet-up .22s ease-out; }
+dialog::backdrop { background: rgb(15 23 18 / .45); }
+@keyframes sheet-up { from { transform: translateY(24px); opacity: 0; } }
+
+/* Placeholder foto/ilustrasi: kotak abu + glyph gambar. Ganti dengan <img> final. */
+.ph { background: #f1f5f9 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2.5'/%3E%3Ccircle cx='9' cy='10' r='1.8'/%3E%3Cpath d='m4 18 5-5 4 4 3-3 4 4'/%3E%3C/svg%3E") center / 34px no-repeat; }
+input:user-invalid, select:user-invalid, textarea:user-invalid { border-color: #ef4444 !important; }
