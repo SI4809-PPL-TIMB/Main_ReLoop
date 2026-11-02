@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BerandaController;
+use App\Http\Controllers\KategorisasiController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfilController;
@@ -22,6 +23,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/pilih-kategori', [KategorisasiController::class, 'index'])->name('kategori.index');
+    Route::post('/pilih-kategori', [KategorisasiController::class, 'pilih'])->name('kategori.pilih');
+    Route::get('/pasang-barang', [KategorisasiController::class, 'pasangBarang'])->name('barang.create');
+    Route::get('/pengepul/sementara', [KategorisasiController::class, 'pengepul'])->name('pengepul.sementara');
     Route::get('/profil', [ProfilController::class, 'show'])->name('account');
     Route::get('/profil/ubah', [ProfilController::class, 'edit'])->name('account.edit');
     Route::match(['post', 'put'], '/profil', [ProfilController::class, 'update'])->name('account.update');
