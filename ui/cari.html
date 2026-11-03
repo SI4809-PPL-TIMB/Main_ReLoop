@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Reloop · Cari Barang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white pb-24">
+
+  <!-- (c) Cari dan filter per daerah -->
+  <header class="sticky top-0 z-20 bg-white px-4 pb-3 pt-4">
+    <div class="flex items-center gap-2">
+      <a href="index.html" aria-label="Kembali" class="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200">
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <!-- GET biasa: kirim ke cari.html?q=… -->
+      <form role="search" class="flex flex-1 items-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 focus-within:border-ink">
+        <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" name="q" type="search" value="kursi" enterkeyhint="search" placeholder="Cari barang bekas" class="w-full bg-transparent text-sm outline-none" aria-label="Kata kunci">
+      </form>
+      <button data-open="filter" aria-label="Filter" class="relative grid size-10 shrink-0 place-items-center rounded-full border border-slate-200">
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        <span class="absolute -right-0.5 -top-0.5 grid size-4 place-items-center rounded-full bg-ink text-[10px] font-bold text-white">3</span>
+      </button>
+    </div>
+
+    <!-- Wilayah berjenjang -->
+    <button id="wilayah" data-open="lokasi" class="no-scrollbar mt-3 flex w-full items-center gap-1.5 overflow-x-auto whitespace-nowrap text-xs font-medium text-slate-500">
+      <svg class="size-3.5 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+      Jawa Barat <span>›</span> Kab. Bogor <span>›</span> Ciomas <span>›</span> <b class="font-semibold text-ink">Sukamaju</b>
+    </button>
+  </header>
+
+  <main>
+    <div data-state="loading" data-skeleton="grid" class="mt-2"></div>
+    <div data-state="error" data-blank="Gagal memuat barang" data-desc="Periksa koneksi internetmu, lalu coba lagi."></div>
+    <div data-state="empty" class="px-8 py-12 text-center">
+      <div class="ph mx-auto size-28 rounded-3xl"></div>
+      <p class="mt-4 text-lg font-bold">Barang tidak ditemukan</p>
+      <p class="mt-1 text-sm text-slate-500">Coba kata kunci lain, longgarkan filter, atau perluas daerah pencarian.</p>
+      <button data-open="filter" class="mt-5 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white">Ubah filter</button>
+      <a href="cari.html" class="mt-2 block py-2 text-sm font-semibold text-slate-500">Perluas ke Kab. Bogor</a>
+    </div>
+
+    <div data-state="ok" class="px-4">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3 text-sm">
+      <p><b>24 barang</b> <span class="text-slate-500">di sekitar Sukamaju</span></p>
+      <button data-open="urut" class="flex items-center gap-1 font-semibold"><span data-urut="dekat">Terdekat</span><span data-urut="baru">Terbaru</span><span data-urut="murah">Termurah</span><span data-urut="mahal">Termahal</span>
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button>
+    </div>
+
+    <div id="hasil" class="mt-4 grid grid-cols-2 gap-x-3 gap-y-5">
+      <a href="detail-barang.html" data-km="0.8" data-harga="350000" data-umur="2">
+        <div class="ph relative h-36 rounded-xl"><span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 bg-sky-50 text-sky-700 ring-sky-200">Baik</span></div>
+        <p class="mt-3"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ 4.8</span></p>
+        <p class="mt-2 truncate text-[15px] font-semibold leading-snug">Kursi Kayu Jati Ukir</p>
+        <p class="mt-1.5 flex items-center gap-1 text-xs text-slate-500"><svg class="size-3 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>0,8 km · Sukamaju</p>
+        <p class="mt-2 font-semibold">Rp 350.000</p>
+      </a>
+      <a href="detail-barang.html" data-km="1.1" data-harga="120000" data-umur="5">
+        <div class="ph relative h-36 rounded-xl"><span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 bg-emerald-50 text-emerald-700 ring-emerald-200">Seperti baru</span></div>
+        <p class="mt-3"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ 4.6</span></p>
+        <p class="mt-2 truncate text-[15px] font-semibold leading-snug">Kursi Lipat Kantor (2 pcs)</p>
+        <p class="mt-1.5 flex items-center gap-1 text-xs text-slate-500"><svg class="size-3 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>1,1 km · Sukamaju</p>
+        <p class="mt-2 font-semibold">Rp 120.000</p>
+      </a>
+      <a href="detail-barang.html" data-km="2.3" data-harga="75000" data-umur="1">
+        <div class="ph relative h-36 rounded-xl"><span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 bg-amber-50 text-amber-800 ring-amber-200">Ada minus</span></div>
+        <p class="mt-3"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ 4.9</span></p>
+        <p class="mt-2 truncate text-[15px] font-semibold leading-snug">Kursi Rotan Teras</p>
+        <p class="mt-1.5 flex items-center gap-1 text-xs text-slate-500"><svg class="size-3 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>2,3 km · Laladon</p>
+        <p class="mt-2 font-semibold">Rp 75.000</p>
+      </a>
+      <a href="detail-barang.html" data-km="3.5" data-harga="600000" data-umur="9">
+        <div class="ph relative h-36 rounded-xl"><span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 bg-sky-50 text-sky-700 ring-sky-200">Baik</span></div>
+        <p class="mt-3"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ 4.7</span></p>
+        <p class="mt-2 truncate text-[15px] font-semibold leading-snug">Set Kursi Makan Kayu</p>
+        <p class="mt-1.5 flex items-center gap-1 text-xs text-slate-500"><svg class="size-3 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>3,5 km · Pagelaran</p>
+        <p class="mt-2 font-semibold">Rp 600.000</p>
+      </a>
+    </div>
+    </div>
+  </main>
+
+  <!-- Bottom sheet urutkan -->
+  <dialog id="urut" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
+    <div class="p-5">
+      <div class="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200"></div>
+      <h2 class="text-lg font-bold">Urutkan</h2>
+      <div id="urut-opsi" data-seg="urut" data-on="border-ink ring-1 ring-ink" data-off="border-slate-200" class="mt-3 flex flex-col gap-2 text-sm font-semibold">
+        <button value="dekat" data-close data-toast="Diurutkan: terdekat" class="rounded-2xl border p-3.5 text-left">Terdekat dari lokasimu</button>
+        <button value="baru" data-close data-toast="Diurutkan: terbaru" class="rounded-2xl border p-3.5 text-left">Terbaru diunggah</button>
+        <button value="murah" data-close data-toast="Diurutkan: harga termurah" class="rounded-2xl border p-3.5 text-left">Harga termurah</button>
+        <button value="mahal" data-close data-toast="Diurutkan: harga termahal" class="rounded-2xl border p-3.5 text-left">Harga termahal</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Bottom sheet filter -->
+  <dialog id="filter" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
+    <form method="dialog" class="p-5">
+      <div class="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200"></div>
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold">Filter</h2>
+        <button type="reset" data-toast="Filter dikembalikan" class="text-sm font-semibold text-slate-400">Reset</button>
+      </div>
+
+      <p class="mt-4 text-sm font-semibold">Harga</p>
+      <div class="mt-2 flex items-center gap-2 text-sm">
+        <input class="w-full rounded-xl border border-slate-200 px-3 py-3 font-medium" placeholder="Min" inputmode="numeric" aria-label="Harga minimum">
+        <span class="text-slate-400">–</span>
+        <input class="w-full rounded-xl border border-slate-200 px-3 py-3 font-medium" placeholder="Maks" value="500.000" inputmode="numeric" aria-label="Harga maksimum">
+      </div>
+
+      <p class="mt-4 text-sm font-semibold">Kondisi</p>
+      <div class="mt-2 flex flex-wrap gap-2 text-sm font-medium">
+        <label class="relative cursor-pointer"><input type="checkbox" class="peer sr-only" checked><span class="block rounded-full bg-slate-100 px-4 py-2 peer-checked:bg-ink peer-checked:text-white">Seperti baru</span></label>
+        <label class="relative cursor-pointer"><input type="checkbox" class="peer sr-only" checked><span class="block rounded-full bg-slate-100 px-4 py-2 peer-checked:bg-ink peer-checked:text-white">Baik</span></label>
+        <label class="relative cursor-pointer"><input type="checkbox" class="peer sr-only"><span class="block rounded-full bg-slate-100 px-4 py-2 peer-checked:bg-ink peer-checked:text-white">Ada minus</span></label>
+      </div>
+
+      <button data-toast="Filter diterapkan" class="mt-6 w-full rounded-full bg-ink py-3.5 font-semibold text-white">Tampilkan 24 barang</button>
+    </form>
+  </dialog>
+
+  <!-- Cari lokasi -->
+  <dialog id="lokasi" class="m-0 h-full max-h-full w-full max-w-[420px] p-0 sm:mx-auto">
+    <div class="flex h-full flex-col bg-white px-4 pt-4">
+      <div class="flex items-center gap-3">
+        <button type="button" data-close aria-label="Kembali" class="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <h2 class="text-base font-bold">Cari lokasi</h2>
+      </div>
+      <div class="mt-4 flex items-center gap-2 rounded-xl bg-slate-100 px-3">
+        <svg class="size-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="lok-q" type="search" placeholder="Cari desa, kecamatan, atau kota" class="w-full bg-transparent py-3 text-sm font-medium outline-none" autocomplete="off">
+      </div>
+      <button type="button" id="lok-gps" class="mt-3 flex items-center gap-2 border-b border-slate-100 pb-3 text-sm font-semibold text-brand-600">
+        <svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+        Gunakan lokasi saya
+      </button>
+      <p class="mt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Hasil pencarian</p>
+      <div id="lok-list" class="no-scrollbar flex-1 overflow-y-auto">
+        <button type="button" data-p="Jawa Barat|Kab. Bogor|Ciomas|Sukamaju" class="flex w-full flex-col items-start border-b border-slate-100 py-3 text-left"><span class="text-sm font-semibold">Sukamaju</span><span class="text-xs text-slate-500">Ciomas, Kab. Bogor, Jawa Barat</span></button>
+        <button type="button" data-p="Jawa Barat|Kab. Bogor|Ciomas|Laladon" class="flex w-full flex-col items-start border-b border-slate-100 py-3 text-left"><span class="text-sm font-semibold">Laladon</span><span class="text-xs text-slate-500">Ciomas, Kab. Bogor, Jawa Barat</span></button>
+        <button type="button" data-p="Jawa Barat|Kab. Bogor|Ciomas|Pagelaran" class="flex w-full flex-col items-start border-b border-slate-100 py-3 text-left"><span class="text-sm font-semibold">Pagelaran</span><span class="text-xs text-slate-500">Ciomas, Kab. Bogor, Jawa Barat</span></button>
+        <button type="button" data-p="Jawa Barat|Kab. Bogor|Dramaga|Dramaga" class="flex w-full flex-col items-start border-b border-slate-100 py-3 text-left"><span class="text-sm font-semibold">Dramaga</span><span class="text-xs text-slate-500">Dramaga, Kab. Bogor, Jawa Barat</span></button>
+        <button type="button" data-p="Jawa Barat|Kab. Bogor|Tamansari|Tamansari" class="flex w-full flex-col items-start border-b border-slate-100 py-3 text-left"><span class="text-sm font-semibold">Tamansari</span><span class="text-xs text-slate-500">Tamansari, Kab. Bogor, Jawa Barat</span></button>
+        <button type="button" data-p="Jawa Barat|Kota Bogor|Tanah Sareal|Tanah Sareal" class="flex w-full flex-col items-start border-b border-slate-100 py-3 text-left"><span class="text-sm font-semibold">Tanah Sareal</span><span class="text-xs text-slate-500">Kota Bogor, Jawa Barat</span></button>
+        <button type="button" data-p="Jawa Barat|Kota Depok|Beji|Beji" class="flex w-full flex-col items-start border-b border-slate-100 py-3 text-left"><span class="text-sm font-semibold">Beji</span><span class="text-xs text-slate-500">Kota Depok, Jawa Barat</span></button>
+        <p id="lok-kosong" hidden class="py-10 text-center text-sm text-slate-500">Lokasi tidak ditemukan. Coba nama desa atau kecamatan lain.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <nav id="bottom-nav" data-active="search"></nav>
+</div>
+<script src="js/app.js?v=3"></script>
+<script>
+  // Kata kunci dari ?q= dan urutan hasil (mockup; di Laravel diurutkan query server)
+  if (params.has('q')) document.getElementById('q').value = params.get('q');
+  const hasil = document.getElementById('hasil');
+  const kunci = { dekat: (a) => +a.dataset.km, baru: (a) => +a.dataset.umur, murah: (a) => +a.dataset.harga, mahal: (a) => -a.dataset.harga };
+  const urutkan = (v) => [...hasil.children].sort((a, b) => kunci[v](a) - kunci[v](b)).forEach((a) => hasil.append(a));
+  document.getElementById('urut-opsi').addEventListener('click', (e) => e.target.closest('button[value]') && urutkan(e.target.closest('button[value]').value));
+  urutkan(segs.urut || 'dekat');
+
+  // Cari lokasi: saring daftar, pilih -> perbarui breadcrumb (di Laravel: endpoint wilayah)
+  const lok = document.getElementById('lokasi'), lq = document.getElementById('lok-q');
+  const items = [...document.querySelectorAll('#lok-list [data-p]')];
+  const pilih = (p) => {
+    document.getElementById('wilayah').innerHTML = '<svg class="size-3.5 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg> '
+      + p.split('|').map((x, i, a) => i === a.length - 1 ? '<b class="font-semibold text-ink">' + x + '</b>' : x + ' <span>›</span> ').join(' ');
+    lok.close();
+  };
+  lq.addEventListener('input', () => {
+    const k = lq.value.trim().toLowerCase();
+    items.forEach((b) => b.hidden = !b.textContent.toLowerCase().includes(k));
+    document.getElementById('lok-kosong').hidden = items.some((b) => !b.hidden);
+  });
+  items.forEach((b) => b.addEventListener('click', () => pilih(b.dataset.p)));
+  document.getElementById('lok-gps').addEventListener('click', () => pilih(items[0].dataset.p));
+</script>
+</body>
+</html>
+
