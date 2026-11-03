@@ -107,7 +107,7 @@
                     @foreach (\App\Models\Listing::KONDISI as $kode => [$label, $ket])
                         <label class="relative cursor-pointer">
                             <input type="radio" name="condition" value="{{ $kode }}" class="peer sr-only" @checked($nilai('condition') === $kode)>
-                            <span class="flex h-full flex-col items-center gap-0.5 rounded-2xl border border-slate-200 px-2 py-3.5 text-center peer-checked:border-ink peer-checked:ring-1 peer-checked:ring-ink"><span class="text-sm font-semibold">{{ $label }}</span><span class="text-[11px] leading-tight text-slate-500">{{ $ket }}</span></span>
+                            <span class="flex h-full flex-col items-center gap-0.5 rounded-2xl border border-slate-200 px-2 py-3.5 text-center peer-checked:border-ink peer-checked:bg-slate-50 peer-checked:ring-1 peer-checked:ring-ink"><img src="{{ asset('assets/illust/conditions/'.str_replace('_', '-', $kode).'.png') }}" alt="" width="44" height="44" class="mb-2 size-11 object-contain"><span class="text-sm font-semibold">{{ $label }}</span><span class="text-[11px] leading-snug text-slate-500">{{ $ket }}</span></span>
                         </label>
                     @endforeach
                 </div>

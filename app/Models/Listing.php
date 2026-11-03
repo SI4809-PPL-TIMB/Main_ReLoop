@@ -16,9 +16,9 @@ class Listing extends Model
     public const DIHAPUS = 'dihapus';
 
     public const KONDISI = [
-        'seperti_baru' => ['Seperti baru', 'Hampir tidak ada bekas pakai'],
-        'baik'         => ['Baik', 'Normal, masih nyaman dipakai'],
-        'ada_minus'    => ['Ada minus', 'Ada kekurangan, tulis di catatan'],
+        'seperti_baru' => ['Seperti baru', 'Hampir tanpa bekas'],
+        'baik'         => ['Baik', 'Wajar dipakai'],
+        'ada_minus'    => ['Ada minus', 'Ada cacat kecil'],
     ];
 
     public const MAKS_FOTO = 5;
