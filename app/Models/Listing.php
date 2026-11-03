@@ -64,6 +64,26 @@ class Listing extends Model
     }
 
     /**
+     * Cari di judul dan deskripsi barang aktif (5.1.3).
+     */
+    public function scopeCari($query, ?string $keyword)
+    {
+        $query->where('listings.status', self::AKTIF);
+
+        $keyword = trim((string) $keyword);
+        if ($keyword === '') {
+            return $query;
+        }
+
+        $escaped = '%' . addcslashes($keyword, '%_\\') . '%';
+
+        return $query->where(function ($q) use ($escaped) {
+            $q->where('listings.title', 'like', $escaped)
+              ->orWhere('listings.description', 'like', $escaped);
+        });
+    }
+
+    /**
      * Urutkan barang dari yang terdekat dengan lokasi pembeli (titik + desa yang disimpan di 3.1).
      * Titik barang = titik profil penjual, karena barang mewarisi lokasi penjual saat dipasang.
      *
