@@ -124,9 +124,9 @@ class Sprint1DatabaseTest extends TestCase
             'elektronik-bekas' => 'Elektronik bekas',
         ];
 
-        $this->assertSame(7, Category::bekas()->count());
+        $this->assertSame(8, Category::bekas()->count());
         $this->assertSame(5, Category::daurUlang()->count());
-        $this->assertSame(12, Category::count());
+        $this->assertSame(13, Category::count());
 
         foreach ($expectedBekas as $slug => $name) {
             $this->assertDatabaseHas('categories', [
@@ -146,7 +146,7 @@ class Sprint1DatabaseTest extends TestCase
 
         // Uji keidempotensian: jalankan ulang seeder, jumlah data harus tetap 12
         $this->seed(CategorySeeder::class);
-        $this->assertSame(12, Category::count());
+        $this->assertSame(13, Category::count());
     }
 
     /**

@@ -9,6 +9,20 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Listing extends Model
 {
+    public const AKTIF = 'aktif';
+    public const DIPESAN = 'dipesan';
+    public const TERJUAL = 'terjual';
+    public const DRAFT = 'draft';
+    public const DIHAPUS = 'dihapus';
+
+    public const KONDISI = [
+        'seperti_baru' => ['Seperti baru', 'Hampir tanpa bekas'],
+        'baik'         => ['Baik', 'Wajar dipakai'],
+        'ada_minus'    => ['Ada minus', 'Ada cacat kecil'],
+    ];
+
+    public const MAKS_FOTO = 5;
+
     protected $fillable = [
         'user_id',
         'category_id',
@@ -35,6 +49,11 @@ class Listing extends Model
             'is_negotiable' => 'boolean',
             'published_at' => 'datetime',
         ];
+    }
+
+    public function scopeMilik($query, User $user)
+    {
+        return $query->where('user_id', $user->id)->where('status', '!=', self::DIHAPUS);
     }
 
     public function user(): BelongsTo

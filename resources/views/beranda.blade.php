@@ -59,7 +59,7 @@
             @php($aksi = fn ($ikon, $label) => '<span class="grid size-10 place-items-center rounded-full border border-slate-200 bg-white shadow-sm"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$ikon.'</svg></span>'.$label)
             <div data-mode="jual" class="flex gap-4 text-center text-xs font-medium">
                 <a href="{{ route('kategori.index') }}" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M12 5v14M5 12h14"/>', 'Jual') !!}</a>
-                <a href="#" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/>', 'Pesanan') !!}</a>
+                <a href="{{ route('barang.index') }}" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/>', 'Barang saya') !!}</a>
             </div>
             <div data-mode="daur" hidden class="flex gap-4 text-center text-xs font-medium">
                 <a href="#" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M12 19V5M6 11l6-6 6 6"/>', 'Setor') !!}</a>
@@ -83,7 +83,7 @@
         <section data-mode="jual" class="relative overflow-hidden rounded-2xl border border-slate-200 bg-[#f7f8f5] p-4">
             <p class="max-w-[62%] text-2xl font-bold leading-tight text-orange-500">Mulai jualan</p>
             <p class="mt-0.5 max-w-[62%] text-sm font-medium">Dana aman sampai barang diterima pembeli</p>
-            <a href="#" class="mt-3 inline-block rounded-full bg-ink px-4 py-2 text-xs font-bold uppercase tracking-wide text-white">Pasang sekarang</a>
+            <a href="{{ route('barang.create') }}" class="mt-3 inline-block rounded-full bg-ink px-4 py-2 text-xs font-bold uppercase tracking-wide text-white">Pasang sekarang</a>
             <img src="{{ asset('assets/illust/promo-jual.png') }}" class="absolute right-4 top-1/2 size-28 -translate-y-1/2 object-contain" width="112" height="112" alt="">
         </section>
 
@@ -111,7 +111,7 @@
             <div class="no-scrollbar -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1">
                 @foreach ($barang as $b)
                     <a href="#" class="w-40 shrink-0">
-                        <div class="ph relative h-36 rounded-xl"><span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 {{ $b['kondisi'][1] }}">{{ $b['kondisi'][0] }}</span></div>
+                        <div class="ph relative h-36 overflow-hidden rounded-xl">@if (! empty($b['foto']))<img src="{{ $b['foto'] }}" alt="" class="absolute inset-0 size-full object-cover">@endif<span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 {{ $b['kondisi'][1] }}">{{ $b['kondisi'][0] }}</span></div>
                         @if ($b['rating'] > 0)
                             <p class="mt-3"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ {{ number_format($b['rating'], 1) }}</span></p>
                         @endif
