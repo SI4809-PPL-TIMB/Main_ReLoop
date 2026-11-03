@@ -127,6 +127,61 @@ class Listing extends Model
     }
 
     /**
+     * Filter wilayah dari tingkat provinsi sampai desa/kelurahan (5.1.5).
+     */
+    public function scopeWilayah($query, $provinsi = null, $kabupaten = null, $kecamatan = null, $kelurahan = null)
+    {
+        if (is_array($provinsi)) {
+            $kelurahan = $provinsi['kelurahan_id'] ?? $provinsi['kelurahan'] ?? $provinsi['desa'] ?? null;
+            $kecamatan = $provinsi['kecamatan_id'] ?? $provinsi['kecamatan'] ?? null;
+            $kabupaten = $provinsi['kabupaten_id'] ?? $provinsi['kabupaten'] ?? $provinsi['kota'] ?? null;
+            $provinsi  = $provinsi['provinsi_id'] ?? $provinsi['provinsi'] ?? null;
+        }
+
+        if (! empty($kelurahan)) {
+            $query->whereHas('kelurahan', function ($q) use ($kelurahan) {
+                if (is_numeric($kelurahan)) {
+                    $q->where('id', (int) $kelurahan);
+                } else {
+                    $q->where('nama', 'like', '%' . $kelurahan . '%');
+                }
+            });
+        }
+
+        if (! empty($kecamatan)) {
+            $query->whereHas('kelurahan.kecamatan', function ($q) use ($kecamatan) {
+                if (is_numeric($kecamatan)) {
+                    $q->where('id', (int) $kecamatan);
+                } else {
+                    $q->where('nama', 'like', '%' . $kecamatan . '%');
+                }
+            });
+        }
+
+        if (! empty($kabupaten)) {
+            $query->whereHas('kelurahan.kecamatan.kabupaten', function ($q) use ($kabupaten) {
+                if (is_numeric($kabupaten)) {
+                    $q->where('id', (int) $kabupaten);
+                } else {
+                    $q->where('nama', 'like', '%' . $kabupaten . '%');
+                }
+            });
+        }
+
+        if (! empty($provinsi)) {
+            $query->whereHas('kelurahan.kecamatan.kabupaten.provinsi', function ($q) use ($provinsi) {
+                if (is_numeric($provinsi)) {
+                    $q->where('id', (int) $provinsi);
+                } else {
+                    $q->where('nama', 'like', '%' . $provinsi . '%');
+                }
+            });
+        }
+
+        return $query;
+    }
+
+    /**
      * Normalisasi input angka atau format nominal uang rupiah.
      */
     public static function bersihkanNominal($nilai): ?float

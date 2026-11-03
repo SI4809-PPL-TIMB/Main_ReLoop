@@ -2,17 +2,26 @@
     $rupiah = fn ($n) => 'Rp '.number_format((float) $n, 0, ',', '.');
     $ikonLokasi = '<path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/>';
 
-    $adaFilter = $keyword !== '' || ! empty($kategori) || $minHarga !== null || $maxHarga !== null;
+    $adaFilterWilayah = ! empty($provinsi) || ! empty($kabupaten) || ! empty($kecamatan) || ! empty($kelurahan);
+    $adaFilter = $keyword !== '' || ! empty($kategori) || $minHarga !== null || $maxHarga !== null || $adaFilterWilayah;
 
-    $urlTanpa = function (array $hapus) use ($keyword, $kategori, $minHarga, $maxHarga) {
+    $urlTanpa = function (array $hapus) use ($keyword, $kategori, $minHarga, $maxHarga, $provinsi, $kabupaten, $kecamatan, $kelurahan) {
         $params = [
-            'q'         => $keyword,
-            'kategori'  => $kategori,
-            'min_harga' => $minHarga,
-            'max_harga' => $maxHarga,
+            'q'            => $keyword,
+            'kategori'     => $kategori,
+            'min_harga'    => $minHarga,
+            'max_harga'    => $maxHarga,
+            'provinsi_id'  => $provinsi,
+            'kabupaten_id' => $kabupaten,
+            'kecamatan_id' => $kecamatan,
+            'kelurahan_id' => $kelurahan,
         ];
         foreach ($hapus as $h) {
             unset($params[$h]);
+            // Jika hapus wilayah, hapus seluruh level wilayah
+            if ($h === 'wilayah') {
+                unset($params['provinsi_id'], $params['kabupaten_id'], $params['kecamatan_id'], $params['kelurahan_id'], $params['provinsi'], $params['kabupaten'], $params['kecamatan'], $params['kelurahan'], $params['desa']);
+            }
         }
         return route('cari', array_filter($params, fn ($v) => $v !== null && $v !== ''));
     };
@@ -54,6 +63,18 @@
                 @if ($maxHarga !== null)
                     <input type="hidden" name="max_harga" value="{{ $maxHarga }}">
                 @endif
+                @if (! empty($provinsi))
+                    <input type="hidden" name="provinsi_id" value="{{ $provinsi }}">
+                @endif
+                @if (! empty($kabupaten))
+                    <input type="hidden" name="kabupaten_id" value="{{ $kabupaten }}">
+                @endif
+                @if (! empty($kecamatan))
+                    <input type="hidden" name="kecamatan_id" value="{{ $kecamatan }}">
+                @endif
+                @if (! empty($kelurahan))
+                    <input type="hidden" name="kelurahan_id" value="{{ $kelurahan }}">
+                @endif
 
                 <button type="submit" class="rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90">
                     Cari
@@ -70,7 +91,7 @@
             </a>
             @foreach ($daftarKategori as $kat)
                 @php($aktif = ((string) $kategori === (string) $kat->id || (string) $kategori === (string) $kat->slug))
-                <a href="{{ $aktif ? $urlTanpa(['kategori']) : route('cari', array_filter(['q' => $keyword, 'kategori' => $kat->slug, 'min_harga' => $minHarga, 'max_harga' => $maxHarga])) }}"
+                <a href="{{ $aktif ? $urlTanpa(['kategori']) : route('cari', array_filter(['q' => $keyword, 'kategori' => $kat->slug, 'min_harga' => $minHarga, 'max_harga' => $maxHarga, 'provinsi_id' => $provinsi, 'kabupaten_id' => $kabupaten, 'kecamatan_id' => $kecamatan, 'kelurahan_id' => $kelurahan])) }}"
                    class="shrink-0 rounded-full px-3 py-1.5 font-medium transition-colors {{ $aktif ? 'bg-ink font-semibold text-white' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50' }}">
                     {{ $kat->name }}
                 </a>
@@ -79,58 +100,149 @@
     </header>
 
     <main class="px-4 pb-8 pt-3">
-        {{-- Baris Filter Harga & Ringkasan --}}
         <div class="mb-3 space-y-2.5">
-            {{-- Form Rentang Harga --}}
-            <details class="group rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs" @if ($minHarga !== null || $maxHarga !== null) open @endif>
-                <summary class="flex cursor-pointer items-center justify-between font-semibold text-ink">
-                    <span class="flex items-center gap-1.5">
-                        <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
-                        </svg>
-                        Filter Rentang Harga
-                        @if ($minHarga !== null || $maxHarga !== null)
-                            <span class="rounded-full bg-loop-dark/15 px-2 py-0.5 text-[10px] font-bold text-loop-dark">Aktif</span>
+            {{-- Bagian Accordion Filter (Wilayah & Harga) --}}
+            <div class="grid grid-cols-2 gap-2">
+                {{-- Form Filter Wilayah (5.1.5) --}}
+                <details class="group rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs col-span-2" @if ($adaFilterWilayah) open @endif>
+                    <summary class="flex cursor-pointer items-center justify-between font-semibold text-ink">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+                                {!! $ikonLokasi !!}
+                            </svg>
+                            Filter Wilayah (Provinsi – Desa)
+                            @if ($adaFilterWilayah)
+                                <span class="rounded-full bg-loop-dark/15 px-2 py-0.5 text-[10px] font-bold text-loop-dark">Aktif</span>
+                            @endif
+                        </span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+
+                    <form action="{{ route('cari') }}" method="GET" class="mt-3 space-y-2.5 pt-2 border-t border-slate-200">
+                        @if ($keyword !== '')
+                            <input type="hidden" name="q" value="{{ $keyword }}">
                         @endif
-                    </span>
-                    <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-
-                <form action="{{ route('cari') }}" method="GET" class="mt-3 space-y-2.5 pt-2 border-t border-slate-200">
-                    @if ($keyword !== '')
-                        <input type="hidden" name="q" value="{{ $keyword }}">
-                    @endif
-                    @if (! empty($kategori))
-                        <input type="hidden" name="kategori" value="{{ $kategori }}">
-                    @endif
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label for="min_harga" class="block font-medium text-slate-500 mb-1">Harga Minimum</label>
-                            <input type="number" id="min_harga" name="min_harga" value="{{ $minHarga }}" placeholder="Rp 0" min="0" step="1000"
-                                   class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-loop-dark focus:outline-none">
-                        </div>
-                        <div>
-                            <label for="max_harga" class="block font-medium text-slate-500 mb-1">Harga Maksimum</label>
-                            <input type="number" id="max_harga" name="max_harga" value="{{ $maxHarga }}" placeholder="Rp Tak terhingga" min="0" step="1000"
-                                   class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-loop-dark focus:outline-none">
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between gap-2 pt-1">
-                        @if ($minHarga !== null || $maxHarga !== null)
-                            <a href="{{ $urlTanpa(['min_harga', 'max_harga']) }}" class="text-[11px] font-semibold text-slate-500 hover:text-ink">
-                                Reset Harga
-                            </a>
-                        @else
-                            <span></span>
+                        @if (! empty($kategori))
+                            <input type="hidden" name="kategori" value="{{ $kategori }}">
                         @endif
-                        <button type="submit" class="rounded-xl bg-ink px-4 py-1.5 text-xs font-semibold text-white">
-                            Terapkan Harga
-                        </button>
-                    </div>
-                </form>
-            </details>
+                        @if ($minHarga !== null)
+                            <input type="hidden" name="min_harga" value="{{ $minHarga }}">
+                        @endif
+                        @if ($maxHarga !== null)
+                            <input type="hidden" name="max_harga" value="{{ $maxHarga }}">
+                        @endif
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label for="filter_provinsi" class="block font-medium text-slate-500 mb-1">Provinsi</label>
+                                <select id="filter_provinsi" name="provinsi_id" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-loop-dark focus:outline-none">
+                                    <option value="">-- Semua Provinsi --</option>
+                                    @foreach ($daftarProvinsi as $prov)
+                                        <option value="{{ $prov->id }}" @selected((string) $provinsi === (string) $prov->id)>{{ $prov->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="filter_kabupaten" class="block font-medium text-slate-500 mb-1">Kota / Kabupaten</label>
+                                <select id="filter_kabupaten" name="kabupaten_id" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-loop-dark focus:outline-none">
+                                    <option value="">-- Semua Kab / Kota --</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="filter_kecamatan" class="block font-medium text-slate-500 mb-1">Kecamatan</label>
+                                <select id="filter_kecamatan" name="kecamatan_id" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-loop-dark focus:outline-none">
+                                    <option value="">-- Semua Kecamatan --</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="filter_kelurahan" class="block font-medium text-slate-500 mb-1">Desa / Kelurahan</label>
+                                <select id="filter_kelurahan" name="kelurahan_id" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-loop-dark focus:outline-none">
+                                    <option value="">-- Semua Desa / Kelurahan --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2 pt-1">
+                            @if ($adaFilterWilayah)
+                                <a href="{{ $urlTanpa(['wilayah']) }}" class="text-[11px] font-semibold text-slate-500 hover:text-ink">
+                                    Reset Wilayah
+                                </a>
+                            @else
+                                <span></span>
+                            @endif
+                            <button type="submit" class="rounded-xl bg-ink px-4 py-1.5 text-xs font-semibold text-white">
+                                Terapkan Wilayah
+                            </button>
+                        </div>
+                    </form>
+                </details>
+
+                {{-- Form Rentang Harga (5.1.4) --}}
+                <details class="group rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs col-span-2" @if ($minHarga !== null || $maxHarga !== null) open @endif>
+                    <summary class="flex cursor-pointer items-center justify-between font-semibold text-ink">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
+                            </svg>
+                            Filter Rentang Harga
+                            @if ($minHarga !== null || $maxHarga !== null)
+                                <span class="rounded-full bg-loop-dark/15 px-2 py-0.5 text-[10px] font-bold text-loop-dark">Aktif</span>
+                            @endif
+                        </span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+
+                    <form action="{{ route('cari') }}" method="GET" class="mt-3 space-y-2.5 pt-2 border-t border-slate-200">
+                        @if ($keyword !== '')
+                            <input type="hidden" name="q" value="{{ $keyword }}">
+                        @endif
+                        @if (! empty($kategori))
+                            <input type="hidden" name="kategori" value="{{ $kategori }}">
+                        @endif
+                        @if (! empty($provinsi))
+                            <input type="hidden" name="provinsi_id" value="{{ $provinsi }}">
+                        @endif
+                        @if (! empty($kabupaten))
+                            <input type="hidden" name="kabupaten_id" value="{{ $kabupaten }}">
+                        @endif
+                        @if (! empty($kecamatan))
+                            <input type="hidden" name="kecamatan_id" value="{{ $kecamatan }}">
+                        @endif
+                        @if (! empty($kelurahan))
+                            <input type="hidden" name="kelurahan_id" value="{{ $kelurahan }}">
+                        @endif
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label for="min_harga" class="block font-medium text-slate-500 mb-1">Harga Minimum</label>
+                                <input type="number" id="min_harga" name="min_harga" value="{{ $minHarga }}" placeholder="Rp 0" min="0" step="1000"
+                                       class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-loop-dark focus:outline-none">
+                            </div>
+                            <div>
+                                <label for="max_harga" class="block font-medium text-slate-500 mb-1">Harga Maksimum</label>
+                                <input type="number" id="max_harga" name="max_harga" value="{{ $maxHarga }}" placeholder="Rp Tak terhingga" min="0" step="1000"
+                                       class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs focus:border-loop-dark focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2 pt-1">
+                            @if ($minHarga !== null || $maxHarga !== null)
+                                <a href="{{ $urlTanpa(['min_harga', 'max_harga']) }}" class="text-[11px] font-semibold text-slate-500 hover:text-ink">
+                                    Reset Harga
+                                </a>
+                            @else
+                                <span></span>
+                            @endif
+                            <button type="submit" class="rounded-xl bg-ink px-4 py-1.5 text-xs font-semibold text-white">
+                                Terapkan Harga
+                            </button>
+                        </div>
+                    </form>
+                </details>
+            </div>
 
             {{-- Chip Filter Aktif --}}
             @if ($adaFilter)
@@ -148,6 +260,13 @@
                         <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-ink">
                             <span>Kategori: {{ $kategoriTerpilih->name }}</span>
                             <a href="{{ $urlTanpa(['kategori']) }}" aria-label="Hapus filter kategori" class="text-slate-400 hover:text-ink">✕</a>
+                        </span>
+                    @endif
+
+                    @if ($wilayahTerpilih)
+                        <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-ink" title="{{ $wilayahTerpilih['breadcrumb'] ?? '' }}">
+                            <span>{{ $wilayahTerpilih['label'] }}</span>
+                            <a href="{{ $urlTanpa(['wilayah']) }}" aria-label="Hapus filter wilayah" class="text-slate-400 hover:text-ink">✕</a>
                         </span>
                     @endif
 
@@ -219,7 +338,7 @@
                         </div>
 
                         <div class="mt-2 pt-2 border-t border-slate-100">
-                            <p class="flex items-center gap-1 text-[11px] text-slate-500">
+                            <p class="flex items-center gap-1 text-[11px] text-slate-500" title="{{ $b->kelurahan?->breadcrumb() ?? '' }}">
                                 <svg class="size-3 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">{!! $ikonLokasi !!}</svg>
                                 <span class="truncate">
                                     {{ $b->jarak_km !== null ? number_format($b->jarak_km, 1, ',', '.').' km' : ($b->kelurahan?->nama ?? 'Lokasi belum diatur') }}
@@ -248,7 +367,7 @@
                 <h2 class="mt-4 text-base font-bold text-ink">Barang tidak ditemukan</h2>
                 <p class="mx-auto mt-1.5 max-w-[280px] text-xs leading-relaxed text-slate-500">
                     @if ($adaFilter)
-                        Tidak ada barang aktif yang sesuai dengan kombinasi kata kunci, kategori, atau rentang harga yang dipilih.
+                        Tidak ada barang aktif yang cocok dengan kombinasi kata kunci, kategori, wilayah, atau rentang harga yang dipilih.
                     @else
                         Belum ada barang aktif yang tersedia saat ini.
                     @endif
@@ -269,4 +388,66 @@
             </div>
         @endif
     </main>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const provSelect = document.getElementById('filter_provinsi');
+            const kabSelect = document.getElementById('filter_kabupaten');
+            const kecSelect = document.getElementById('filter_kecamatan');
+            const kelSelect = document.getElementById('filter_kelurahan');
+
+            if (!provSelect) return;
+
+            const selectedKab = @json($kabupaten);
+            const selectedKec = @json($kecamatan);
+            const selectedKel = @json($kelurahan);
+
+            async function loadAnak(level, parentId, targetSelect, selectedVal) {
+                targetSelect.innerHTML = `<option value="">-- Semua ${targetSelect.previousElementSibling.textContent} --</option>`;
+                if (!parentId) return;
+                try {
+                    const res = await fetch(`/wilayah/${level}?parent=${parentId}`);
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    data.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.nama;
+                        if (String(item.id) === String(selectedVal)) opt.selected = true;
+                        targetSelect.appendChild(opt);
+                    });
+                } catch (e) {}
+            }
+
+            provSelect.addEventListener('change', async () => {
+                await loadAnak('kabupaten', provSelect.value, kabSelect, null);
+                kecSelect.innerHTML = '<option value="">-- Semua Kecamatan --</option>';
+                kelSelect.innerHTML = '<option value="">-- Semua Desa / Kelurahan --</option>';
+            });
+
+            kabSelect.addEventListener('change', async () => {
+                await loadAnak('kecamatan', kabSelect.value, kecSelect, null);
+                kelSelect.innerHTML = '<option value="">-- Semua Desa / Kelurahan --</option>';
+            });
+
+            kecSelect.addEventListener('change', async () => {
+                await loadAnak('kelurahan', kecSelect.value, kelSelect, null);
+            });
+
+            // Muat kaskade awal jika ada yang terpilih
+            if (provSelect.value) {
+                loadAnak('kabupaten', provSelect.value, kabSelect, selectedKab).then(() => {
+                    if (kabSelect.value) {
+                        loadAnak('kecamatan', kabSelect.value, kecSelect, selectedKec).then(() => {
+                            if (kecSelect.value) {
+                                loadAnak('kelurahan', kecSelect.value, kelSelect, selectedKel);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>

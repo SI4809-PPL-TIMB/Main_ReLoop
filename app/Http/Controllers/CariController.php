@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Listing;
+use App\Models\WilayahKabupaten;
+use App\Models\WilayahKecamatan;
+use App\Models\WilayahKelurahan;
+use App\Models\WilayahProvinsi;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -21,13 +25,20 @@ class CariController extends Controller
         $kategori = $request->query('kategori') ?? $request->query('category_id');
         $minHarga = $request->query('min_harga') ?? $request->query('min_price');
         $maxHarga = $request->query('max_harga') ?? $request->query('max_price');
+
+        $provinsi = $request->query('provinsi_id') ?? $request->query('provinsi');
+        $kabupaten = $request->query('kabupaten_id') ?? $request->query('kabupaten');
+        $kecamatan = $request->query('kecamatan_id') ?? $request->query('kecamatan');
+        $kelurahan = $request->query('kelurahan_id') ?? $request->query('kelurahan') ?? $request->query('desa');
+
         $profile = $request->user()?->profile;
 
         $barang = Listing::cari($keyword)
             ->kategori($kategori)
             ->harga($minHarga, $maxHarga)
+            ->wilayah($provinsi, $kabupaten, $kecamatan, $kelurahan)
             ->terdekat($profile)
-            ->with('user.profile', 'kelurahan', 'category', 'primaryPhoto')
+            ->with('user.profile', 'kelurahan.kecamatan.kabupaten.provinsi', 'category', 'primaryPhoto')
             ->paginate(12)
             ->withQueryString();
 
@@ -43,12 +54,60 @@ class CariController extends Controller
             });
         }
 
+        // Resolusi info label wilayah terpilih
+        $wilayahTerpilih = null;
+        if (! empty($kelurahan)) {
+            $kelObj = is_numeric($kelurahan) ? WilayahKelurahan::with('kecamatan.kabupaten.provinsi')->find($kelurahan) : WilayahKelurahan::with('kecamatan.kabupaten.provinsi')->where('nama', 'like', '%'.$kelurahan.'%')->first();
+            if ($kelObj) {
+                $wilayahTerpilih = [
+                    'level'      => 'kelurahan',
+                    'label'      => 'Desa/Kel: '.$kelObj->nama,
+                    'breadcrumb' => $kelObj->breadcrumb(),
+                ];
+            }
+        } elseif (! empty($kecamatan)) {
+            $kecObj = is_numeric($kecamatan) ? WilayahKecamatan::with('kabupaten.provinsi')->find($kecamatan) : WilayahKecamatan::with('kabupaten.provinsi')->where('nama', 'like', '%'.$kecamatan.'%')->first();
+            if ($kecObj) {
+                $wilayahTerpilih = [
+                    'level'      => 'kecamatan',
+                    'label'      => 'Kec: '.$kecObj->nama,
+                    'breadcrumb' => $kecObj->nama.', '.$kecObj->kabupaten?->nama,
+                ];
+            }
+        } elseif (! empty($kabupaten)) {
+            $kabObj = is_numeric($kabupaten) ? WilayahKabupaten::with('provinsi')->find($kabupaten) : WilayahKabupaten::with('provinsi')->where('nama', 'like', '%'.$kabupaten.'%')->first();
+            if ($kabObj) {
+                $wilayahTerpilih = [
+                    'level'      => 'kabupaten',
+                    'label'      => $kabObj->nama,
+                    'breadcrumb' => $kabObj->nama.', '.$kabObj->provinsi?->nama,
+                ];
+            }
+        } elseif (! empty($provinsi)) {
+            $provObj = is_numeric($provinsi) ? WilayahProvinsi::find($provinsi) : WilayahProvinsi::where('nama', 'like', '%'.$provinsi.'%')->first();
+            if ($provObj) {
+                $wilayahTerpilih = [
+                    'level'      => 'provinsi',
+                    'label'      => 'Prov: '.$provObj->nama,
+                    'breadcrumb' => $provObj->nama,
+                ];
+            }
+        }
+
+        $daftarProvinsi = WilayahProvinsi::orderBy('nama')->get();
+
         return view('cari', [
             'keyword'          => $keyword,
             'kategori'         => $kategori,
             'kategoriTerpilih' => $kategoriTerpilih,
             'minHarga'         => Listing::bersihkanNominal($minHarga),
             'maxHarga'         => Listing::bersihkanNominal($maxHarga),
+            'provinsi'         => $provinsi,
+            'kabupaten'        => $kabupaten,
+            'kecamatan'        => $kecamatan,
+            'kelurahan'        => $kelurahan,
+            'wilayahTerpilih'  => $wilayahTerpilih,
+            'daftarProvinsi'   => $daftarProvinsi,
             'daftarKategori'   => $daftarKategori,
             'barang'           => $barang,
             'kondisi'          => self::KONDISI,
