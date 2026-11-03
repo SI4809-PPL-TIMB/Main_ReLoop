@@ -49,6 +49,42 @@ class BarangController extends Controller
         return redirect()->route('barang.index')->with('success', $request->isDraft() ? 'Draft tersimpan.' : 'Barangmu sudah tayang!');
     }
 
+    public function edit(Request $request, Listing $listing): View
+    {
+        Gate::authorize('update', $listing);
+
+        return view('barang.form', ['listing' => $listing->load('photos'), 'kategori' => $this->kategori(), 'lokasi' => $listing->kelurahan?->breadcrumb()]);
+    }
+
+    public function update(ListingRequest $request, Listing $listing): RedirectResponse
+    {
+        Gate::authorize('update', $listing);
+
+        $listing->update($this->data($request) + ($listing->status === Listing::DRAFT && ! $request->isDraft()
+            ? ['status' => Listing::AKTIF, 'published_at' => now()] : []));
+
+        $listing->photos()->whereIn('id', $request->input('remove_photos', []))->get()->each(fn ($f) => ListingPhotos::hapus($f));
+        ListingPhotos::simpan($listing, $request->file('photos', []));
+
+        return redirect()->route('barang.index')->with('success', 'Perubahan tersimpan.');
+    }
+
+    public function destroy(Listing $listing): RedirectResponse
+    {
+        Gate::authorize('delete', $listing);
+        $listing->update(['status' => Listing::DIHAPUS]);
+
+        return redirect()->route('barang.index')->with('success', 'Barang dihapus.');
+    }
+
+    public function terjual(Listing $listing): RedirectResponse
+    {
+        Gate::authorize('markSold', $listing);
+        $listing->update(['status' => Listing::TERJUAL]);
+
+        return redirect()->route('barang.index', ['tab' => 'terjual'])->with('success', 'Barang ditandai terjual.');
+    }
+
     private function kategori()
     {
         return Category::where('type', Category::TYPE_BEKAS)->orderBy('id')->get();

@@ -37,6 +37,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/barang-saya', [BarangController::class, 'index'])->name('barang.index');
     Route::get('/jual', [BarangController::class, 'create'])->name('barang.create');
     Route::post('/jual', [BarangController::class, 'store'])->name('barang.store');
+    Route::get('/barang/{listing}/ubah', [BarangController::class, 'edit'])->name('barang.edit');
+    Route::put('/barang/{listing}', [BarangController::class, 'update'])->name('barang.update');
+    Route::delete('/barang/{listing}', [BarangController::class, 'destroy'])->name('barang.destroy');
+    Route::post('/barang/{listing}/terjual', [BarangController::class, 'terjual'])->name('barang.terjual');
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');
