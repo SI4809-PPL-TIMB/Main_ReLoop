@@ -84,6 +84,82 @@ class Listing extends Model
     }
 
     /**
+     * Filter kategori barang (dari 1.3) berdasarkan ID atau slug (5.1.4).
+     */
+    public function scopeKategori($query, $kategori)
+    {
+        if (empty($kategori)) {
+            return $query;
+        }
+
+        if (is_numeric($kategori)) {
+            return $query->where('listings.category_id', (int) $kategori);
+        }
+
+        return $query->whereHas('category', function ($q) use ($kategori) {
+            $q->where('slug', $kategori);
+        });
+    }
+
+    /**
+     * Filter rentang harga min dan maks (5.1.4).
+     */
+    public function scopeHarga($query, $min = null, $max = null)
+    {
+        $min = self::bersihkanNominal($min);
+        $max = self::bersihkanNominal($max);
+
+        if ($min !== null && $max !== null) {
+            $batasBawah = min($min, $max);
+            $batasAtas = max($min, $max);
+            return $query->whereBetween('listings.price', [$batasBawah, $batasAtas]);
+        }
+
+        if ($min !== null) {
+            return $query->where('listings.price', '>=', $min);
+        }
+
+        if ($max !== null) {
+            return $query->where('listings.price', '<=', $max);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Normalisasi input angka atau format nominal uang rupiah.
+     */
+    public static function bersihkanNominal($nilai): ?float
+    {
+        if ($nilai === null || $nilai === '') {
+            return null;
+        }
+
+        if (is_int($nilai) || is_float($nilai)) {
+            return max(0, (float) $nilai);
+        }
+
+        if (is_string($nilai)) {
+            $bersih = preg_replace('/^[^\d]+/', '', trim($nilai));
+            // Tangani titik ribuan Indonesia misal "50.000" atau "1.500.000"
+            if (preg_match('/^\d{1,3}(\.\d{3})+$/', $bersih)) {
+                $bersih = str_replace('.', '', $bersih);
+            } else {
+                $bersih = preg_replace('/[^\d.]/', '', $bersih);
+                if (substr_count($bersih, '.') === 1 && strlen(substr($bersih, strrpos($bersih, '.') + 1)) === 3) {
+                    $bersih = str_replace('.', '', $bersih);
+                }
+            }
+
+            if (is_numeric($bersih)) {
+                return max(0, (float) $bersih);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Urutkan barang dari yang terdekat dengan lokasi pembeli (titik + desa yang disimpan di 3.1).
      * Titik barang = titik profil penjual, karena barang mewarisi lokasi penjual saat dipasang.
      *

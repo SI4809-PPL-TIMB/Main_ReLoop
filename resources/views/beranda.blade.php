@@ -70,11 +70,11 @@
         {{-- Kategori barang bekas --}}
         <section aria-label="Kategori barang bekas" data-mode="jual" class="grid grid-cols-4 gap-2.5 text-center text-[13px] font-medium">
             @foreach ($kategori as $k)
-                <a href="#" class="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 pb-2.5 pt-3">
+                <a href="{{ route('cari', ['kategori' => $k->slug]) }}" class="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 pb-2.5 pt-3">
                     <img src="{{ asset('assets/illust/categories/'.$k->slug.'.png') }}" class="size-12 object-contain" width="48" height="48" alt="">{{ $k->name }}
                 </a>
             @endforeach
-            <a href="#" class="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 pb-2.5 pt-3">
+            <a href="{{ route('cari') }}" class="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 pb-2.5 pt-3">
                 <span class="grid size-12 grid-cols-2 gap-1 p-1.5" aria-hidden="true"><i class="rounded-md bg-loop"></i><i class="rounded-md bg-teal-600"></i><i class="rounded-md bg-teal-600"></i><i class="rotate-45 scale-75 rounded-sm bg-loop"></i></span>Lainnya
             </a>
         </section>

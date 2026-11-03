@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,20 +18,41 @@ class CariController extends Controller
     public function index(Request $request): View
     {
         $keyword = trim((string) $request->query('q', ''));
+        $kategori = $request->query('kategori') ?? $request->query('category_id');
+        $minHarga = $request->query('min_harga') ?? $request->query('min_price');
+        $maxHarga = $request->query('max_harga') ?? $request->query('max_price');
         $profile = $request->user()?->profile;
 
         $barang = Listing::cari($keyword)
+            ->kategori($kategori)
+            ->harga($minHarga, $maxHarga)
             ->terdekat($profile)
-            ->with('user.profile', 'kelurahan', 'primaryPhoto')
+            ->with('user.profile', 'kelurahan', 'category', 'primaryPhoto')
             ->paginate(12)
             ->withQueryString();
 
+        $daftarKategori = Category::bekas()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        $kategoriTerpilih = null;
+        if (! empty($kategori)) {
+            $kategoriTerpilih = $daftarKategori->first(function ($c) use ($kategori) {
+                return (string) $c->id === (string) $kategori || $c->slug === (string) $kategori;
+            });
+        }
+
         return view('cari', [
-            'keyword' => $keyword,
-            'barang'  => $barang,
-            'kondisi' => self::KONDISI,
-            'lokasi'  => $profile?->kelurahan?->nama,
+            'keyword'          => $keyword,
+            'kategori'         => $kategori,
+            'kategoriTerpilih' => $kategoriTerpilih,
+            'minHarga'         => Listing::bersihkanNominal($minHarga),
+            'maxHarga'         => Listing::bersihkanNominal($maxHarga),
+            'daftarKategori'   => $daftarKategori,
+            'barang'           => $barang,
+            'kondisi'          => self::KONDISI,
+            'lokasi'           => $profile?->kelurahan?->nama,
         ]);
     }
 }
-
