@@ -43,8 +43,8 @@ class PilihAlurTest extends TestCase
         $this->seed(CategorySeeder::class);
         $this->actingAs(User::factory()->create());
         $this->followingRedirects()->post('/pilih-kategori', ['tipe' => 'bekas'])
-            ->assertOk()->assertSee('Form pasang barang segera hadir')
-            ->assertSee(route('kategori.index', ['tipe' => 'bekas']), false);
+            ->assertOk()->assertSee('Pasang Barang')
+            ->assertSee(route('barang.store'), false); // alur bekas langsung ke form 4.2
         $this->followingRedirects()->post('/pilih-kategori', ['tipe' => 'daur_ulang'])
             ->assertOk()->assertSee('Pencarian mitra segera hadir')
             ->assertSee(route('kategori.index', ['tipe' => 'daur_ulang']), false);
