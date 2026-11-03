@@ -5,7 +5,7 @@
     // Tautan '#' = halamannya belum dibuat di Sprint 1.
     $grup = [
         'Jual beli' => [
-            ['Barang saya', '#', '<path d="m12 3 9 5-9 5-9-5z"/><path d="M3 8v9l9 5 9-5V8M12 13v9M7.5 5.5l9 5"/>'],
+            ['Barang saya', route('barang.index'), '<path d="m12 3 9 5-9 5-9-5z"/><path d="M3 8v9l9 5 9-5V8M12 13v9M7.5 5.5l9 5"/>'],
             ['Pesanan saya', '#', '<path d="M6 4h12v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>'],
         ],
         'Daur ulang' => [
