@@ -19,13 +19,13 @@ class BerandaController extends Controller
     {
         $profile = $request->user()->profile;
 
-        $barang = Listing::with('user.profile', 'kelurahan', 'primaryPhoto')->where('status', 'aktif')->latest('published_at')->limit(8)->get()
+        $barang = Listing::with('user.profile', 'kelurahan', 'primaryPhoto')->aktif()->terdekat($profile)->limit(8)->get()
             ->map(fn ($l) => [
                 'judul'   => $l->title,
                 'harga'   => (int) $l->price,
                 'kondisi' => self::KONDISI[$l->condition],
                 'rating'  => $l->user->profile?->avg_rating,
-                'lokasi'  => $l->kelurahan?->nama,
+                'lokasi'  => $l->jarak_km !== null ? number_format($l->jarak_km, 1, ',', '.').' km' : $l->kelurahan?->nama,
                 'foto'    => $l->primaryPhoto?->url,
             ]);
 
