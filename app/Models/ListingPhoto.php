@@ -9,6 +9,11 @@ class ListingPhoto extends Model
 {
     protected $fillable = ['listing_id', 'path', 'sort_order'];
 
+    public function getUrlAttribute(): string
+    {
+        return asset('storage/'.$this->path);
+    }
+
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class);

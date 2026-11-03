@@ -60,9 +60,9 @@ class CategoryMasterTest extends TestCase
     {
         $this->seed(CategorySeeder::class);
 
-        $this->assertSame(7, Category::bekas()->count());
+        $this->assertSame(8, Category::bekas()->count());
         $this->assertSame(5, Category::daurUlang()->count());
-        $this->assertSame(12, Category::count());
+        $this->assertSame(13, Category::count());
 
         $expectedBekas = ['perabot', 'pakaian', 'buku', 'elektronik', 'mainan', 'sepeda', 'gadget'];
         foreach ($expectedBekas as $slug) {
@@ -85,10 +85,10 @@ class CategoryMasterTest extends TestCase
     public function test_category_seeder_is_idempotent(): void
     {
         $this->seed(CategorySeeder::class);
-        $this->assertSame(12, Category::count());
+        $this->assertSame(13, Category::count());
 
         $this->seed(CategorySeeder::class);
-        $this->assertSame(12, Category::count());
+        $this->assertSame(13, Category::count());
     }
 
     /**
@@ -99,7 +99,7 @@ class CategoryMasterTest extends TestCase
         $this->seed(CategorySeeder::class);
 
         $bekas = Category::forSelect(Category::TYPE_BEKAS);
-        $this->assertCount(7, $bekas);
+        $this->assertCount(8, $bekas);
 
         $daurUlang = Category::forSelect(Category::TYPE_DAUR_ULANG);
         $this->assertCount(5, $daurUlang);
@@ -107,7 +107,7 @@ class CategoryMasterTest extends TestCase
         $grouped = Category::groupedByType();
         $this->assertArrayHasKey(Category::TYPE_BEKAS, $grouped);
         $this->assertArrayHasKey(Category::TYPE_DAUR_ULANG, $grouped);
-        $this->assertCount(7, $grouped[Category::TYPE_BEKAS]);
+        $this->assertCount(8, $grouped[Category::TYPE_BEKAS]);
         $this->assertCount(5, $grouped[Category::TYPE_DAUR_ULANG]);
     }
 

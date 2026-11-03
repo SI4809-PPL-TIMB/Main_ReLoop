@@ -67,6 +67,13 @@ class CategorySeeder extends Seeder
                 'icon'       => 'smartphone',
                 'sort_order' => 7,
             ],
+            [
+                'name'       => 'Lainnya',
+                'slug'       => 'lainnya',
+                'type'       => Category::TYPE_BEKAS,
+                'icon'       => 'grid',
+                'sort_order' => 8,
+            ],
 
             // --- Kategori Sampah Daur Ulang (type: daur_ulang) ---
             [
