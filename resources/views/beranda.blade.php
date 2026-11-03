@@ -38,7 +38,7 @@
 
     <main class="relative -mt-7 space-y-4 px-4">
         {{-- Pencarian --}}
-        <a href="#" data-mode="jual" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm">
+        <a href="{{ route('cari') }}" data-mode="jual" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm">
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">{!! $cari !!}</svg>
             <span class="text-sm text-slate-500">Cari kursi, buku, sepeda…</span>
         </a>

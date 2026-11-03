@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BerandaController;
+use App\Http\Controllers\CariController;
 use App\Http\Controllers\KategorisasiController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PasswordResetController;
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profil/avatar', [ProfilController::class, 'uploadAvatar'])->name('account.avatar.upload');
     Route::delete('/profil/avatar', [ProfilController::class, 'hapusAvatar'])->name('account.avatar.delete');
     Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
+    Route::get('/cari', [CariController::class, 'index'])->name('cari');
     Route::get('/barang-saya', [BarangController::class, 'index'])->name('barang.index');
     Route::get('/jual', [BarangController::class, 'create'])->name('barang.create');
     Route::post('/jual', [BarangController::class, 'store'])->name('barang.store');
