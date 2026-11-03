@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\KategorisasiController;
 use App\Http\Controllers\LokasiController;
@@ -25,7 +26,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/pilih-kategori', [KategorisasiController::class, 'index'])->name('kategori.index');
     Route::post('/pilih-kategori', [KategorisasiController::class, 'pilih'])->name('kategori.pilih');
-    Route::get('/pasang-barang', [KategorisasiController::class, 'pasangBarang'])->name('barang.create');
+    Route::get('/pasang-barang', [KategorisasiController::class, 'pasangBarang'])->name('barang.pasang');
     Route::get('/pengepul/sementara', [KategorisasiController::class, 'pengepul'])->name('pengepul.sementara');
     Route::get('/profil', [ProfilController::class, 'show'])->name('account');
     Route::get('/profil/ubah', [ProfilController::class, 'edit'])->name('account.edit');
@@ -33,6 +34,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/profil/avatar', [ProfilController::class, 'uploadAvatar'])->name('account.avatar.upload');
     Route::delete('/profil/avatar', [ProfilController::class, 'hapusAvatar'])->name('account.avatar.delete');
     Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
+    Route::get('/barang-saya', [BarangController::class, 'index'])->name('barang.index');
+    Route::get('/jual', [BarangController::class, 'create'])->name('barang.create');
+    Route::post('/jual', [BarangController::class, 'store'])->name('barang.store');
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');
