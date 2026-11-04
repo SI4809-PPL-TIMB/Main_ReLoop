@@ -21,6 +21,7 @@ class BerandaController extends Controller
 
         $barang = Listing::with('user.profile', 'kelurahan', 'primaryPhoto')->aktif()->terdekat($profile)->limit(8)->get()
             ->map(fn ($l) => [
+                'id'      => $l->id,
                 'judul'   => $l->title,
                 'harga'   => (int) $l->price,
                 'kondisi' => self::KONDISI[$l->condition],
