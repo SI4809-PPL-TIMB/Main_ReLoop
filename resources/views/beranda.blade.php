@@ -110,7 +110,7 @@
             <p class="text-sm text-slate-500">Dari tetangga dalam radius 5 km</p>
             <div class="no-scrollbar -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1">
                 @foreach ($barang as $b)
-                    <a href="#" class="w-40 shrink-0">
+                    <a href="{{ isset($b['id']) ? route('barang.detail', $b['id']) : '#' }}" class="w-40 shrink-0">
                         <div class="ph relative h-36 overflow-hidden rounded-xl">@if (! empty($b['foto']))<img src="{{ $b['foto'] }}" alt="" class="absolute inset-0 size-full object-cover">@endif<span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 {{ $b['kondisi'][1] }}">{{ $b['kondisi'][0] }}</span></div>
                         @if ($b['rating'] > 0)
                             <p class="mt-3"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ {{ number_format($b['rating'], 1) }}</span></p>

@@ -86,7 +86,7 @@
 
             <div id="hasil" class="mt-4 grid grid-cols-2 gap-x-3 gap-y-5">
                 @foreach ($barang as $b)
-                    <a href="#" data-km="{{ $b->jarak_km ?? '' }}" data-harga="{{ (int)$b->price }}">
+                    <a href="{{ route('barang.detail', $b) }}" data-km="{{ $b->jarak_km ?? '' }}" data-harga="{{ (int)$b->price }}">
                         <div class="ph relative h-36 rounded-xl overflow-hidden bg-slate-100">
                             @if ($b->primaryPhoto)
                                 <img src="{{ $b->primaryPhoto->url }}" alt="{{ $b->title }}" class="size-full object-cover">

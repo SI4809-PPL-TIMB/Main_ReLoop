@@ -43,6 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/barang/{listing}', [BarangController::class, 'update'])->name('barang.update');
     Route::delete('/barang/{listing}', [BarangController::class, 'destroy'])->name('barang.destroy');
     Route::post('/barang/{listing}/terjual', [BarangController::class, 'terjual'])->name('barang.terjual');
+    // 5.2.2 — Detail barang (harus setelah semua route /barang/{listing}/... agar tidak bentrok)
+    Route::get('/barang/{listing}', [\App\Http\Controllers\BarangDetailController::class, 'show'])->name('barang.detail');
+    // 5.2 — Profil penjual (berdasarkan penjual.html)
+    Route::get('/penjual/{user}', [\App\Http\Controllers\PenjualController::class, 'show'])->name('penjual.show');
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');
