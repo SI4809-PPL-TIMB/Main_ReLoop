@@ -63,6 +63,12 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// 6.1 · Chat — route sementara untuk preview desain UI (6.1.1)
+Route::middleware('auth')->prefix('pesan')->name('pesan.')->group(function () {
+    Route::get('/', fn () => view('pesan.index'))->name('index');
+    Route::get('/{id}', fn () => view('pesan.show'))->name('show');
+});
+
 // 2. Halaman Daftar
 Route::get('/daftar', [RegisterController::class, 'create'])->name('daftar');
 Route::post('/daftar', [RegisterController::class, 'store'])->name('daftar.store');
