@@ -47,6 +47,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/barang/{listing}', [\App\Http\Controllers\BarangDetailController::class, 'show'])->name('barang.detail');
     // 5.2 — Profil penjual (berdasarkan penjual.html)
     Route::get('/penjual/{user}', [\App\Http\Controllers\PenjualController::class, 'show'])->name('penjual.show');
+
+    // 6.1 · Chat per barang antara pembeli dan penjual (6.1.2)
+    Route::get('/pesan', [\App\Http\Controllers\ChatController::class, 'index'])->name('pesan.index');
+    Route::match(['get', 'post'], '/barang/{listing}/chat', [\App\Http\Controllers\ChatController::class, 'open'])->name('pesan.mulai');
+    Route::get('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('pesan.show');
+    Route::post('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('pesan.kirim');
+
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');
@@ -62,12 +69,6 @@ Route::get('/', function () {
 
     return view('welcome');
 })->name('home');
-
-// 6.1 · Chat — route sementara untuk preview desain UI (6.1.1)
-Route::middleware('auth')->prefix('pesan')->name('pesan.')->group(function () {
-    Route::get('/', fn () => view('pesan.index'))->name('index');
-    Route::get('/{id}', fn () => view('pesan.show'))->name('show');
-});
 
 // 2. Halaman Daftar
 Route::get('/daftar', [RegisterController::class, 'create'])->name('daftar');

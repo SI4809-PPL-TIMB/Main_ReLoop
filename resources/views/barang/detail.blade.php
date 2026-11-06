@@ -293,9 +293,9 @@
                 @endif
                 <a href="{{ route('barang.index') }}" class="flex-1 rounded-full bg-ink py-3 text-center font-semibold text-white">Barang saya</a>
             @else
-                <button type="button" data-soon aria-label="Chat penjual" class="grid size-12 shrink-0 place-items-center rounded-full border border-slate-200">
+                <a href="{{ route('pesan.mulai', $listing) }}" aria-label="Chat penjual" class="grid size-12 shrink-0 place-items-center rounded-full border border-slate-200 hover:bg-slate-50 transition active:scale-95">
                     <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
-                </button>
+                </a>
                 @if ($aktif)
                     @if ($listing->is_negotiable)
                         <button type="button" data-soon class="flex-1 rounded-full border border-slate-300 py-3 text-center font-semibold">Tawar</button>
