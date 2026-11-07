@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payment extends Model
 {
+    public const STATUS_MENUNGGU = 'menunggu';
+    public const STATUS_BERHASIL = 'berhasil';
+    public const STATUS_GAGAL = 'gagal';
+    public const STATUS_KEDALUWARSA = 'kedaluwarsa';
+
+    public const METHOD_QRIS = 'qris';
+    public const METHOD_VA = 'va';
+    public const METHOD_EWALLET = 'ewallet';
+
+    public const KOMISI_RATE = 0.03;
+
     protected $fillable = [
         'order_id',
         'midtrans_id',
@@ -15,6 +26,8 @@ class Payment extends Model
         'bank',
         'amount',
         'platform_fee',
+        'snap_token',
+        'snap_redirect_url',
         'status',
         'paid_at',
         'expired_at',

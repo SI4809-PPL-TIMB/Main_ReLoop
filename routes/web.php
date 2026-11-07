@@ -7,6 +7,7 @@ use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\CariController;
 use App\Http\Controllers\KategorisasiController;
 use App\Http\Controllers\LokasiController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfilController;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('pesan.show');
     Route::post('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('pesan.kirim');
 
+    // 7.1 · Checkout dan Pembayaran (PPLTIMB-64)
+    Route::get('/barang/{listing}/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
+    Route::post('/barang/{listing}/pesan', [OrderController::class, 'store'])->name('order.store');
+    Route::get('/pesanan/{orderNumber}', [OrderController::class, 'show'])->name('order.show');
+    Route::get('/pesanan/{orderNumber}/status', [OrderController::class, 'paymentStatus'])->name('order.status');
+    Route::post('/pesanan/{orderNumber}/snap-token', [OrderController::class, 'getSnapToken'])->name('order.snap_token');
+
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');
@@ -81,3 +89,7 @@ Route::post('/verifikasi/resend', [RegisterController::class, 'resendVerificatio
 
 // 4. Halaman Selesai (Akun Siap)
 Route::get('/selesai', [RegisterController::class, 'showComplete'])->name('selesai');
+
+// 7.1.5 · Webhook Midtrans (PPLTIMB-131)
+Route::post('/api/midtrans/webhook', [\App\Http\Controllers\MidtransWebhookController::class, 'handle'])->name('midtrans.webhook');
+Route::post('/midtrans/webhook', [\App\Http\Controllers\MidtransWebhookController::class, 'handle']);
