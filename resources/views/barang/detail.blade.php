@@ -300,7 +300,7 @@
                     @if ($listing->is_negotiable)
                         <button type="button" data-soon class="flex-1 rounded-full border border-slate-300 py-3 text-center font-semibold">Tawar</button>
                     @endif
-                    <button type="button" data-soon class="flex-[1.4] rounded-full bg-ink py-3 text-center font-semibold text-white">Beli sekarang</button>
+                    <a href="{{ route('order.checkout', $listing) }}" class="flex-[1.4] rounded-full bg-ink py-3 text-center font-semibold text-white">Beli sekarang</a>
                 @else
                     <button type="button" disabled class="flex-1 cursor-not-allowed rounded-full bg-slate-100 py-3 text-center font-semibold text-slate-400">{{ $dipesan ? 'Sudah dipesan' : 'Sudah terjual' }}</button>
                 @endif

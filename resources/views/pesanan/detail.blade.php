@@ -93,6 +93,71 @@
                     </div>
                 </dl>
             </section>
+
+            <!-- Aksi Pembayaran jika Masih Menunggu Pembayaran -->
+            @if ($isBuyer && $order->status === \App\Models\Order::STATUS_MENUNGGU_BAYAR)
+                <div class="pt-4">
+                    <button type="button" id="btn-bayar-snap" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition">
+                        <span id="btn-bayar-label">Bayar Sekarang</span>
+                    </button>
+                    <p class="mt-2 text-center text-xs text-slate-500">Batas waktu bayar 24 jam sebelum pesanan batal otomatis.</p>
+                </div>
+            @endif
         </main>
     </div>
+
+    @if ($isBuyer && $order->status === \App\Models\Order::STATUS_MENUNGGU_BAYAR)
+        @push('scripts')
+            <script src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+            <script>
+                document.getElementById('btn-bayar-snap')?.addEventListener('click', async function () {
+                    const btn = this;
+                    const label = document.getElementById('btn-bayar-label');
+                    btn.disabled = true;
+                    label.textContent = 'Menghubungkan Midtrans...';
+
+                    try {
+                        const res = await fetch("{{ route('order.snap_token', $order->order_number) }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                        });
+
+                        const data = await res.json();
+
+                        if (!res.ok || !data.token) {
+                            throw new Error(data.message || 'Gagal memuat token pembayaran.');
+                        }
+
+                        if (typeof window.snap !== 'undefined' && typeof window.snap.pay === 'function') {
+                            window.snap.pay(data.token, {
+                                onSuccess: function () {
+                                    window.location.href = "{{ route('order.show', $order->order_number) }}?status=sukses";
+                                },
+                                onPending: function () {
+                                    window.location.href = "{{ route('order.show', $order->order_number) }}?status=menunggu";
+                                },
+                                onError: function () {
+                                    window.location.href = "{{ route('order.show', $order->order_number) }}?status=gagal";
+                                },
+                                onClose: function () {
+                                    btn.disabled = false;
+                                    label.textContent = 'Bayar Sekarang';
+                                }
+                            });
+                        } else if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        }
+                    } catch (e) {
+                        alert(e.message);
+                        btn.disabled = false;
+                        label.textContent = 'Bayar Sekarang';
+                    }
+                });
+            </script>
+        @endpush
+    @endif
 </x-app-layout>

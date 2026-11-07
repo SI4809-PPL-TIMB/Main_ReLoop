@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('pesan.kirim');
 
     // 7.1 · Checkout dan Pembayaran (PPLTIMB-64)
+    Route::get('/barang/{listing}/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/barang/{listing}/pesan', [OrderController::class, 'store'])->name('order.store');
     Route::get('/pesanan/{orderNumber}', [OrderController::class, 'show'])->name('order.show');
     Route::post('/pesanan/{orderNumber}/snap-token', [OrderController::class, 'getSnapToken'])->name('order.snap_token');

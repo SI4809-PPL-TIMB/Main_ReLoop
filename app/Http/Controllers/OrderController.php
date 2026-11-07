@@ -20,6 +20,47 @@ use Illuminate\View\View;
 class OrderController extends Controller
 {
     /**
+     * Tampilkan halaman checkout untuk barang (7.1.7).
+     */
+    public function checkout(Request $request, Listing $listing): View|RedirectResponse
+    {
+        $user = $request->user();
+
+        // Pemilik tidak bisa membeli barang miliknya sendiri
+        if ($user->id === $listing->user_id) {
+            return redirect()->route('barang.detail', $listing)
+                ->with('error', 'Anda tidak dapat membeli barang milik sendiri.');
+        }
+
+        // Hanya barang berstatus aktif yang bisa dicheckout
+        if ($listing->status !== Listing::AKTIF) {
+            return redirect()->route('barang.detail', $listing)
+                ->with('error', 'Barang ini tidak tersedia untuk dibeli.');
+        }
+
+        $listing->load(['primaryPhoto', 'photos', 'user.profile.kelurahan']);
+
+        // Cek tawaran yang disepakati (offer diterima)
+        $acceptedOffer = Offer::whereHas('conversation', function ($q) use ($listing, $user) {
+            $q->where('listing_id', $listing->id)
+              ->where('buyer_id', $user->id);
+        })->whereIn('status', ['diterima', 'accepted'])->latest()->first();
+
+        $isOffer = false;
+        $agreedPrice = (int) $listing->price;
+
+        if ($acceptedOffer) {
+            $isOffer = true;
+            $agreedPrice = (int) $acceptedOffer->amount;
+        }
+
+        $platformFee = (int) round($agreedPrice * Payment::KOMISI_RATE);
+        $user->load(['profile.kelurahan']);
+
+        return view('pesanan.checkout', compact('listing', 'agreedPrice', 'isOffer', 'platformFee', 'user', 'acceptedOffer'));
+    }
+
+    /**
      * Buat order baru dengan status menunggu_bayar dan kunci status barang menjadi dipesan.
      */
     public function store(OrderCreateRequest $request, Listing $listing): JsonResponse|RedirectResponse
