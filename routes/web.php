@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
     // 7.1 · Checkout dan Pembayaran (PPLTIMB-64)
     Route::post('/barang/{listing}/pesan', [OrderController::class, 'store'])->name('order.store');
     Route::get('/pesanan/{orderNumber}', [OrderController::class, 'show'])->name('order.show');
+    Route::post('/pesanan/{orderNumber}/snap-token', [OrderController::class, 'getSnapToken'])->name('order.snap_token');
 
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');

@@ -26,6 +26,8 @@ class Payment extends Model
         'bank',
         'amount',
         'platform_fee',
+        'snap_token',
+        'snap_redirect_url',
         'status',
         'paid_at',
         'expired_at',

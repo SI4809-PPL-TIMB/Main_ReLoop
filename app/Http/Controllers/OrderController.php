@@ -7,6 +7,7 @@ use App\Models\Listing;
 use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\MidtransService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -132,4 +133,41 @@ class OrderController extends Controller
 
         return view('pesanan.detail', compact('order'));
     }
+
+    /**
+     * Dapatkan Snap Token Midtrans untuk pembayaran pesanan.
+     */
+    public function getSnapToken(Request $request, string $orderNumber, MidtransService $midtransService): JsonResponse
+    {
+        $order = Order::with(['listing', 'buyer.profile', 'payment'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        // Hanya pembeli yang dapat meminta token pembayaran
+        if ($request->user()->id !== $order->buyer_id) {
+            abort(403, 'Hanya pembeli yang dapat melakukan pembayaran.');
+        }
+
+        // Pesanan harus dalam status menunggu_bayar
+        if ($order->status !== Order::STATUS_MENUNGGU_BAYAR) {
+            return response()->json([
+                'message' => 'Pesanan ini tidak dalam status menunggu pembayaran.',
+            ], 422);
+        }
+
+        try {
+            $snapData = $midtransService->createSnapToken($order);
+
+            return response()->json([
+                'token'        => $snapData['token'],
+                'redirect_url' => $snapData['redirect_url'],
+                'client_key'   => config('services.midtrans.client_key'),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 502);
+        }
+    }
 }
+
