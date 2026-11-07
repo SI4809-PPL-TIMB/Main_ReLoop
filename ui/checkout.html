@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Reloop · Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-clip bg-white pb-40">
+
+  <!-- Checkout dari detail barang "Beli" -->
+  <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-100 bg-white px-4 py-4">
+    <a href="../reloop-ecommerce-flow/detail-barang.html" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <h1 class="text-xl font-bold">Checkout</h1>
+  </header>
+
+  <!-- ?harga=normal dari "Beli sekarang"; bawaan = harga tawaran dari chat (?tawar=angka) -->
+  <div data-seg="harga" hidden><button value="tawar"></button><button value="normal"></button></div>
+
+  <form action="bayar.html" class="space-y-5 px-4 pt-4">
+    <!-- Lokasi antar -->
+    <section>
+      <button type="button" data-open="alamat" aria-label="Lokasi antar, ubah" class="flex w-full items-center gap-3 rounded-2xl border border-slate-200 py-3 pl-3 pr-4 text-left">
+        <span class="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100"><svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></span>
+        <span class="min-w-0 flex-1"><span id="alamat-jalan" class="block truncate font-semibold">Jl. Pandu Raya No. 12</span><span id="alamat-daerah" class="block truncate text-xs text-slate-500">Sukamaju, Ciomas, Kab. Bogor</span></span>
+        <span class="shrink-0 text-sm font-semibold text-brand-600">Ubah</span>
+      </button>
+    </section>
+
+    <!-- Ringkasan barang -->
+    <section class="flex items-start gap-3 rounded-2xl border border-slate-200 p-3">
+      <img src="../public/assets/illust/activities/kursi-jati.png" alt="Kursi kayu jati ukir" width="64" height="64" class="size-16 shrink-0 rounded-lg bg-[#f7f8f4] object-contain p-1">
+      <div class="min-w-0 flex-1">
+        <p class="truncate font-semibold">Kursi Kayu Jati Ukir</p>
+        <p class="text-xs text-slate-500">Penjual: Siti Rahma · Sukamaju</p>
+        <div class="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <p data-total class="font-bold">Rp 320.000</p>
+          <p data-harga="tawar" class="text-xs text-slate-400 line-through">Rp 350.000</p>
+          <span data-harga="tawar" class="rounded-md bg-loop-soft px-2 py-0.5 text-[11px] font-semibold text-loop-dark">Harga tawaran disepakati</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cara serah terima -->
+    <fieldset>
+      <legend class="text-sm font-semibold">Cara serah terima <span class="font-normal text-slate-400">(wajib)</span></legend>
+      <div class="mt-2 flex flex-col gap-2">
+        <label class="block cursor-pointer"><input type="radio" name="serah" value="cod" class="peer sr-only" required>
+          <span class="flex items-center gap-3 rounded-2xl border border-slate-200 py-3 pl-3 pr-5 peer-checked:border-loop-dark/40 peer-checked:bg-loop-soft peer-checked:[&>i]:border-loop-dark peer-checked:[&>i]:bg-loop-dark peer-checked:[&>i]:shadow-[inset_0_0_0_3px_#f3fbe3] peer-[:user-invalid]:border-red-300">
+            <img src="../public/assets/illust/checkout/ketemuan-cod.png" alt="Ilustrasi ketemuan dan serah terima barang" width="48" height="48" class="size-12 shrink-0 object-contain p-1.5">
+            <span class="min-w-0"><b class="block">Ketemuan (COD lokasi)</b><span class="block text-xs text-slate-500">Atur titik temu lewat chat</span></span><i class="ml-auto size-5 shrink-0 rounded-full border-2 border-slate-300"></i></span></label>
+        <label class="block cursor-pointer"><input type="radio" name="serah" value="ambil" class="peer sr-only">
+          <span class="flex items-center gap-3 rounded-2xl border border-slate-200 py-3 pl-3 pr-5 peer-checked:border-loop-dark/40 peer-checked:bg-loop-soft peer-checked:[&>i]:border-loop-dark peer-checked:[&>i]:bg-loop-dark peer-checked:[&>i]:shadow-[inset_0_0_0_3px_#f3fbe3] peer-[:user-invalid]:border-red-300">
+            <img src="../public/assets/illust/checkout/ambil-penjual.png" alt="Ilustrasi ambil barang di tempat penjual" width="48" height="48" class="size-12 shrink-0 object-contain">
+            <span class="min-w-0"><b class="block">Ambil di tempat penjual</b><span class="block text-xs text-slate-500">Alamat dibagikan setelah dibayar</span></span><i class="ml-auto size-5 shrink-0 rounded-full border-2 border-slate-300"></i></span></label>
+      </div>
+    </fieldset>
+
+    <!-- Metode pembayaran -->
+    <fieldset>
+      <legend class="flex w-full items-center justify-between text-sm font-semibold"><span>Metode pembayaran <span class="font-normal text-slate-400">(wajib)</span></span> <span class="text-xs font-medium text-slate-400">Diproses Midtrans</span></legend>
+      <div class="relative mt-2">
+        <input type="radio" name="bayar" value="qris" id="by-qris" class="pointer-events-none absolute inset-x-0 top-0 h-full opacity-0" required><input type="radio" name="bayar" value="va" id="by-va" class="pointer-events-none absolute inset-x-0 top-0 h-full opacity-0"><input type="radio" name="bayar" value="ewallet" id="by-ewallet" class="pointer-events-none absolute inset-x-0 top-0 h-full opacity-0">
+        <details id="bayar-dd" class="group">
+          <summary class="flex cursor-pointer list-none items-center gap-3 rounded-2xl border border-slate-200 bg-white py-2.5 pl-3 pr-4 group-open:border-ink [&::-webkit-details-marker]:hidden">
+            <span id="bayar-pilih" class="flex min-w-0 flex-1 items-center gap-3"><img src="../public/assets/illust/checkout/payment.svg" alt="" width="32" height="32" class="size-8 shrink-0 object-contain"><span class="text-slate-400">Pilih metode pembayaran</span></span>
+            <svg class="size-5 shrink-0 text-slate-400 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="absolute inset-x-0 z-20 mt-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-card">
+          <label for="by-qris" data-row class="flex cursor-pointer items-center gap-3 rounded-xl p-2 hover:bg-slate-50 [&.on]:bg-loop-soft">
+            <img src="../public/assets/illust/checkout/qris.svg" alt="" width="40" height="40" class="size-10 shrink-0 object-contain">
+            <span class="min-w-0"><b class="block">QRIS</b><span class="block text-xs text-slate-500">Scan dari aplikasi bank atau e-wallet</span></span>
+          </label>
+          <label for="by-va" data-row class="flex cursor-pointer items-center gap-3 rounded-xl p-2 hover:bg-slate-50 [&.on]:bg-loop-soft">
+            <img src="../public/assets/illust/checkout/bank.svg" alt="" width="40" height="40" class="size-10 shrink-0 object-contain">
+            <span class="min-w-0"><b class="block">Virtual Account</b><span class="block text-xs text-slate-500">BCA, BNI, BRI, Mandiri</span></span>
+          </label>
+          <label for="by-ewallet" data-row class="flex cursor-pointer items-center gap-3 rounded-xl p-2 hover:bg-slate-50 [&.on]:bg-loop-soft">
+            <img src="../public/assets/illust/checkout/wallet.svg" alt="" width="40" height="40" class="size-10 shrink-0 object-contain">
+            <span class="min-w-0"><b class="block">E-wallet</b><span class="block text-xs text-slate-500">GoPay, ShopeePay</span></span>
+          </label>
+          </div>
+        </details>
+      </div>
+      <p class="mt-2 text-xs text-slate-500">Belum dibayar dalam 24 jam, pesanan batal otomatis.</p>
+    </fieldset>
+
+    <!-- Rincian biaya -->
+    <section class="rounded-2xl border border-slate-200 p-5 text-sm">
+      <h2 class="text-base font-bold">Rincian biaya</h2>
+      <dl class="mt-4 space-y-3">
+        <div class="flex items-baseline justify-between gap-4"><dt class="text-slate-500">Harga barang</dt><dd class="font-medium" data-total>Rp 350.000</dd></div>
+        <div class="flex items-baseline justify-between gap-4"><dt class="text-slate-500">Biaya layanan</dt><dd class="font-medium">Rp 0</dd></div>
+      </dl>
+      <div class="mt-4 flex items-baseline justify-between gap-4 border-t border-dashed border-slate-200 pt-4"><span class="font-semibold">Total bayar</span><span class="text-xl font-bold" data-total>Rp 350.000</span></div>
+    </section>
+
+    <!-- Escrow -->
+    <section class="flex gap-3 rounded-2xl bg-loop-soft p-4">
+      <svg class="size-6 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+      <p class="text-sm text-slate-600"><b class="font-semibold text-ink">Dana ditahan Reloop</b> sampai kamu konfirmasi barang diterima.</p>
+    </section>
+
+    <!-- Aksi -->
+    <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+      <div class="mb-2 flex items-end justify-between">
+        <div><p class="text-xs text-slate-500">Total bayar</p><p data-total class="text-xl font-bold">Rp 320.000</p></div>
+      </div>
+      <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Bayar sekarang</button>
+    </div>
+  </form>
+
+  <dialog id="alamat" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
+    <div class="p-5">
+      <div class="mx-auto h-1 w-9 rounded-full bg-slate-200"></div>
+      <div class="mt-4 flex items-center justify-between">
+        <h2 class="text-xl font-bold">Lokasi antar</h2>
+        <button type="button" data-close aria-label="Tutup" class="grid size-9 place-items-center rounded-full bg-slate-100"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <div id="alamat-sel" class="mt-4 grid gap-2.5">
+        <label class="block rounded-2xl border border-slate-200 px-4 pb-2 pt-2.5 focus-within:border-ink"><span class="block text-xs text-slate-500">Nama jalan dan nomor</span><input id="alamat-in" value="Jl. Pandu Raya No. 12" placeholder="mis. Jl. Pandu Raya No. 12" class="w-full bg-transparent py-1 font-medium outline-none"></label>
+        <label class="block rounded-2xl border border-slate-200 px-4 pb-2 pt-2.5 focus-within:border-ink"><span class="block text-xs text-slate-500">Kecamatan</span><select class="w-full appearance-none bg-transparent bg-[length:18px] bg-[right_center] bg-no-repeat py-1 pr-6 font-medium outline-none" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394a3b8%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')"><option>Ciomas</option></select></label><label class="block rounded-2xl border border-slate-200 px-4 pb-2 pt-2.5 focus-within:border-ink"><span class="block text-xs text-slate-500">Desa/Kelurahan</span><select class="w-full appearance-none bg-transparent bg-[length:18px] bg-[right_center] bg-no-repeat py-1 pr-6 font-medium outline-none" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394a3b8%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')"><option>Sukamaju</option></select></label><label class="block rounded-2xl border border-slate-200 px-4 pb-2 pt-2.5 focus-within:border-ink"><span class="block text-xs text-slate-500">Kota/Kabupaten</span><select class="w-full appearance-none bg-transparent bg-[length:18px] bg-[right_center] bg-no-repeat py-1 pr-6 font-medium outline-none" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394a3b8%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')"><option>Kab. Bogor</option></select></label>
+      </div>
+      <button type="button" data-toast="Lokasi terdeteksi: Sukamaju, Ciomas" class="mt-3 flex w-full items-center gap-3 border-t border-slate-100 pt-4 text-left">
+        <span class="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100"><svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg></span>
+        <span><span class="block font-semibold">Gunakan lokasi saya</span><span class="block text-xs text-slate-500">Isi alamat otomatis dari GPS.</span></span>
+      </button>
+      <button type="button" id="alamat-simpan" class="mt-5 w-full rounded-full bg-ink py-3.5 font-semibold text-white">Simpan lokasi</button>
+    </div>
+  </dialog>
+</div>
+<script src="js/app.js?v=3"></script>
+<script>
+  // Total dari harga tawaran (?tawar=) atau harga normal; dibawa ke halaman bayar (mockup, di Laravel dari sesi pesanan)
+  const totalBayar = segs.harga === 'normal' ? 350000 : Number(params.get('tawar')) || 320000;
+  $$('[data-total]').forEach((el) => (el.textContent = rupiah(totalBayar)));
+  const form = document.querySelector('form[action]');
+  const aksi = () => form.setAttribute('action', `bayar.html?total=${totalBayar}&bayar=${form.bayar.value || 'va'}`);
+  aksi(), form.addEventListener('change', aksi);
+  // Dropdown metode bayar: ikon + nama disalin ke pemicu, lalu menu menutup.
+  const dd = document.getElementById('bayar-dd');
+  form.addEventListener('change', (e) => {
+    if (e.target.name !== 'bayar') return;
+    const row = form.querySelector(`label[for="${e.target.id}"]`);
+    const icon = row.querySelector('img').cloneNode(true);
+    icon.width = icon.height = 32;
+    icon.className = 'size-8 shrink-0 object-contain';
+    const label = document.createElement('b');
+    label.textContent = row.querySelector('b').textContent;
+    document.getElementById('bayar-pilih').replaceChildren(icon, label);
+    $$('[data-row]', dd).forEach((r) => r.classList.toggle('on', r === row));
+    dd.open = false;
+  });
+  document.addEventListener('click', (e) => { if (!dd.contains(e.target)) dd.open = false; });
+  // Lokasi antar: ringkasan di form diisi dari sheet.
+  document.getElementById('alamat-simpan').addEventListener('click', () => {
+    const [kec, desa, kota] = $$('#alamat-sel select').map((x) => x.value);
+    document.getElementById('alamat-jalan').textContent = document.getElementById('alamat-in').value || 'Alamat belum diisi';
+    document.getElementById('alamat-daerah').textContent = `${desa}, ${kec}, ${kota}`;
+    document.getElementById('alamat').close();
+  });
+</script>
+</body>
+</html>
