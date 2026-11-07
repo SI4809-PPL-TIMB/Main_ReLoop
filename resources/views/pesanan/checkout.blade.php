@@ -242,8 +242,8 @@
                         const snapData = await snapRes.json();
 
                         if (!snapRes.ok || !snapData.token) {
-                            // Jika Midtrans API gagal, arahkan langsung ke halaman pesanan
-                            window.location.href = `/pesanan/${orderNumber}`;
+                            // Jika Midtrans API gagal, arahkan langsung ke halaman status pesanan
+                            window.location.href = `/pesanan/${orderNumber}/status`;
                             return;
                         }
 
@@ -251,21 +251,21 @@
                         if (typeof window.snap !== 'undefined' && typeof window.snap.pay === 'function') {
                             window.snap.pay(snapData.token, {
                                 onSuccess: function (result) {
-                                    window.location.href = `/pesanan/${orderNumber}?status=sukses`;
+                                    window.location.href = `/pesanan/${orderNumber}/status?status=sukses`;
                                 },
                                 onPending: function (result) {
-                                    window.location.href = `/pesanan/${orderNumber}?status=menunggu`;
+                                    window.location.href = `/pesanan/${orderNumber}/status?status=menunggu`;
                                 },
                                 onError: function (result) {
-                                    window.location.href = `/pesanan/${orderNumber}?status=gagal`;
+                                    window.location.href = `/pesanan/${orderNumber}/status?status=gagal`;
                                 },
                                 onClose: function () {
-                                    window.location.href = `/pesanan/${orderNumber}`;
+                                    window.location.href = `/pesanan/${orderNumber}/status`;
                                 },
                             });
                         } else {
                             // Fallback jika Snap script belum ter-load (misal offline)
-                            window.location.href = `/pesanan/${orderNumber}`;
+                            window.location.href = `/pesanan/${orderNumber}/status`;
                         }
                     } catch (err) {
                         alert(err.message || 'Terjadi kesalahan sistem.');

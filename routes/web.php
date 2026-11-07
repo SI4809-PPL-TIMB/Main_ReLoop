@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/barang/{listing}/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/barang/{listing}/pesan', [OrderController::class, 'store'])->name('order.store');
     Route::get('/pesanan/{orderNumber}', [OrderController::class, 'show'])->name('order.show');
+    Route::get('/pesanan/{orderNumber}/status', [OrderController::class, 'paymentStatus'])->name('order.status');
     Route::post('/pesanan/{orderNumber}/snap-token', [OrderController::class, 'getSnapToken'])->name('order.snap_token');
 
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');

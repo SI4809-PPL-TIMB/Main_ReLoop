@@ -176,6 +176,33 @@ class OrderController extends Controller
     }
 
     /**
+     * Halaman status pembayaran pesanan (sukses, menunggu, gagal/kedaluwarsa).
+     */
+    public function paymentStatus(Request $request, string $orderNumber): JsonResponse|View
+    {
+        $order = Order::with(['listing.primaryPhoto', 'payment', 'seller.profile', 'buyer.profile'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        $user = $request->user();
+
+        // Hanya pembeli atau penjual yang boleh mengakses status pesanan ini
+        if ($user->id !== $order->buyer_id && $user->id !== $order->seller_id) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'order_number' => $order->order_number,
+                'status'       => $order->status,
+                'order'        => $order,
+            ]);
+        }
+
+        return view('pesanan.status', compact('order'));
+    }
+
+    /**
      * Dapatkan Snap Token Midtrans untuk pembayaran pesanan.
      */
     public function getSnapToken(Request $request, string $orderNumber, MidtransService $midtransService): JsonResponse
