@@ -150,6 +150,34 @@ class OrderStatusViewTest extends TestCase
             ->assertJson([
                 'order_number' => $this->order->order_number,
                 'status'       => Order::STATUS_MENUNGGU_BAYAR,
+                'is_paid'      => false,
+            ]);
+    }
+
+    public function test_halaman_status_sinkronisasi_otomatis_dengan_midtrans_dan_mengembalikan_is_paid(): void
+    {
+        $this->payment->update(['snap_token' => 'mock-token']);
+
+        $midtransMock = $this->mock(\App\Services\MidtransService::class);
+        $midtransMock->shouldReceive('syncOrderWithMidtrans')
+            ->once()
+            ->withArgs(function ($order) {
+                return $order->id === $this->order->id;
+            })
+            ->andReturnUsing(function ($order) {
+                $order->update(['status' => Order::STATUS_DIBAYAR]);
+                $this->payment->update(['status' => Payment::STATUS_BERHASIL]);
+                return $order;
+            });
+
+        $response = $this->actingAs($this->buyer)
+            ->getJson(route('order.status', $this->order->order_number));
+
+        $response->assertOk()
+            ->assertJson([
+                'order_number' => $this->order->order_number,
+                'status'       => Order::STATUS_DIBAYAR,
+                'is_paid'      => true,
             ]);
     }
 }

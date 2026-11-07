@@ -7,6 +7,9 @@ use App\Models\Listing;
 use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\WilayahKabupaten;
+use App\Models\WilayahKecamatan;
+use App\Models\WilayahKelurahan;
 use App\Services\MidtransService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -55,9 +58,23 @@ class OrderController extends Controller
         }
 
         $platformFee = (int) round($agreedPrice * Payment::KOMISI_RATE);
-        $user->load(['profile.kelurahan']);
+        $user->load(['profile.kelurahan.kecamatan.kabupaten']);
 
-        return view('pesanan.checkout', compact('listing', 'agreedPrice', 'isOffer', 'platformFee', 'user', 'acceptedOffer'));
+        $kecamatans = WilayahKecamatan::orderBy('nama')->get();
+        $kelurahans = WilayahKelurahan::orderBy('nama')->get();
+        $kabupatens = WilayahKabupaten::orderBy('nama')->get();
+
+        return view('pesanan.checkout', compact(
+            'listing',
+            'agreedPrice',
+            'isOffer',
+            'platformFee',
+            'user',
+            'acceptedOffer',
+            'kecamatans',
+            'kelurahans',
+            'kabupatens'
+        ));
     }
 
     /**
@@ -178,7 +195,7 @@ class OrderController extends Controller
     /**
      * Halaman status pembayaran pesanan (sukses, menunggu, gagal/kedaluwarsa).
      */
-    public function paymentStatus(Request $request, string $orderNumber): JsonResponse|View
+    public function paymentStatus(Request $request, string $orderNumber, MidtransService $midtransService): JsonResponse|View
     {
         $order = Order::with(['listing.primaryPhoto', 'payment', 'seller.profile', 'buyer.profile'])
             ->where('order_number', $orderNumber)
@@ -191,10 +208,18 @@ class OrderController extends Controller
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
+        // Otomatis sinkronkan status dengan Midtrans API jika pesanan masih menunggu bayar
+        if ($order->status === Order::STATUS_MENUNGGU_BAYAR && ($order->payment?->snap_token || ! app()->environment('testing'))) {
+            $midtransService->syncOrderWithMidtrans($order);
+            $order->refresh();
+            $order->load(['listing.primaryPhoto', 'payment', 'seller.profile', 'buyer.profile']);
+        }
+
         if ($request->expectsJson()) {
             return response()->json([
                 'order_number' => $order->order_number,
                 'status'       => $order->status,
+                'is_paid'      => $order->status === Order::STATUS_DIBAYAR,
                 'order'        => $order,
             ]);
         }

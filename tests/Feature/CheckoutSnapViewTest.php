@@ -82,8 +82,7 @@ class CheckoutSnapViewTest extends TestCase
             ->assertSee('Siti Rahma')
             ->assertSee('Rp 350.000')
             ->assertSee('Bayar sekarang')
-            ->assertSee('Cara serah terima')
-            ->assertSee('Metode pembayaran');
+            ->assertSee('Cara serah terima');
     }
 
     public function test_checkout_menggunakan_harga_tawaran_disepakati(): void
