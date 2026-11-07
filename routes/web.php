@@ -87,3 +87,7 @@ Route::post('/verifikasi/resend', [RegisterController::class, 'resendVerificatio
 
 // 4. Halaman Selesai (Akun Siap)
 Route::get('/selesai', [RegisterController::class, 'showComplete'])->name('selesai');
+
+// 7.1.5 · Webhook Midtrans (PPLTIMB-131)
+Route::post('/api/midtrans/webhook', [\App\Http\Controllers\MidtransWebhookController::class, 'handle'])->name('midtrans.webhook');
+Route::post('/midtrans/webhook', [\App\Http\Controllers\MidtransWebhookController::class, 'handle']);
