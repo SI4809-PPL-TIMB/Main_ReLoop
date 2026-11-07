@@ -7,6 +7,7 @@ use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\CariController;
 use App\Http\Controllers\KategorisasiController;
 use App\Http\Controllers\LokasiController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfilController;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +54,10 @@ Route::middleware('auth')->group(function () {
     Route::match(['get', 'post'], '/barang/{listing}/chat', [\App\Http\Controllers\ChatController::class, 'open'])->name('pesan.mulai');
     Route::get('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('pesan.show');
     Route::post('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('pesan.kirim');
+
+    // 7.1 · Checkout dan Pembayaran (PPLTIMB-64)
+    Route::post('/barang/{listing}/pesan', [OrderController::class, 'store'])->name('order.store');
+    Route::get('/pesanan/{orderNumber}', [OrderController::class, 'show'])->name('order.show');
 
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
