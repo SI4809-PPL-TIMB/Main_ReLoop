@@ -117,7 +117,7 @@
             {{-- Judul & harga --}}
             <section>
                 <p class="text-xs text-slate-500">{{ $listing->category?->name }}@if ($listing->published_at) · Diunggah {{ $listing->published_at->locale('id')->diffForHumans() }}@endif</p>
-                <h1 class="mt-1 text-[22px] font-bold leading-tight">{{ $listing->title }}</h1>
+                <h1 class="mt-1.5 text-[22px] font-bold leading-tight">{{ $listing->title }}</h1>
                 <div class="mt-2 flex items-baseline gap-2">
                     <p class="text-2xl font-bold">{{ $rupiah($listing->price) }}</p>
                     @if ($listing->is_negotiable)
@@ -298,7 +298,7 @@
                 </a>
                 @if ($aktif)
                     @if ($listing->is_negotiable)
-                        <button type="button" data-soon class="flex-1 rounded-full border border-slate-300 py-3 text-center font-semibold">Tawar</button>
+                        <a href="{{ route('pesan.mulai', ['listing' => $listing, 'tawar' => 1]) }}" class="flex-1 rounded-full border border-slate-300 py-3 text-center font-semibold hover:bg-slate-50 transition">Tawar</a>
                     @endif
                     <a href="{{ route('order.checkout', $listing) }}" class="flex-[1.4] rounded-full bg-ink py-3 text-center font-semibold text-white">Beli sekarang</a>
                 @else

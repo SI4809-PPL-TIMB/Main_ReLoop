@@ -95,8 +95,8 @@ class OrderStatusViewTest extends TestCase
             ->get(route('order.status', $this->order->order_number));
 
         $response->assertOk()
-            ->assertSee('Pembayaran Berhasil!')
-            ->assertSee('Dana Ditahan Rekber Reloop')
+            ->assertSee('Pembayaran berhasil')
+            ->assertSee('Dana ditahan Rekber Reloop')
             ->assertSee($this->order->order_number)
             ->assertSee('Chat Penjual untuk Janjian')
             ->assertSee('Lihat Detail Pesanan');
@@ -108,11 +108,10 @@ class OrderStatusViewTest extends TestCase
             ->get(route('order.status', $this->order->order_number));
 
         $response->assertOk()
-            ->assertSee('Menunggu Pembayaran')
-            ->assertSee('BCA Virtual Account')
-            ->assertSee('8077081234567890')
-            ->assertSee('Bayar Sekarang via Snap')
-            ->assertSee('Cek Status Pembayaran');
+            ->assertSee('Menunggu pembayaran')
+            ->assertSee($this->order->order_number)
+            ->assertSee('Lanjut bayar')
+            ->assertSee('Cek status pembayaran');
     }
 
     public function test_halaman_status_menampilkan_state_gagal_ketika_order_dibatalkan(): void
@@ -127,10 +126,10 @@ class OrderStatusViewTest extends TestCase
             ->get(route('order.status', $this->order->order_number));
 
         $response->assertOk()
-            ->assertSee('Pesanan Dibatalkan')
-            ->assertSee('Batas Waktu Bayar Terlewat / Dibatalkan')
-            ->assertSee('Cari Barang Lain')
-            ->assertSee('Kembali ke Beranda');
+            ->assertSee('Pesanan dibatalkan')
+            ->assertSee('Batas bayar 24 jam terlewat')
+            ->assertSee('Cari barang lain')
+            ->assertSee('Lihat barang ini lagi');
     }
 
     public function test_user_lain_dilarang_mengakses_halaman_status_pesanan(): void

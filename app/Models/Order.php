@@ -18,6 +18,7 @@ class Order extends Model
 
     public const DELIVERY_COD = 'cod';
     public const DELIVERY_AMBIL = 'ambil';
+    public const DELIVERY_KIRIM = 'kirim';
 
     protected $fillable = [
         'order_number',
@@ -54,6 +55,15 @@ class Order extends Model
             'auto_complete_at'    => 'datetime',
             'cancelled_at'        => 'datetime',
         ];
+    }
+
+    public function deliveryLabel(): string
+    {
+        return match ($this->delivery_method) {
+            self::DELIVERY_AMBIL => 'Ambil di tempat penjual',
+            self::DELIVERY_KIRIM => 'Kirim pakai delivery',
+            default => 'Ketemuan (COD lokasi)',
+        };
     }
 
     public function listing(): BelongsTo

@@ -48,7 +48,7 @@
         </a>
 
         {{-- Poin + aksi cepat. Poin hanya untuk level, tidak bisa ditukar uang (BR-05/BR-06). --}}
-        <section class="flex items-start justify-between rounded-2xl border border-slate-200 bg-gradient-to-r from-loop-soft via-white to-white p-4">
+        <section class="flex items-start justify-between rounded-2xl border border-slate-200 bg-[linear-gradient(to_right,#f3fbe3,#ffffff,#ffffff)] p-4">
             <a href="#" class="flex flex-col justify-between self-stretch">
                 <img src="{{ asset('assets/reloop-wordmark-dark.svg') }}" alt="Reloop" class="h-3 w-fit">
                 <span class="mt-5 flex items-baseline gap-1">
@@ -84,7 +84,7 @@
             <p class="max-w-[62%] text-2xl font-bold leading-tight text-orange-500">Mulai jualan</p>
             <p class="mt-0.5 max-w-[62%] text-sm font-medium">Dana aman sampai barang diterima pembeli</p>
             <a href="{{ route('barang.create') }}" class="mt-3 inline-block rounded-full bg-ink px-4 py-2 text-xs font-bold uppercase tracking-wide text-white">Pasang sekarang</a>
-            <img src="{{ asset('assets/illust/promo-jual.png') }}" class="absolute right-4 top-1/2 size-28 -translate-y-1/2 object-contain" width="112" height="112" alt="">
+            <img src="{{ asset('assets/illust/promo-jual.png') }}" class="absolute right-4 top-1/2 -mt-14 size-28 object-contain" width="112" height="112" alt="">
         </section>
 
         {{-- Streak (mode daur ulang) --}}

@@ -85,11 +85,25 @@
                         <i class="ml-auto size-5 shrink-0 rounded-full border-2 border-slate-300"></i>
                     </span>
                 </label>
+                <label class="block cursor-pointer">
+                    <input type="radio" name="delivery_method" value="kirim" class="peer sr-only" {{ old('delivery_method') === 'kirim' ? 'checked' : '' }}>
+                    <span class="flex items-center gap-3 rounded-2xl border border-slate-200 py-3 pl-3 pr-5 peer-checked:border-loop-dark/40 peer-checked:bg-loop-soft peer-checked:[&>i]:border-loop-dark peer-checked:[&>i]:bg-loop-dark peer-checked:[&>i]:shadow-[inset_0_0_0_3px_#f3fbe3] peer-[:user-invalid]:border-red-300">
+                        <span aria-hidden="true" class="grid size-12 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span>
+                        <span class="min-w-0"><b class="block">Kirim pakai delivery</b><span class="block text-xs text-slate-500">Diantar kurir ke lokasi antar kamu</span></span>
+                        <i class="ml-auto size-5 shrink-0 rounded-full border-2 border-slate-300"></i>
+                    </span>
+                </label>
             </div>
             @error('delivery_method')
                 <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
             @enderror
         </fieldset>
+
+        <!-- Metode dipilih di halaman Midtrans, bukan di sini -->
+        <p class="flex items-start gap-3 rounded-2xl bg-slate-100 p-4 text-sm text-slate-500">
+            <svg class="mt-0.5 size-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            Pilih metode bayar di Midtrans setelah klik bayar. Belum dibayar 24 jam, pesanan batal otomatis.
+        </p>
 
         <!-- Rincian biaya -->
         <section class="rounded-2xl border border-slate-200 p-5 text-sm">

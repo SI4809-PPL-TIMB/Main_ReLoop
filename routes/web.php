@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profil/avatar', [ProfilController::class, 'hapusAvatar'])->name('account.avatar.delete');
     Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
     Route::get('/cari', [CariController::class, 'index'])->name('cari');
+    Route::get('/aktivitas', [\App\Http\Controllers\AktivitasController::class, 'index'])->name('aktivitas');
     Route::get('/barang-saya', [BarangController::class, 'index'])->name('barang.index');
     Route::get('/jual', [BarangController::class, 'create'])->name('barang.create');
     Route::post('/jual', [BarangController::class, 'store'])->name('barang.store');

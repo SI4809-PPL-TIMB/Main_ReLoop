@@ -24,194 +24,140 @@
     <main class="space-y-4 px-4 pt-5">
         {{-- 1. STATE SUKSES / BERHASIL (ui/bayar.html modal lunas & ringkasan) --}}
         @if ($isSukses)
-            <section class="text-center pt-2">
-                <div class="mx-auto grid size-20 place-items-center rounded-full bg-loop-soft text-loop-dark">
-                    <svg class="size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 6 9 17l-5-5"/>
-                    </svg>
+            {{-- Konfirmasi pembayaran (pola Shop "Order confirmed") --}}
+            <section class="pt-1 text-center">
+                <div class="min-w-0">
+                    <span class="mx-auto grid size-11 place-items-center rounded-full bg-loop-soft text-loop-dark">
+                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    </span>
+                    <h2 class="mt-3 text-2xl font-extrabold leading-tight text-ink">Pembayaran berhasil</h2>
+                    <p class="mt-1 text-sm text-slate-500">Pesanan <span class="font-mono font-medium text-ink">#{{ $order->order_number }}</span></p>
                 </div>
-                <h2 class="mt-4 text-2xl font-extrabold text-ink">Pembayaran Berhasil!</h2>
-                <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-loop-soft px-3 py-1 text-xs font-semibold text-loop-dark">
-                    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/></svg>
-                    Dana Ditahan Rekber Reloop
-                </p>
-                <p class="mx-auto mt-2 max-w-[320px] text-xs text-slate-500 leading-relaxed">
-                    Pembayaran kamu telah kami terima. Dana aman di rekening bersama Reloop sampai kamu memeriksa dan mengonfirmasi barang.
-                </p>
             </section>
 
-            <!-- Ringkasan Transaksi Sukses -->
-            <section class="rounded-2xl border border-slate-200 p-4 text-sm shadow-card">
-                <h3 class="font-bold text-ink mb-3">Rincian Transaksi</h3>
-                <dl class="space-y-2.5">
-                    <div class="flex justify-between text-slate-600">
-                        <dt>Nomor Pesanan</dt>
-                        <dd class="font-mono font-medium text-ink">{{ $order->order_number }}</dd>
+            <p class="flex items-start gap-2 rounded-2xl bg-loop-soft px-3.5 py-3 text-xs leading-relaxed text-loop-dark">
+                <svg class="mt-0.5 size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/></svg>
+                <span><b>Dana ditahan Rekber Reloop.</b> Baru diteruskan ke penjual setelah kamu memeriksa dan mengonfirmasi barang.</span>
+            </p>
+
+            <section class="divide-y divide-slate-100 rounded-2xl border border-slate-200 text-sm">
+                <div class="flex items-center justify-between gap-4 px-4 py-3">
+                    <span class="text-slate-500">Barang</span>
+                    <span class="max-w-[200px] truncate font-medium text-ink">{{ $order->listing?->title }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4 px-4 py-3">
+                    <span class="text-slate-500">Serah terima</span>
+                    <span class="font-medium text-ink">{{ $order->deliveryLabel() }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4 px-4 py-3">
+                    <span class="text-slate-500">Metode bayar</span>
+                    <span class="font-medium uppercase text-ink">{{ $order->payment?->method ?? 'Midtrans' }}{{ $order->payment?->bank ? ' · '.strtoupper($order->payment->bank) : '' }}</span>
+                </div>
+                @if ($order->payment?->paid_at)
+                    <div class="flex items-center justify-between gap-4 px-4 py-3">
+                        <span class="text-slate-500">Dibayar pada</span>
+                        <span class="font-medium text-ink">{{ $order->payment->paid_at->format('d M Y, H:i') }}</span>
                     </div>
-                    <div class="flex justify-between text-slate-600">
-                        <dt>Barang</dt>
-                        <dd class="font-medium text-ink truncate max-w-[180px]">{{ $order->listing?->title }}</dd>
-                    </div>
-                    <div class="flex justify-between text-slate-600">
-                        <dt>Metode Bayar</dt>
-                        <dd class="font-medium uppercase text-ink">{{ $order->payment?->method ?? 'Midtrans' }} {{ $order->payment?->bank ? '('.strtoupper($order->payment->bank).')' : '' }}</dd>
-                    </div>
-                    <div class="flex justify-between border-t border-dashed border-slate-200 pt-2.5 font-bold text-base text-ink">
-                        <dt>Total Bayar</dt>
-                        <dd>{{ $rupiah($order->agreed_price) }}</dd>
-                    </div>
-                </dl>
+                @endif
+                <div class="flex items-center justify-between gap-4 px-4 py-3.5">
+                    <span class="font-bold text-ink">Total bayar</span>
+                    <span class="text-lg font-extrabold text-ink">{{ $rupiah($order->agreed_price) }}</span>
+                </div>
+            </section>
+
+            {{-- Langkah berikutnya --}}
+            <section class="rounded-2xl border border-slate-200">
+                <h3 class="border-b border-slate-200 px-4 py-3 text-sm font-bold text-ink">Langkah berikutnya</h3>
+                <ol class="space-y-3.5 p-4 text-sm">
+                    @foreach ([
+                        ['Pembayaran diterima', 'Penjual sudah kami kabari untuk menyiapkan barang.', true],
+                        ['Janjian serah terima', 'Atur waktu dan titik temu lewat chat dengan penjual.', false],
+                        ['Periksa & konfirmasi barang', 'Setelah barang sesuai, konfirmasi agar dana diteruskan ke penjual.', false],
+                    ] as $i => [$judul, $ket, $done])
+                        <li class="flex items-center gap-3">
+                            <span class="grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold {{ $done ? 'bg-loop-dark text-white' : 'border border-slate-300 text-slate-500' }}">
+                                @if ($done)<svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>@else{{ $i + 1 }}@endif
+                            </span>
+                            <div>
+                                <p class="font-semibold text-ink">{{ $judul }}</p>
+                                <p class="text-xs leading-relaxed text-slate-500">{{ $ket }}</p>
+                            </div>
+                        </li>
+                    @endforeach
+                </ol>
             </section>
 
             <!-- Tombol Aksi Sukses (Fixed Bottom) -->
-            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
                 <a href="{{ route('pesan.mulai', $order->listing) }}" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white shadow-md hover:bg-slate-800 transition">
                     Chat Penjual untuk Janjian
                 </a>
-                <a href="{{ route('order.show', $order->order_number) }}" class="mt-2 block w-full rounded-full border border-slate-200 py-2.5 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
+                <a href="{{ route('order.show', $order->order_number) }}" class="mt-2 block w-full rounded-full border border-slate-200 py-3.5 text-center font-semibold text-slate-700 hover:bg-slate-50 transition">
                     Lihat Detail Pesanan
                 </a>
             </div>
 
         {{-- 2. STATE MENUNGGU PEMBAYARAN (ui/bayar.html) --}}
         @elseif ($isMenunggu)
+            @php $batas = $order->payment?->expired_at ?? $order->created_at->copy()->addHours(24); @endphp
             <section class="text-center pt-2">
-                <div class="mx-auto grid size-20 place-items-center rounded-full bg-amber-50 text-amber-600">
-                    <svg class="size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="9"/>
-                        <path d="M12 7v5l3 2"/>
-                    </svg>
+                <div class="mx-auto grid size-24 place-items-center rounded-2xl bg-amber-50 text-amber-600">
+                    <svg class="size-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
                 </div>
-                <h2 class="mt-4 text-2xl font-extrabold text-ink">Menunggu Pembayaran</h2>
-                <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-xs font-semibold text-amber-800">
+                <h2 class="mt-3 text-xl font-bold">Menunggu pembayaran</h2>
+                <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-800">
                     <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                    Bayar sebelum <span>{{ $order->payment?->expired_at ? $order->payment->expired_at->format('H:i') : '24 Jam' }}</span>
+                    Bayar sebelum <span id="countdown" data-end="{{ $batas->getTimestamp() }}">--:--:--</span>
                 </p>
-                <p class="mt-2 text-xs text-slate-500">
-                    Selesaikan pembayaran sebelum batas waktu terlewat agar pesanan tidak batal otomatis.
-                </p>
+                <p class="mt-2 text-xs text-slate-500">Lewat batas waktu, pesanan batal otomatis.</p>
             </section>
 
-            <!-- Kartu Pembayaran VA / QRIS / E-Wallet -->
-            @if ($order->payment && ($order->payment->va_number || $order->payment->method === 'va'))
-                <section class="rounded-2xl border border-slate-200 p-4 shadow-card">
-                    <div class="flex items-center gap-3">
-                        <img src="{{ asset('assets/illust/checkout/bank.svg') }}" alt="Bank" class="size-9 shrink-0 object-contain">
-                        <div class="flex-1">
-                            <p class="font-semibold text-sm">{{ strtoupper($order->payment->bank ?? 'BCA') }} Virtual Account</p>
-                            <p class="text-xs text-slate-500">Diproses Midtrans</p>
-                        </div>
+            <!-- Ringkasan pesanan -->
+            <section class="rounded-2xl border border-slate-200 p-4 shadow-card">
+                <div class="flex items-center gap-3">
+                    <img src="{{ $fotoUrl }}" alt="" width="48" height="48" class="size-12 shrink-0 rounded-xl bg-[#f7f8f4] object-contain p-1">
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate font-semibold">{{ $order->listing?->title }}</p>
+                        <p class="text-xs text-slate-500">#{{ $order->order_number }}</p>
                     </div>
-                    <p class="mt-4 text-xs text-slate-500">Nomor virtual account</p>
-                    <div class="mt-1 flex items-center justify-between gap-3">
-                        <p id="va-number" class="text-xl font-bold tracking-wide font-mono">{{ $order->payment->va_number ?? '8077 0812 3456 7890' }}</p>
-                        <button type="button" id="btn-copy-va" data-va="{{ $order->payment->va_number ?? '8077081234567890' }}" class="shrink-0 rounded-full border border-slate-300 px-4 py-1.5 text-xs font-semibold hover:bg-slate-50">
-                            Salin
-                        </button>
-                    </div>
-                    <div class="mt-4 flex items-center justify-between border-t border-dashed border-slate-200 pt-3">
-                        <p class="text-xs text-slate-500">Jumlah bayar</p>
-                        <p class="text-lg font-bold text-ink">{{ $rupiah($order->agreed_price) }}</p>
-                    </div>
-                </section>
+                </div>
+                <div class="mt-4 flex items-center justify-between border-t border-dashed border-slate-200 pt-3">
+                    <p class="text-sm text-slate-500">Jumlah bayar</p>
+                    <p class="text-lg font-bold">{{ $rupiah($order->agreed_price) }}</p>
+                </div>
+            </section>
 
-                <!-- Cara Bayar (Accordion) sesuai ui/bayar.html -->
-                <section id="cara-bayar" class="rounded-2xl border border-slate-200 text-sm">
-                    <h2 class="px-4 pt-4 font-bold">Cara bayar</h2>
-                    <details class="group border-b border-slate-100 px-4 py-3" open>
-                        <summary class="flex cursor-pointer list-none items-center justify-between font-semibold [&::-webkit-details-marker]:hidden">
-                            m-Banking ({{ strtoupper($order->payment->bank ?? 'BCA') }})
-                            <svg class="size-4 transition group-open:rotate-180 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
-                        </summary>
-                        <ol class="mt-2 list-decimal space-y-1 pl-5 text-xs text-slate-600">
-                            <li>Buka aplikasi m-Banking, pilih menu Pembayaran / Transfer.</li>
-                            <li>Pilih Virtual Account.</li>
-                            <li>Masukkan nomor Virtual Account di atas.</li>
-                            <li>Cek rincian pesanan dan jumlah bayar, lalu masukkan PIN transaksi.</li>
-                        </ol>
-                    </details>
-                    <details class="group border-b border-slate-100 px-4 py-3">
-                        <summary class="flex cursor-pointer list-none items-center justify-between font-semibold [&::-webkit-details-marker]:hidden">
-                            ATM ({{ strtoupper($order->payment->bank ?? 'BCA') }})
-                            <svg class="size-4 transition group-open:rotate-180 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
-                        </summary>
-                        <ol class="mt-2 list-decimal space-y-1 pl-5 text-xs text-slate-600">
-                            <li>Masukkan kartu ATM dan PIN kamu.</li>
-                            <li>Pilih Transaksi Lainnya, lalu Transfer / Pembayaran.</li>
-                            <li>Pilih ke Rekening Virtual Account.</li>
-                            <li>Masukkan nomor VA dan konfirmasi nominal pembayaran.</li>
-                        </ol>
-                    </details>
-                    <details class="group px-4 py-3">
-                        <summary class="flex cursor-pointer list-none items-center justify-between font-semibold [&::-webkit-details-marker]:hidden">
-                            Internet Banking
-                            <svg class="size-4 transition group-open:rotate-180 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
-                        </summary>
-                        <ol class="mt-2 list-decimal space-y-1 pl-5 text-xs text-slate-600">
-                            <li>Login ke akun Internet Banking kamu.</li>
-                            <li>Pilih menu Transfer Dana ke Virtual Account.</li>
-                            <li>Masukkan nomor VA dan otentikasi transaksi kamu.</li>
-                        </ol>
-                    </details>
-                </section>
-            @else
-                <section class="rounded-2xl border border-slate-200 p-4 shadow-card text-center">
-                    <p class="font-semibold text-sm">Pembayaran Instan Midtrans Snap</p>
-                    <p class="text-xs text-slate-500 mt-1">Gunakan QRIS, Virtual Account, atau E-Wallet pilihanmu</p>
-                    <div class="mt-4 flex items-center justify-between border-t border-dashed border-slate-200 pt-3 text-left">
-                        <p class="text-xs text-slate-500">Jumlah bayar</p>
-                        <p class="text-lg font-bold text-ink">{{ $rupiah($order->agreed_price) }}</p>
-                    </div>
-                </section>
-            @endif
-
-            <!-- Banner Garansi Rekber Reloop sesuai ui/bayar.html -->
             <section class="flex gap-3 rounded-2xl bg-loop-soft p-4">
-                <svg class="size-6 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/>
-                    <path d="m9 12 2 2 4-4"/>
-                </svg>
-                <p class="text-sm text-slate-600"><b class="font-semibold text-ink">Dana ditahan Reloop</b> sampai kamu konfirmasi barang diterima.</p>
+                <svg class="size-6 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+                <p class="text-sm text-slate-600">Dana ditahan Reloop sampai kamu konfirmasi barang diterima.</p>
             </section>
 
-            <!-- Aksi Bayar & Cek Status (Fixed Bottom) -->
-            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
-                <button type="button" id="btn-bayar-snap" class="block w-full rounded-full bg-ink py-3.5 font-semibold text-white shadow-md flex items-center justify-center gap-2 hover:bg-slate-800 transition">
-                    <span id="btn-bayar-label">Bayar Sekarang via Snap</span>
+            <!-- Aksi (Fixed Bottom) -->
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
+                <button type="button" id="btn-bayar-snap" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white hover:bg-slate-800 transition disabled:opacity-60">
+                    <span id="btn-bayar-label">Lanjut bayar</span>
                 </button>
-                <button type="button" onclick="window.location.reload()" class="mt-2 block w-full py-2 text-center text-sm font-semibold text-slate-500 hover:text-ink transition flex items-center justify-center gap-2">
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-                    Cek Status Pembayaran
+                <button type="button" onclick="window.location.reload()" class="mt-2 block w-full rounded-full border border-slate-300 py-3.5 text-center font-semibold hover:bg-slate-50 transition">
+                    Cek status pembayaran
                 </button>
             </div>
 
         {{-- 3. STATE GAGAL / KEDALUWARSA / DIBATALKAN (ui/bayar.html data-state="kedaluwarsa") --}}
         @else
-            <section class="text-center pt-2">
-                <div class="mx-auto grid size-20 place-items-center rounded-full bg-slate-100 text-slate-500">
-                    <svg class="size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="9"/>
-                        <line x1="15" y1="9" x2="9" y2="15"/>
-                        <line x1="9" y1="9" x2="15" y2="15"/>
-                    </svg>
+            <section class="pt-6 text-center">
+                <div class="mx-auto grid size-24 place-items-center rounded-2xl bg-slate-100 text-slate-500">
+                    <svg class="size-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/></svg>
                 </div>
-                <h2 class="mt-4 text-2xl font-extrabold text-ink">Pesanan Dibatalkan</h2>
-                <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3.5 py-1 text-xs font-semibold text-slate-600">
-                    Batas Waktu Bayar Terlewat / Dibatalkan
-                </p>
-                <p class="mx-auto mt-2 max-w-[320px] text-xs text-slate-500 leading-relaxed">
-                    Pembayaran untuk <b>{{ $order->listing?->title }}</b> tidak diterima atau dibatalkan. Kamu tidak dikenai biaya apa pun, dan barang telah dibuka kembali ke katalog.
-                </p>
+                <h2 class="mt-3 text-xl font-bold">Pesanan dibatalkan</h2>
+                <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-600">Batas bayar 24 jam terlewat</p>
+                <p class="mx-auto mt-3 max-w-[300px] text-sm text-slate-500">Pembayaran untuk {{ $order->listing?->title }} tidak kami terima, jadi pesanan batal otomatis. Kamu tidak dikenai biaya apa pun.</p>
             </section>
 
-            <!-- Aksi Dibatalkan (Fixed Bottom) -->
-            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
-                <a href="{{ route('cari') }}" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white shadow-md hover:bg-slate-800 transition">
-                    Cari Barang Lain
-                </a>
-                <a href="{{ route('beranda') }}" class="mt-2 block w-full rounded-full border border-slate-200 py-2.5 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
-                    Kembali ke Beranda
-                </a>
+            <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
+                <a href="{{ route('cari') }}" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white hover:bg-slate-800 transition">Cari barang lain</a>
+                @if ($order->listing)
+                    <a href="{{ route('barang.detail', $order->listing) }}" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">Lihat barang ini lagi</a>
+                @endif
             </div>
         @endif
     </main>
@@ -220,14 +166,15 @@
         @if ($isMenunggu)
             <script src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
             <script>
-                // Salin nomor VA
-                document.getElementById('btn-copy-va')?.addEventListener('click', function () {
-                    const va = this.getAttribute('data-va');
-                    navigator.clipboard.writeText(va).then(() => {
-                        this.textContent = 'Tersalin!';
-                        setTimeout(() => this.textContent = 'Salin', 2000);
-                    });
-                });
+                // Hitung mundur batas bayar
+                const cd = document.getElementById('countdown');
+                const tick = () => {
+                    const s = Math.max(0, Number(cd.dataset.end) - Math.floor(Date.now() / 1000));
+                    cd.textContent = [s / 3600, (s % 3600) / 60, s % 60].map((n) => String(Math.floor(n)).padStart(2, '0')).join(':');
+                    if (s === 0) window.location.reload();
+                };
+                tick();
+                setInterval(tick, 1000);
 
                 // Trigger Snap Pay
                 document.getElementById('btn-bayar-snap')?.addEventListener('click', async function () {
@@ -265,7 +212,7 @@
                                 },
                                 onClose: function () {
                                     btn.disabled = false;
-                                    label.textContent = 'Bayar Sekarang via Snap';
+                                    label.textContent = 'Lanjut bayar';
                                 }
                             });
                         } else if (data.redirect_url) {
@@ -274,7 +221,7 @@
                     } catch (e) {
                         alert(e.message);
                         btn.disabled = false;
-                        label.textContent = 'Bayar Sekarang via Snap';
+                        label.textContent = 'Lanjut bayar';
                     }
                 });
 

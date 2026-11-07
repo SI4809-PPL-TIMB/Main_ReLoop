@@ -29,6 +29,7 @@ class ChatController extends Controller
                 'buyer.profile',
                 'seller.profile',
                 'latestMessage.sender',
+                'offers' => fn ($q) => $q->where('status', 'menunggu')->where('expires_at', '>', now()),
             ])
             ->withCount([
                 'messages as unread_count' => function ($query) use ($userId) {
@@ -46,7 +47,7 @@ class ChatController extends Controller
      * Buka atau buat percakapan baru untuk barang tertentu.
      * Aturan: Pembeli tidak bisa mengirim chat ke barang miliknya sendiri.
      */
-    public function open(Listing $listing): RedirectResponse
+    public function open(Request $request, Listing $listing): RedirectResponse
     {
         $userId = Auth::id();
 
@@ -67,7 +68,7 @@ class ChatController extends Controller
             ]
         );
 
-        return redirect()->route('pesan.show', $conversation);
+        return redirect()->route('pesan.show', [$conversation] + $request->only('tawar'));
     }
 
     /**

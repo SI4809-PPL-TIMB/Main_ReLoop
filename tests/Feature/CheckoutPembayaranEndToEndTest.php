@@ -144,8 +144,8 @@ class CheckoutPembayaranEndToEndTest extends TestCase
         $resStatus = $this->actingAs($this->buyer)
             ->get(route('order.status', $order->order_number));
         $resStatus->assertOk()
-            ->assertSee('Pembayaran Berhasil!')
-            ->assertSee('Dana Ditahan Rekber Reloop')
+            ->assertSee('Pembayaran berhasil')
+            ->assertSee('Dana ditahan Rekber Reloop')
             ->assertSee('Chat Penjual untuk Janjian');
     }
 

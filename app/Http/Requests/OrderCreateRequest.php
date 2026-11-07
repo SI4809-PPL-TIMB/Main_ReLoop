@@ -19,7 +19,7 @@ class OrderCreateRequest extends FormRequest
             'delivery_method' => [
                 'required',
                 'string',
-                Rule::in([Order::DELIVERY_COD, Order::DELIVERY_AMBIL]),
+                Rule::in([Order::DELIVERY_COD, Order::DELIVERY_AMBIL, Order::DELIVERY_KIRIM]),
             ],
             'delivery_address' => [
                 'nullable',

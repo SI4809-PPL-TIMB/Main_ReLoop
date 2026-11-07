@@ -84,7 +84,7 @@
                 </button>
             </div>
 
-            <div id="hasil" class="mt-4 grid grid-cols-2 gap-x-3 gap-y-5">
+            <div id="hasil" class="mt-4 grid grid-cols-2 gap-x-3 gap-y-4">
                 @foreach ($barang as $b)
                     <a href="{{ route('barang.detail', $b) }}" data-km="{{ $b->jarak_km ?? '' }}" data-harga="{{ (int)$b->price }}">
                         <div class="ph relative h-36 rounded-xl overflow-hidden bg-slate-100">
@@ -98,14 +98,14 @@
                             @endif
                         </div>
                         @if ($b->user?->profile?->avg_rating > 0)
-                            <p class="mt-3"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ {{ number_format($b->user->profile->avg_rating, 1) }}</span></p>
+                            <p class="mt-2"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ {{ number_format($b->user->profile->avg_rating, 1) }}</span></p>
                         @endif
-                        <p class="mt-2 truncate text-[15px] font-semibold leading-snug">{{ $b->title }}</p>
-                        <p class="mt-1.5 flex items-center gap-1 text-xs text-slate-500">
+                        <p class="mt-1 truncate text-[15px] font-semibold leading-snug">{{ $b->title }}</p>
+                        <p class="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
                             <svg class="size-3 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="currentColor">{!! $ikonLokasi !!}</svg>
                             {{ $b->jarak_km !== null ? number_format($b->jarak_km, 1, ',', '.').' km' : '' }}{{ $b->jarak_km !== null && $b->kelurahan ? ' · ' : '' }}{{ $b->kelurahan?->nama }}
                         </p>
-                        <p class="mt-2 font-semibold">{{ $rupiah($b->price) }}</p>
+                        <p class="mt-1 font-semibold">{{ $rupiah($b->price) }}</p>
                     </a>
                 @endforeach
             </div>
