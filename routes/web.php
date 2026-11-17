@@ -54,6 +54,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'show'])->name('pesan.show');
     Route::post('/pesan/{conversation}', [\App\Http\Controllers\ChatController::class, 'storeMessage'])->name('pesan.kirim');
 
+    // 6.2 · Tawar harga: ajukan, terima, tolak, kedaluwarsa (PPLTIMB-63)
+    Route::post('/pesan/{conversation}/tawar', [\App\Http\Controllers\OfferController::class, 'store'])->name('tawar.store');
+    Route::post('/pesan/{conversation}/tawar/{offer}/respons', [\App\Http\Controllers\OfferController::class, 'respond'])->name('tawar.respons');
+
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');

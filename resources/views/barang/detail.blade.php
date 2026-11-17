@@ -298,7 +298,9 @@
                 </a>
                 @if ($aktif)
                     @if ($listing->is_negotiable)
-                        <button type="button" data-soon class="flex-1 rounded-full border border-slate-300 py-3 text-center font-semibold">Tawar</button>
+                        {{-- 6.2 — Tombol Tawar: arahkan ke chat, tombol tawar muncul di sana --}}
+                        <a href="{{ route('pesan.mulai', $listing) }}"
+                           class="flex-1 rounded-full border border-slate-300 py-3 text-center font-semibold hover:bg-slate-50 transition">Tawar</a>
                     @endif
                     <button type="button" data-soon class="flex-[1.4] rounded-full bg-ink py-3 text-center font-semibold text-white">Beli sekarang</button>
                 @else
