@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
 
         // 3. Barang dummy milik akun penjual
         $this->call(ListingSeeder::class);
+
+        // 4. Pesanan demo untuk testing alur kelola pesanan (7.2)
+        $this->call(OrderSeeder::class);
     }
 
     private function seedDemoAccounts(): void

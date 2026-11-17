@@ -66,6 +66,70 @@ class Order extends Model
         };
     }
 
+    /**
+     * Cek apakah dana pesanan sedang tertahan di sistem (escrow).
+     */
+    public function isEscrowHeld(): bool
+    {
+        return in_array($this->status, [self::STATUS_DIBAYAR, self::STATUS_DISERAHKAN]);
+    }
+
+    /**
+     * Hitung nilai komisi platform (3%).
+     */
+    public function platformFee(): float
+    {
+        if ($this->payment && $this->payment->platform_fee > 0) {
+            return (float) $this->payment->platform_fee;
+        }
+
+        return (float) round((float) $this->agreed_price * Payment::KOMISI_RATE);
+    }
+
+    /**
+     * Hitung dana bersih yang diterima penjual setelah dipotong komisi 3%.
+     */
+    public function netSellerAmount(): float
+    {
+        return (float) $this->agreed_price - $this->platformFee();
+    }
+
+    /**
+     * Cek apakah pesanan dapat ditandai diserahkan oleh penjual.
+     */
+    public function canBeMarkedDiserahkan(): bool
+    {
+        return $this->status === self::STATUS_DIBAYAR;
+    }
+
+    /**
+     * Cek apakah pesanan dapat dikonfirmasi telah diterima oleh pembeli.
+     */
+    public function canBeConfirmedReceived(): bool
+    {
+        return $this->status === self::STATUS_DISERAHKAN;
+    }
+
+    /**
+     * Cek apakah pesanan masih dapat dibatalkan (sebelum diserahkan).
+     */
+    public function canBeCancelled(): bool
+    {
+        return in_array($this->status, [self::STATUS_MENUNGGU_BAYAR, self::STATUS_DIBAYAR]);
+    }
+
+    public function isBuyer(User|int $user): bool
+    {
+        $id = $user instanceof User ? $user->id : $user;
+        return (int) $this->buyer_id === (int) $id;
+    }
+
+    public function isSeller(User|int $user): bool
+    {
+        $id = $user instanceof User ? $user->id : $user;
+        return (int) $this->seller_id === (int) $id;
+    }
+
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class);
