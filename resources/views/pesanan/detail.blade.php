@@ -99,6 +99,7 @@
             <!-- Aksi Pembayaran jika Masih Menunggu Pembayaran -->
             @if ($isBuyer && $order->status === \App\Models\Order::STATUS_MENUNGGU_BAYAR)
                 <div class="pt-4">
+                    <p id="bayar-error" role="alert" hidden class="mb-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"></p>
                     <button type="button" id="btn-bayar-snap" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition">
                         <span id="btn-bayar-label">Bayar Sekarang</span>
                     </button>
@@ -114,9 +115,15 @@
             <script>
                 document.getElementById('btn-bayar-snap')?.addEventListener('click', async function () {
                     const btn = this;
-                    const label = document.getElementById('btn-bayar-label');
-                    btn.disabled = true;
-                    label.textContent = 'Menghubungkan Midtrans...';
+                    const errorBox = document.getElementById('bayar-error');
+                    if (btn.disabled) return;
+                    const gagal = (pesan) => {
+                        window.ReloopLoading.idle(btn);
+                        errorBox.textContent = pesan;
+                        errorBox.hidden = false;
+                    };
+                    errorBox.hidden = true;
+                    window.ReloopLoading.busy(btn, 'Membuka pembayaran…');
 
                     try {
                         const res = await fetch("{{ route('order.snap_token', $order->order_number) }}", {
@@ -127,14 +134,14 @@
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             },
                         });
-
-                        const data = await res.json();
+                        const data = await res.json().catch(() => ({}));
 
                         if (!res.ok || !data.token) {
-                            throw new Error(data.message || 'Gagal memuat token pembayaran.');
+                            return gagal(res.status === 419 ? 'Sesi kamu sudah kedaluwarsa. Muat ulang halaman, lalu coba lagi.'
+                                : (data.message || 'Pembayaran belum bisa dibuka. Coba lagi beberapa saat lagi.'));
                         }
 
-                        if (typeof window.snap !== 'undefined' && typeof window.snap.pay === 'function') {
+                        if (typeof window.snap?.pay === 'function') {
                             window.snap.pay(data.token, {
                                 onSuccess: function () {
                                     window.location.href = "{{ route('order.show', $order->order_number) }}?status=sukses";
@@ -146,17 +153,16 @@
                                     window.location.href = "{{ route('order.show', $order->order_number) }}?status=gagal";
                                 },
                                 onClose: function () {
-                                    btn.disabled = false;
-                                    label.textContent = 'Bayar Sekarang';
+                                    window.ReloopLoading.idle(btn);
                                 }
                             });
                         } else if (data.redirect_url) {
                             window.location.href = data.redirect_url;
+                        } else {
+                            gagal('Halaman pembayaran Midtrans gagal dimuat. Periksa koneksi internetmu, lalu coba lagi.');
                         }
                     } catch (e) {
-                        alert(e.message);
-                        btn.disabled = false;
-                        label.textContent = 'Bayar Sekarang';
+                        gagal('Gagal terhubung ke server. Periksa koneksi internetmu, lalu coba lagi.');
                     }
                 });
             </script>

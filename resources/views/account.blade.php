@@ -73,14 +73,14 @@
         <p class="pb-2 text-center text-xs text-slate-400">Reloop v0.1.0</p>
     </main>
 
-    <dialog id="keluar" class="w-[min(92vw,360px)] rounded-3xl p-0">
+    <dialog id="keluar" class="m-auto w-[min(92vw,360px)] rounded-3xl p-0">
         <div class="p-6 text-center">
             <h2 class="text-lg font-bold">Keluar dari Reloop?</h2>
             <p class="mt-1 text-sm text-slate-500">Streak dan barangmu tetap aman. Masuk lagi kapan saja dengan emailmu.</p>
             <div class="mt-5 grid gap-2">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full rounded-full bg-red-500 py-3 font-semibold text-white">Ya, keluar</button>
+                    <button type="submit" data-loading-text="Keluar…" class="w-full rounded-full bg-red-500 py-3 font-semibold text-white">Ya, keluar</button>
                 </form>
                 <button type="button" data-close class="rounded-full border border-slate-300 py-3 font-semibold">Batal</button>
             </div>

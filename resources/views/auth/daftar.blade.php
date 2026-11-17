@@ -166,6 +166,7 @@
                 px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))]">
         <button
             id="btn-daftar"
+            data-loading-text="Mendaftarkan…"
             form="form-daftar"
             type="submit"
             class="w-full rounded-full bg-ink py-3.5 font-semibold text-white transition

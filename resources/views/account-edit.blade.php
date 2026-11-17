@@ -76,7 +76,7 @@
             </p>
 
             <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
-                <button type="submit" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Simpan</button>
+                <button type="submit" data-loading-text="Menyimpan…" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Simpan</button>
             </div>
         </form>
     </main>
@@ -88,25 +88,25 @@
             <div class="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 text-sm font-medium">
                 <form method="POST" action="{{ route('account.avatar.upload') }}" enctype="multipart/form-data">
                     @csrf
-                    <label class="flex w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left">
+                    <label data-loading-text="Mengunggah foto…" class="flex w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left">
                         <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
                         Ambil foto
-                        <input type="file" name="avatar" accept="{{ $tipeFoto }}" capture="environment" class="sr-only" onchange="this.form.submit()">
+                        <input type="file" name="avatar" accept="{{ $tipeFoto }}" capture="environment" class="sr-only" onchange="this.form.requestSubmit()">
                     </label>
                 </form>
                 <form method="POST" action="{{ route('account.avatar.upload') }}" enctype="multipart/form-data">
                     @csrf
-                    <label class="flex w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left">
+                    <label data-loading-text="Mengunggah foto…" class="flex w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left">
                         <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>
                         Pilih dari galeri
-                        <input type="file" name="avatar" accept="{{ $tipeFoto }}" class="sr-only" onchange="this.form.submit()">
+                        <input type="file" name="avatar" accept="{{ $tipeFoto }}" class="sr-only" onchange="this.form.requestSubmit()">
                     </label>
                 </form>
                 @if ($profil?->avatar)
                     <form method="POST" action="{{ route('account.avatar.delete') }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="flex w-full items-center gap-3 px-4 py-3.5 text-left text-red-500">
+                        <button type="submit" data-loading-text="Menghapus foto…" class="flex w-full items-center gap-3 px-4 py-3.5 text-left text-red-500">
                             <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
                             Hapus foto
                         </button>

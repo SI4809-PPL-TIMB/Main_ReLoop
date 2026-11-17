@@ -41,7 +41,7 @@ class OrderController extends Controller
                 ->with('error', 'Barang ini tidak tersedia untuk dibeli.');
         }
 
-        $listing->load(['primaryPhoto', 'photos', 'user.profile.kelurahan']);
+        $listing->load(['primaryPhoto', 'user.profile.kelurahan']); // 'photos' tidak dipakai tampilan checkout
 
         // Cek tawaran yang disepakati (offer diterima)
         $acceptedOffer = Offer::whereHas('conversation', function ($q) use ($listing, $user) {
@@ -60,9 +60,14 @@ class OrderController extends Controller
         $platformFee = (int) round($agreedPrice * Payment::KOMISI_RATE);
         $user->load(['profile.kelurahan.kecamatan.kabupaten']);
 
-        $kecamatans = WilayahKecamatan::orderBy('nama')->get();
-        $kelurahans = WilayahKelurahan::orderBy('nama')->get();
-        $kabupatens = WilayahKabupaten::orderBy('nama')->get();
+        // Muat hanya anak wilayah terpilih; seluruh kelurahan Indonesia terlalu besar
+        // untuk dimasukkan ke HTML checkout sekaligus.
+        $kecamatan = $user->profile?->kelurahan?->kecamatan;
+        $kecamatans = WilayahKecamatan::where('kabupaten_id', $kecamatan?->kabupaten_id)
+            ->orderBy('nama')->get(['id', 'nama']);
+        $kelurahans = WilayahKelurahan::where('kecamatan_id', $kecamatan?->id)
+            ->orderBy('nama')->get(['id', 'nama']);
+        $kabupatens = WilayahKabupaten::orderBy('nama')->get(['id', 'nama']);
 
         return view('pesanan.checkout', compact(
             'listing',

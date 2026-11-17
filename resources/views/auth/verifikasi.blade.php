@@ -94,7 +94,7 @@
             </p>
 
             <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
-                <button id="lanjut"
+                <button id="lanjut" data-loading-text="Memverifikasi…"
                         type="submit"
                         class="w-full rounded-full bg-ink py-3.5 font-semibold text-white disabled:opacity-40"
                         disabled>

@@ -179,4 +179,26 @@ class OrderStatusViewTest extends TestCase
                 'is_paid'      => true,
             ]);
     }
+
+    public function test_callback_snap_sukses_belum_dikonfirmasi_server_tidak_menampilkan_sukses(): void
+    {
+        $response = $this->actingAs($this->buyer)
+            ->get(route('order.status', $this->order->order_number).'?status=sukses');
+
+        $response->assertOk()
+            ->assertDontSee('Pembayaran berhasil')
+            ->assertSee('Memverifikasi pembayaran')
+            ->assertSee('Menunggu pembayaran');
+    }
+
+    public function test_callback_snap_gagal_tetap_bisa_bayar_ulang_selama_pesanan_menunggu(): void
+    {
+        $response = $this->actingAs($this->buyer)
+            ->get(route('order.status', $this->order->order_number).'?status=gagal');
+
+        $response->assertOk()
+            ->assertDontSee('Pesanan dibatalkan')
+            ->assertSee('Pembayaran belum berhasil')
+            ->assertSee('Lanjut bayar');
+    }
 }

@@ -40,13 +40,7 @@ class RegisterController extends Controller
         ]);
 
         // 4. Kirim OTP ke email
-        Mail::raw(
-            "Kode verifikasi ReLoop Anda adalah: {$otp}",
-            function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject('Kode Verifikasi Akun ReLoop');
-            }
-        );
+        $this->kirimKode($user, $otp, 'Kode Verifikasi Akun ReLoop');
 
         // Jangan login sebelum OTP terverifikasi
         return redirect()->route('verifikasi')
@@ -178,13 +172,7 @@ class RegisterController extends Controller
         ]);
 
         // Kirim OTP baru
-        Mail::raw(
-            "Kode verifikasi baru ReLoop Anda adalah: {$otp}",
-            function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject('Kode Verifikasi Baru ReLoop');
-            }
-        );
+        $this->kirimKode($user, $otp, 'Kode Verifikasi Baru ReLoop');
 
         return back()->with(
             'success',
@@ -195,5 +183,19 @@ class RegisterController extends Controller
     public function showComplete(): View
     {
         return view('auth.selesai');
+    }
+
+    private function kirimKode(User $user, string $otp, string $subjek): void
+    {
+        Mail::send(
+            ['html' => 'emails.kode', 'raw' => "Kode verifikasi ReLoop kamu: {$otp}. Berlaku 5 menit."],
+            [
+                'judul'   => 'Verifikasi email kamu',
+                'pembuka' => "Halo {$user->name}, masukkan kode di bawah ini untuk mengaktifkan akun ReLoop-mu.",
+                'kode'    => $otp,
+                'berlaku' => '5 menit',
+            ],
+            fn ($message) => $message->to($user->email)->subject($subjek)
+        );
     }
 }

@@ -24,7 +24,7 @@
         @error('tipe')<p role="alert" class="mt-3 text-sm text-red-600">{{ $message }}</p>@enderror
         <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
             <p aria-live="polite" class="mb-3 text-xs text-slate-500">{{ $canContinue ? $types[$tipe] : 'Pilih jenis barang untuk melanjutkan.' }}</p>
-            <button type="submit" @disabled(!$canContinue) wire:loading.attr="disabled" class="w-full rounded-full bg-ink px-3 py-3.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">
+            <button type="submit" @disabled(!$canContinue) wire:loading.attr="disabled" data-loading-text="Memproses…" class="w-full rounded-full bg-ink px-3 py-3.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">
                 {{ !$canContinue ? 'Lanjutkan' : ($tipe === 'bekas' ? 'Lanjut ke Pasang Barang' : 'Lanjut ke Mitra Pengepul') }}
             </button>
         </div>

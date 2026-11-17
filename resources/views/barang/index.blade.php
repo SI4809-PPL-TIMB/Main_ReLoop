@@ -31,7 +31,7 @@
                 <li class="rounded-2xl border border-slate-200 p-4">
                     <div class="flex gap-3">
                         @if ($b->primaryPhoto)
-                            <img src="{{ $b->primaryPhoto->url }}" alt="" class="size-16 shrink-0 rounded-lg object-cover">
+                            <img src="{{ $b->primaryPhoto->url }}" alt="" loading="lazy" decoding="async" width="64" height="64" class="size-16 shrink-0 rounded-lg object-cover">
                         @else
                             <div class="ph size-16 shrink-0 rounded-lg"></div>
                         @endif
@@ -51,12 +51,12 @@
                             <a href="{{ route('barang.edit', $b) }}" class="flex-1 rounded-full border border-slate-300 py-2 text-center text-sm font-semibold">Ubah</a>
                             @can('markSold', $b)
                                 <form method="POST" action="{{ route('barang.terjual', $b) }}" class="flex-1">@csrf
-                                    <button class="w-full rounded-full bg-ink py-2 text-sm font-semibold text-white">Tandai terjual</button>
+                                    <button data-loading-text="Memproses…" class="w-full rounded-full bg-ink py-2 text-sm font-semibold text-white">Tandai terjual</button>
                                 </form>
                             @endcan
                             @can('delete', $b)
                                 <form method="POST" action="{{ route('barang.destroy', $b) }}" onsubmit="return confirm('Hapus barang ini? Tindakan ini tidak bisa dibatalkan.')">@csrf @method('DELETE')
-                                    <button aria-label="Hapus" class="grid size-9 shrink-0 place-items-center rounded-full border border-red-200 text-red-600">
+                                    <button aria-label="Hapus" data-loading-text="" class="grid size-9 shrink-0 place-items-center rounded-full border border-red-200 text-red-600">
                                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
                                     </button>
                                 </form>

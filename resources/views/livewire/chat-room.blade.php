@@ -94,11 +94,15 @@
                             <p class="mt-2 text-xs text-amber-700">{{ $mine ? 'Menunggu jawaban' : 'Jawab dalam' }} · kedaluwarsa {{ $msg->expires_at->locale('id')->diffForHumans(['parts' => 1]) }}</p>
                             <div class="mt-3 flex flex-wrap gap-2">
                                 @if ($mine)
-                                    <button type="button" wire:click="cancelOffer({{ $msg->id }})" class="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700">Batal</button>
+                                    <button type="button" wire:click="cancelOffer({{ $msg->id }})" wire:loading.attr="disabled" wire:target="cancelOffer({{ $msg->id }})" class="disabled:opacity-60 rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700">Batal</button>
                                 @else
-                                    <button type="button" wire:click="rejectOffer({{ $msg->id }})" class="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700">Tolak</button>
+                                    <button type="button" wire:click="rejectOffer({{ $msg->id }})" wire:loading.attr="disabled" wire:target="rejectOffer({{ $msg->id }}), acceptOffer({{ $msg->id }})" class="disabled:opacity-60 rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700">Tolak</button>
                                     <button type="button" wire:click="openOffer" class="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700">Tawar balik</button>
-                                    <button type="button" wire:click="acceptOffer({{ $msg->id }})" class="rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white">Terima {{ $rp($msg->amount) }}</button>
+                                    <button type="button" wire:click="acceptOffer({{ $msg->id }})" wire:loading.attr="disabled" wire:target="rejectOffer({{ $msg->id }}), acceptOffer({{ $msg->id }})" class="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white disabled:opacity-80">
+                                        <x-spinner class="size-3.5" wire:loading wire:target="acceptOffer({{ $msg->id }})" />
+                                        <span wire:loading.remove wire:target="acceptOffer({{ $msg->id }})">Terima {{ $rp($msg->amount) }}</span>
+                                        <span wire:loading wire:target="acceptOffer({{ $msg->id }})">Menerima…</span>
+                                    </button>
                                 @endif
                             </div>
                         @elseif ($msg->status === 'diterima')
@@ -187,7 +191,11 @@
                 </div>
                 @error('offerAmount') <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p> @enderror
                 <p class="mt-2 text-[11px] text-slate-400">Lawan bicara punya 24 jam untuk menjawab. Tawaran yang diterima jadi harga checkout.</p>
-                <button type="submit" class="mt-3 w-full rounded-full bg-ink py-3 text-sm font-semibold text-white">Kirim tawaran</button>
+                <button type="submit" wire:loading.attr="disabled" wire:target="submitOffer" class="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-ink py-3 text-sm font-semibold text-white disabled:opacity-80">
+                    <x-spinner wire:loading wire:target="submitOffer" />
+                    <span wire:loading.remove wire:target="submitOffer">Kirim tawaran</span>
+                    <span wire:loading wire:target="submitOffer">Mengirim tawaran…</span>
+                </button>
             </form>
         </div>
     @endif
@@ -204,11 +212,13 @@
                    class="flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-brand-400 focus:bg-white focus:ring-1 focus:ring-brand-400">
             <button type="submit" aria-label="Kirim pesan"
                     class="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white shadow-sm transition hover:bg-brand-600 active:scale-95 disabled:opacity-50"
-                    wire:loading.attr="disabled">
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    wire:loading.attr="disabled" wire:target="sendMessage">
+                <svg wire:loading.remove wire:target="sendMessage" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/>
                 </svg>
+                <x-spinner wire:loading wire:target="sendMessage" />
+                <span wire:loading wire:target="sendMessage" class="sr-only" role="status">Mengirim pesan…</span>
             </button>
         </form>
     </div>

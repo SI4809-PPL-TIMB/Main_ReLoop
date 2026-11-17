@@ -179,6 +179,7 @@ return [
     |
     */
 
+    // Aset Livewire (+Alpine) hanya disisipkan di halaman yang merender komponen Livewire.
     'inject_assets' => true,
 
     /*

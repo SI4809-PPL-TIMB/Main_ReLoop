@@ -57,7 +57,8 @@ class CariController extends Controller
         }
 
         $barang = $query
-            ->with('user.profile', 'kelurahan.kecamatan.kabupaten.provinsi', 'category', 'primaryPhoto')
+            // Hanya relasi yang dipakai kartu hasil (rating penjual, nama kelurahan, foto utama).
+            ->with('user.profile', 'kelurahan', 'primaryPhoto')
             ->paginate(12)
             ->withQueryString();
 
@@ -96,11 +97,16 @@ class CariController extends Controller
         $breadcrumbHtml = $this->bangunBreadcrumbHtml($wilayahTerpilih, $profile);
 
         // Rekomendasi wilayah untuk dialog cari lokasi
-        $daftarKelurahanRekomendasi = WilayahKelurahan::with('kecamatan.kabupaten.provinsi')
+        // Satu query join (bukan 4 query eager load) untuk 10 rekomendasi wilayah.
+        $daftarKelurahanRekomendasi = WilayahKelurahan::query()
+            ->join('wilayah_kecamatan as kec', 'kec.id', '=', 'wilayah_kelurahan.kecamatan_id')
+            ->join('wilayah_kabupaten as kab', 'kab.id', '=', 'kec.kabupaten_id')
+            ->join('wilayah_provinsi as prov', 'prov.id', '=', 'kab.provinsi_id')
+            ->orderBy('wilayah_kelurahan.id')
             ->limit(10)
-            ->get()
+            ->get(['wilayah_kelurahan.*', 'kec.nama as kec_nama', 'kab.nama as kab_nama', 'prov.nama as prov_nama'])
             ->map(function ($k) {
-                $k->breadcrumb_pipe = ($k->kecamatan?->kabupaten?->provinsi?->nama ?? '').'|'.($k->kecamatan?->kabupaten?->nama ?? '').'|'.($k->kecamatan?->nama ?? '').'|'.$k->nama;
+                $k->breadcrumb_pipe = $k->prov_nama.'|'.$k->kab_nama.'|'.$k->kec_nama.'|'.$k->nama;
                 return $k;
             });
 
