@@ -1,4 +1,5 @@
 import './bootstrap';
+import './loading';
 
 document.querySelectorAll('[data-resend-countdown]').forEach((button) => {
     const deadline = Date.now() + Number(button.dataset.resendCountdown) * 1000;

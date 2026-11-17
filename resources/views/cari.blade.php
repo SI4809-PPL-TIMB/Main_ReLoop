@@ -13,7 +13,7 @@
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </a>
             <!-- GET biasa: kirim ke cari?q=… -->
-            <form role="search" action="{{ route('cari') }}" method="GET" class="flex flex-1 items-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 focus-within:border-ink">
+            <form role="search" action="{{ route('cari') }}" method="GET" data-busy-target="#cari-main" class="flex flex-1 items-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 focus-within:border-ink">
                 <svg class="size-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
                 <input id="q" name="q" type="search" value="{{ $keyword }}" enterkeyhint="search" placeholder="Cari barang bekas" class="w-full bg-transparent text-sm outline-none" aria-label="Kata kunci">
                 <span class="sr-only">Cari kursi, buku, sepeda…</span>
@@ -49,33 +49,37 @@
         </button>
     </header>
 
-    <main>
-        <div data-state="loading" data-skeleton="grid" class="mt-2" hidden></div>
+    <main id="cari-main" data-busy-label="Memuat hasil pencarian…">
+        {{-- Ditampilkan resources/js/loading.js selama cari/filter/urut/halaman berikutnya dimuat. --}}
+        <div data-state="loading" data-busy-show class="mt-2 px-4" hidden>
+            <div class="reloop-skeleton h-5 w-2/5 rounded-md"></div>
+            <x-skeleton.produk-grid class="mt-5" />
+        </div>
         <div data-state="error" data-blank="Gagal memuat barang" data-desc="Periksa koneksi internetmu, lalu coba lagi." hidden></div>
 
-        <div data-state="empty" @class(['px-8 py-12 text-center', 'hidden' => $barang->isNotEmpty()])>
+        <div data-state="empty" data-busy-hide @class(['px-8 py-12 text-center', 'hidden' => $barang->isNotEmpty()])>
             <div class="ph mx-auto size-28 rounded-3xl bg-slate-100"></div>
             <p class="mt-4 text-lg font-bold">Barang tidak ditemukan</p>
             <p class="mt-1 text-sm text-slate-500">Coba kata kunci lain, longgarkan filter, atau perluas daerah pencarian.</p>
             @if ($keyword !== '')
                 <p class="mt-2 text-xs text-slate-400">Tidak ada hasil untuk kata kunci "{{ $keyword }}"</p>
-                <a href="{{ route('cari', array_filter(['kategori' => $kategori, 'min_harga' => $minHarga, 'max_harga' => $maxHarga, 'provinsi_id' => $provinsi, 'kabupaten_id' => $kabupaten, 'kecamatan_id' => $kecamatan, 'kelurahan_id' => $kelurahan, 'urut' => $urut])) }}" class="mt-2 inline-block text-sm font-semibold text-brand-600 hover:underline">Hapus kata kunci</a>
+                <a data-busy-target="#cari-main" href="{{ route('cari', array_filter(['kategori' => $kategori, 'min_harga' => $minHarga, 'max_harga' => $maxHarga, 'provinsi_id' => $provinsi, 'kabupaten_id' => $kabupaten, 'kecamatan_id' => $kecamatan, 'kelurahan_id' => $kelurahan, 'urut' => $urut])) }}" class="mt-2 inline-block text-sm font-semibold text-brand-600 hover:underline">Hapus kata kunci</a>
             @endif
             <div class="mt-5 flex flex-col items-center gap-2">
                 <button type="button" data-open="filter" class="w-full max-w-xs rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white">Ubah filter</button>
-                <a href="{{ route('cari') }}" class="block py-2 text-sm font-semibold text-slate-500 hover:text-ink">
+                <a href="{{ route('cari') }}" data-busy-target="#cari-main" class="block py-2 text-sm font-semibold text-slate-500 hover:text-ink">
                     @if ($wilayahTerpilih && isset($wilayahTerpilih['induk']))
                         Perluas ke {{ $wilayahTerpilih['induk'] }}
                     @else
                         Reset pencarian
                     @endif
                 </a>
-                <a href="{{ route('cari') }}" class="text-xs text-slate-400 hover:underline">Reset Semua Filter</a>
+                <a href="{{ route('cari') }}" data-busy-target="#cari-main" class="text-xs text-slate-400 hover:underline">Reset Semua Filter</a>
                 <a href="{{ route('beranda') }}" class="text-xs text-slate-400 hover:underline">Kembali ke Beranda</a>
             </div>
         </div>
 
-        <div data-state="ok" @class(['px-4', 'hidden' => $barang->isEmpty()])>
+        <div data-state="ok" data-busy-hide @class(['px-4', 'hidden' => $barang->isEmpty()])>
             <div class="flex items-center justify-between border-b border-slate-100 pb-3 text-sm">
                 <p><b>{{ $barang->total() }} barang</b> <span class="text-slate-500">di sekitar {{ $namaDaerah }}</span></p>
                 <button type="button" data-open="urut" class="flex items-center gap-1 font-semibold">
@@ -89,7 +93,7 @@
                     <a href="{{ route('barang.detail', $b) }}" data-km="{{ $b->jarak_km ?? '' }}" data-harga="{{ (int)$b->price }}">
                         <div class="ph relative h-36 rounded-xl overflow-hidden bg-slate-100">
                             @if ($b->primaryPhoto)
-                                <img src="{{ $b->primaryPhoto->url }}" alt="{{ $b->title }}" class="size-full object-cover">
+                                <img src="{{ $b->primaryPhoto->url }}" alt="{{ $b->title }}" @if ($loop->index >= 4) loading="lazy" @endif decoding="async" class="size-full object-cover">
                             @endif
                             @if (isset($kondisi[$b->condition]))
                                 <span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 {{ $kondisi[$b->condition][1] }}">
@@ -110,14 +114,14 @@
                 @endforeach
             </div>
 
-            <div class="mt-6">
+            <div class="mt-6" data-busy-target="#cari-main">
                 {{ $barang->links() }}
             </div>
         </div>
     </main>
 
     <!-- Bottom sheet urutkan -->
-    <dialog id="urut" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
+    <dialog id="urut" data-busy-target="#cari-main" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
         <div class="p-5">
             <div class="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200"></div>
             <h2 class="text-lg font-bold">Urutkan</h2>
@@ -155,7 +159,7 @@
     </dialog>
 
     <!-- Bottom sheet filter -->
-    <dialog id="filter" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
+    <dialog id="filter" data-busy-target="#cari-main" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
         <form method="GET" action="{{ route('cari') }}" class="p-5">
             @if ($keyword !== '')<input type="hidden" name="q" value="{{ $keyword }}">@endif
             @if (! empty($kategori))<input type="hidden" name="kategori" value="{{ $kategori }}">@endif
@@ -198,7 +202,7 @@
     </dialog>
 
     <!-- Cari lokasi -->
-    <dialog id="lokasi" class="m-0 h-full max-h-full w-full max-w-[420px] p-0 sm:mx-auto">
+    <dialog id="lokasi" data-busy-target="#cari-main" class="m-0 h-full max-h-full w-full max-w-[420px] p-0 sm:mx-auto">
         <div class="flex h-full flex-col bg-white px-4 pt-4">
             <div class="flex items-center gap-3">
                 <button type="button" data-close aria-label="Kembali" class="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200">
@@ -214,6 +218,7 @@
                 <svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
                 Gunakan lokasi saya
             </button>
+            <p id="lok-gps-error" role="alert" hidden class="mt-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700"></p>
             <p class="mt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Hasil pencarian</p>
             <div id="lok-list" class="no-scrollbar flex-1 overflow-y-auto">
                 @foreach ($daftarKelurahanRekomendasi as $itemKel)
@@ -230,7 +235,7 @@
                     @endphp
                     <a href="{{ $linkWilayah }}" data-p="{{ $itemKel->breadcrumb_pipe }}" class="flex w-full flex-col items-start border-b border-slate-100 py-3 text-left">
                         <span class="text-sm font-semibold">{{ $itemKel->nama }}</span>
-                        <span class="text-xs text-slate-500">{{ $itemKel->kecamatan?->nama }}, {{ $itemKel->kecamatan?->kabupaten?->nama }}, {{ $itemKel->kecamatan?->kabupaten?->provinsi?->nama }}</span>
+                        <span class="text-xs text-slate-500">{{ $itemKel->kec_nama }}, {{ $itemKel->kab_nama }}, {{ $itemKel->prov_nama }}</span>
                     </a>
                 @endforeach
                 <p id="lok-kosong" hidden class="py-10 text-center text-sm text-slate-500">Lokasi tidak ditemukan. Coba nama desa atau kecamatan lain.</p>
@@ -293,17 +298,27 @@
                 });
             }
 
-            // GPS di sheet dialog lokasi
+            // GPS di sheet dialog lokasi: tombol dikunci selama proses, selalu pulih, gagal ditampilkan.
             const lokGps = document.getElementById('lok-gps');
-            if (lokGps && navigator.geolocation) {
+            const lokGpsError = document.getElementById('lok-gps-error');
+            if (lokGps) {
+                const gagal = (pesan) => {
+                    window.ReloopLoading.idle(lokGps);
+                    lokGpsError.textContent = pesan;
+                    lokGpsError.hidden = false;
+                };
                 lokGps.addEventListener('click', () => {
-                    lokGps.textContent = 'Mencari lokasi GPS...';
+                    if (lokGps.disabled) return;
+                    lokGpsError.hidden = true;
+                    if (!navigator.geolocation) return gagal('Perangkat ini tidak mendukung lokasi GPS. Pilih daerah dari daftar.');
+                    window.ReloopLoading.busy(lokGps, 'Mencari lokasimu…');
                     navigator.geolocation.getCurrentPosition(async (pos) => {
                         try {
                             const res = await fetch('/lokasi/gps', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 },
                                 body: JSON.stringify({
@@ -311,20 +326,20 @@
                                     longitude: pos.coords.longitude,
                                 })
                             });
-                            if (res.ok) {
-                                const data = await res.json();
-                                if (data.kelurahan && data.kelurahan.id) {
-                                    const url = new URL(window.location.href);
-                                    url.searchParams.set('kelurahan_id', data.kelurahan.id);
-                                    window.location.href = url.toString();
-                                }
-                            }
+                            const data = res.ok ? await res.json() : null;
+                            if (!data?.kelurahan?.id) return gagal('Daerahmu belum bisa dikenali. Pilih daerah dari daftar.');
+                            const url = new URL(window.location.href);
+                            url.searchParams.set('kelurahan_id', data.kelurahan.id);
+                            url.searchParams.delete('page');
+                            document.getElementById('lokasi').close();
+                            window.ReloopLoading.region('#cari-main');
+                            window.ReloopLoading.startNav();
+                            window.location.href = url.toString();
                         } catch (e) {
-                            lokGps.textContent = 'Gunakan lokasi saya';
+                            gagal('Gagal terhubung. Periksa koneksi internetmu, lalu coba lagi.');
                         }
-                    }, () => {
-                        lokGps.textContent = 'Gunakan lokasi saya';
-                    });
+                    }, () => gagal('Izin lokasi ditolak atau sinyal GPS tidak tersedia. Pilih daerah dari daftar.'),
+                    { timeout: 15000 });
                 });
             }
         });

@@ -51,7 +51,7 @@
         </label>
 
         <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
-            <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">{{ $dariProfil ? 'Simpan lokasi' : 'Mulai pakai Reloop' }}</button>
+            <button data-loading-text="Menyimpan lokasi…" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">{{ $dariProfil ? 'Simpan lokasi' : 'Mulai pakai Reloop' }}</button>
         </div>
     </form>
 
@@ -59,7 +59,7 @@
     {{-- Bottom sheet pilih daerah --}}
     <dialog id="sheet" aria-labelledby="sheet-judul" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl bg-white p-0 backdrop:bg-black/40 sm:mx-auto">
         <div class="flex max-h-[85vh] flex-col">
-            <div class="flex items-center gap-2 px-4 pb-2 pt-4">
+            <div class="flex shrink-0 items-center gap-2 px-4 pb-2 pt-4">
                 <button type="button" id="sheet-back" hidden aria-label="Kembali" class="grid size-9 place-items-center rounded-full border border-slate-200">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
                 </button>
@@ -68,12 +68,12 @@
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
                 </button>
             </div>
-            <p id="sheet-jejak" class="truncate px-4 text-xs text-slate-500"></p>
-            <div class="px-4 pb-2 pt-3">
+            <p id="sheet-jejak" class="shrink-0 truncate px-4 pb-1 text-xs leading-4 text-slate-500"></p>
+            <div class="shrink-0 px-4 pb-2 pt-3">
                 <input id="cari" type="search" autocomplete="off" placeholder="Cari desa, kecamatan, atau kota" aria-label="Cari wilayah"
                        class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-ink">
             </div>
-            <div class="px-4 pb-3">
+            <div class="shrink-0 px-4 pb-3">
                 <div id="gps-error" role="alert" hidden class="mb-3 rounded-2xl border border-red-200 bg-red-50 p-3 text-xs text-red-700"></div>
                 <button type="button" id="gps" class="flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 py-2.5 text-sm font-semibold disabled:opacity-70">Gunakan lokasi saat ini</button>
             </div>

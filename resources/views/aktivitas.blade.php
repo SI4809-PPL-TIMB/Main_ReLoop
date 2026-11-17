@@ -59,7 +59,7 @@
                             <div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
                                 <form method="POST" action="{{ route('barang.destroy', $l) }}" onsubmit="return confirm('Hapus draft ini?')">
                                     @csrf @method('DELETE')
-                                    <button class="text-sm font-semibold text-red-500">Hapus</button>
+                                    <button data-loading-text="Menghapus…" class="text-sm font-semibold text-red-500">Hapus</button>
                                 </form>
                                 <a href="{{ route('barang.edit', $l) }}" class="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">Lanjutkan</a>
                             </div>

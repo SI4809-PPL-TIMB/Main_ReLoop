@@ -11,8 +11,8 @@
 
     {{-- Hero --}}
     <header class="relative h-[232px] overflow-hidden bg-slate-100">
-        <img data-mode="jual" src="{{ asset('assets/illust/hero-jual.png') }}" alt="Warga bertukar barang preloved di lingkungan Reloop" class="absolute inset-0 h-full w-full object-cover">
-        <img data-mode="daur" hidden src="{{ asset('assets/illust/hero-daur.png') }}" alt="Warga menyerahkan sampah terpilah kepada petugas daur ulang di lingkungan Reloop" class="absolute inset-0 h-full w-full object-cover">
+        <img data-mode="jual" src="{{ asset('assets/illust/hero-jual.webp') }}" width="840" height="506" fetchpriority="high" alt="Warga bertukar barang preloved di lingkungan Reloop" class="absolute inset-0 h-full w-full object-cover">
+        <img data-mode="daur" hidden src="{{ asset('assets/illust/hero-daur.webp') }}" width="840" height="506" loading="lazy" alt="Warga menyerahkan sampah terpilah kepada petugas daur ulang di lingkungan Reloop" class="absolute inset-0 h-full w-full object-cover">
 
         <div class="relative flex items-center justify-between gap-2 px-4 pt-5">
             <a href="{{ route('lokasi', ['from' => 'beranda']) }}" class="flex min-w-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold">
@@ -111,7 +111,7 @@
             <div class="no-scrollbar -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1">
                 @foreach ($barang as $b)
                     <a href="{{ isset($b['id']) ? route('barang.detail', $b['id']) : '#' }}" class="w-40 shrink-0">
-                        <div class="ph relative h-36 overflow-hidden rounded-xl">@if (! empty($b['foto']))<img src="{{ $b['foto'] }}" alt="" class="absolute inset-0 size-full object-cover">@endif<span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 {{ $b['kondisi'][1] }}">{{ $b['kondisi'][0] }}</span></div>
+                        <div class="ph relative h-36 overflow-hidden rounded-xl">@if (! empty($b['foto']))<img src="{{ $b['foto'] }}" loading="lazy" decoding="async" alt="" class="absolute inset-0 size-full object-cover">@endif<span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 {{ $b['kondisi'][1] }}">{{ $b['kondisi'][0] }}</span></div>
                         @if ($b['rating'] > 0)
                             <p class="mt-3"><span class="inline-block rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold leading-none text-white">★ {{ number_format($b['rating'], 1) }}</span></p>
                         @endif

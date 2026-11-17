@@ -88,7 +88,7 @@
                 <label class="block cursor-pointer">
                     <input type="radio" name="delivery_method" value="kirim" class="peer sr-only" {{ old('delivery_method') === 'kirim' ? 'checked' : '' }}>
                     <span class="flex items-center gap-3 rounded-2xl border border-slate-200 py-3 pl-3 pr-5 peer-checked:border-loop-dark/40 peer-checked:bg-loop-soft peer-checked:[&>i]:border-loop-dark peer-checked:[&>i]:bg-loop-dark peer-checked:[&>i]:shadow-[inset_0_0_0_3px_#f3fbe3] peer-[:user-invalid]:border-red-300">
-                        <span aria-hidden="true" class="grid size-12 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span>
+                        <img src="{{ asset('assets/illust/checkout/kirim-delivery.png') }}" alt="Ilustrasi pengiriman barang dengan mobil delivery" width="48" height="48" class="size-12 shrink-0 object-contain">
                         <span class="min-w-0"><b class="block">Kirim pakai delivery</b><span class="block text-xs text-slate-500">Diantar kurir ke lokasi antar kamu</span></span>
                         <i class="ml-auto size-5 shrink-0 rounded-full border-2 border-slate-300"></i>
                     </span>
@@ -141,6 +141,7 @@
                     <p data-total class="text-xl font-bold">{{ $rupiah($agreedPrice) }}</p>
                 </div>
             </div>
+            <p id="checkout-error" role="alert" hidden class="mb-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"></p>
             <button type="submit" id="btn-bayar-sekarang" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white flex items-center justify-center gap-2 hover:bg-slate-800 transition disabled:opacity-50">
                 <span id="btn-text">Bayar sekarang</span>
             </button>
@@ -163,11 +164,23 @@
                     <input id="alamat-in" value="{{ $alamatJalan }}" placeholder="mis. Jl. Pandu Raya No. 12" class="w-full bg-transparent py-1 font-medium outline-none">
                 </label>
                 <label class="block rounded-2xl border border-slate-200 px-4 pb-2 pt-2.5 focus-within:border-ink">
+                    <span class="block text-xs text-slate-500">Kota/Kabupaten</span>
+                    <select id="alamat-kota" class="w-full appearance-none bg-transparent bg-[length:18px] bg-[right_center] bg-no-repeat py-1 pr-6 font-medium outline-none" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394a3b8%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')">
+                        @if(isset($kabupatens) && $kabupatens->isNotEmpty())
+                            @foreach ($kabupatens as $kab)
+                                <option data-id="{{ $kab->id }}" value="{{ $kab->nama }}" {{ $kab->nama === $userKota ? 'selected' : '' }}>{{ $kab->nama }}</option>
+                            @endforeach
+                        @else
+                            <option value="{{ $userKota }}" selected>{{ $userKota }}</option>
+                        @endif
+                    </select>
+                </label>
+                <label class="block rounded-2xl border border-slate-200 px-4 pb-2 pt-2.5 focus-within:border-ink">
                     <span class="block text-xs text-slate-500">Kecamatan</span>
                     <select id="alamat-kec" class="w-full appearance-none bg-transparent bg-[length:18px] bg-[right_center] bg-no-repeat py-1 pr-6 font-medium outline-none" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394a3b8%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')">
                         @if(isset($kecamatans) && $kecamatans->isNotEmpty())
                             @foreach ($kecamatans as $kec)
-                                <option value="{{ $kec->nama }}" {{ $kec->nama === $userKec ? 'selected' : '' }}>{{ $kec->nama }}</option>
+                                <option data-id="{{ $kec->id }}" value="{{ $kec->nama }}" {{ $kec->nama === $userKec ? 'selected' : '' }}>{{ $kec->nama }}</option>
                             @endforeach
                         @else
                             <option value="{{ $userKec }}" selected>{{ $userKec }}</option>
@@ -179,22 +192,10 @@
                     <select id="alamat-desa" class="w-full appearance-none bg-transparent bg-[length:18px] bg-[right_center] bg-no-repeat py-1 pr-6 font-medium outline-none" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394a3b8%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')">
                         @if(isset($kelurahans) && $kelurahans->isNotEmpty())
                             @foreach ($kelurahans as $kel)
-                                <option value="{{ $kel->nama }}" {{ $kel->nama === $userDesa ? 'selected' : '' }}>{{ $kel->nama }}</option>
+                                <option data-id="{{ $kel->id }}" value="{{ $kel->nama }}" {{ $kel->nama === $userDesa ? 'selected' : '' }}>{{ $kel->nama }}</option>
                             @endforeach
                         @else
                             <option value="{{ $userDesa }}" selected>{{ $userDesa }}</option>
-                        @endif
-                    </select>
-                </label>
-                <label class="block rounded-2xl border border-slate-200 px-4 pb-2 pt-2.5 focus-within:border-ink">
-                    <span class="block text-xs text-slate-500">Kota/Kabupaten</span>
-                    <select id="alamat-kota" class="w-full appearance-none bg-transparent bg-[length:18px] bg-[right_center] bg-no-repeat py-1 pr-6 font-medium outline-none" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394a3b8%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E')">
-                        @if(isset($kabupatens) && $kabupatens->isNotEmpty())
-                            @foreach ($kabupatens as $kab)
-                                <option value="{{ $kab->nama }}" {{ $kab->nama === $userKota ? 'selected' : '' }}>{{ $kab->nama }}</option>
-                            @endforeach
-                        @else
-                            <option value="{{ $userKota }}" selected>{{ $userKota }}</option>
                         @endif
                     </select>
                 </label>
@@ -262,6 +263,54 @@
                     document.getElementById('alamat')?.close();
                 });
 
+                // Muat hanya wilayah di bawah induk terpilih.
+                const kotaSelect = document.getElementById('alamat-kota');
+                const kecSelect = document.getElementById('alamat-kec');
+                const desaSelect = document.getElementById('alamat-desa');
+                const saveAlamat = document.getElementById('alamat-simpan');
+                const selectedId = (select) => select.selectedOptions[0]?.dataset.id;
+                const resetSelect = (select, text) => {
+                    select.replaceChildren(new Option(text, ''));
+                    select.disabled = true;
+                };
+                const loadWilayah = async (level, parentSelect, target, label) => {
+                    const parent = selectedId(parentSelect);
+                    resetSelect(target, `Pilih ${label}`);
+                    if (!parent) return;
+                    target.options[0].textContent = 'Memuat…';
+                    try {
+                        const res = await fetch(`{{ url('/wilayah') }}/${level}?parent=${encodeURIComponent(parent)}`, {
+                            headers: { 'Accept': 'application/json' },
+                        });
+                        if (!res.ok) throw new Error('Wilayah gagal dimuat');
+                        const rows = await res.json();
+                        if (selectedId(parentSelect) !== parent) return;
+                        resetSelect(target, `Pilih ${label}`);
+                        rows.forEach((row) => {
+                            const option = new Option(row.nama, row.nama);
+                            option.dataset.id = row.id;
+                            target.add(option);
+                        });
+                        target.disabled = rows.length === 0;
+                    } catch (error) {
+                        if (selectedId(parentSelect) !== parent) return;
+                        resetSelect(target, `Pilih ${label}`);
+                        toast('Gagal memuat wilayah. Pilih ulang wilayah induk untuk mencoba lagi.');
+                    }
+                };
+                kotaSelect.addEventListener('change', async () => {
+                    saveAlamat.disabled = true;
+                    resetSelect(desaSelect, 'Pilih desa/kelurahan');
+                    await loadWilayah('kecamatan', kotaSelect, kecSelect, 'kecamatan');
+                });
+                kecSelect.addEventListener('change', async () => {
+                    saveAlamat.disabled = true;
+                    await loadWilayah('kelurahan', kecSelect, desaSelect, 'desa/kelurahan');
+                });
+                desaSelect.addEventListener('change', () => {
+                    saveAlamat.disabled = !selectedId(desaSelect);
+                });
+
                 // GPS button helper
                 document.getElementById('btn-gps')?.addEventListener('click', () => {
                     const kec = document.getElementById('alamat-kec')?.value || 'Ciomas';
@@ -270,11 +319,36 @@
                 });
 
                 // Submit Form Pesanan + Midtrans Snap
+                // Submit pesanan + Midtrans Snap. Tombol terkunci sampai ada hasil; sukses hanya setelah server mengonfirmasi.
+                const errorBox = document.getElementById('checkout-error');
+                let sedangProses = false;
+
+                // Respons non-JSON (sesi kedaluwarsa 419, error server 500) diubah jadi pesan yang bisa dipahami.
+                async function bacaJson(res) {
+                    try {
+                        return await res.json();
+                    } catch {
+                        return {};
+                    }
+                }
+                function pesanGagal(res, data, bawaan) {
+                    if (res.status === 419) return 'Sesi kamu sudah kedaluwarsa. Muat ulang halaman, lalu coba lagi.';
+                    if (res.status >= 500) return 'Server sedang bermasalah. Coba lagi beberapa saat lagi.';
+                    return data.message || bawaan;
+                }
+                function tampilkanGagal(pesan) {
+                    sedangProses = false;
+                    window.ReloopLoading.idle(btn);
+                    errorBox.textContent = pesan;
+                    errorBox.hidden = false;
+                }
+
                 form.addEventListener('submit', async function (e) {
                     e.preventDefault();
-
-                    btn.disabled = true;
-                    btnText.textContent = 'Memproses Pesanan...';
+                    if (sedangProses) return; // cegah pesanan ganda
+                    sedangProses = true;
+                    errorBox.hidden = true;
+                    window.ReloopLoading.busy(btn, 'Memproses pesanan…');
 
                     const formData = new FormData(form);
                     const payload = {
@@ -295,17 +369,18 @@
                             },
                             body: JSON.stringify(payload),
                         });
-
-                        const orderData = await orderRes.json();
-
-                        if (!orderRes.ok) {
-                            throw new Error(orderData.message || 'Gagal membuat pesanan. Silakan coba lagi.');
+                        const orderData = await bacaJson(orderRes);
+                        if (!orderRes.ok || !orderData.order) {
+                            return tampilkanGagal(pesanGagal(orderRes, orderData, 'Gagal membuat pesanan. Silakan coba lagi.'));
                         }
 
                         const orderNumber = orderData.order.order_number;
+                        const halamanStatus = `/pesanan/${orderNumber}/status`;
 
-                        // 2. Request Midtrans Snap Token
-                        btnText.textContent = 'Membuka Midtrans Snap...';
+                        // 2. Request Midtrans Snap Token. Pesanan sudah dibuat: kegagalan berikutnya diarahkan ke
+                        //    halaman status pesanan (bisa "Lanjut bayar"), bukan membuat pesanan baru.
+                        window.ReloopLoading.idle(btn);
+                        window.ReloopLoading.busy(btn, 'Membuka pembayaran…');
                         const snapRes = await fetch(`/pesanan/${orderNumber}/snap-token`, {
                             method: 'POST',
                             headers: {
@@ -314,61 +389,50 @@
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             },
                         });
+                        const snapData = await bacaJson(snapRes);
 
-                        const snapData = await snapRes.json();
-
-                        if (!snapRes.ok || !snapData.token) {
-                            window.location.href = `/pesanan/${orderNumber}/status`;
+                        if (!snapRes.ok || !snapData.token || typeof window.snap?.pay !== 'function') {
+                            window.location.href = halamanStatus;
                             return;
                         }
 
-                        // 3. Tampilkan Midtrans Snap Popup jika script tersedia
-                        if (typeof window.snap !== 'undefined' && typeof window.snap.pay === 'function') {
-                            // Mulai auto-polling deteksi pembayaran saat Snap terbuka
-                            const pollPayment = setInterval(async function () {
-                                try {
-                                    const checkRes = await fetch(`/pesanan/${orderNumber}/status`, {
-                                        headers: {
-                                            'Accept': 'application/json',
-                                            'X-Requested-With': 'XMLHttpRequest'
-                                        }
-                                    });
-                                    if (checkRes.ok) {
-                                        const checkData = await checkRes.json();
-                                        if (checkData.status === '{{ \App\Models\Order::STATUS_DIBAYAR }}' || checkData.is_paid) {
-                                            clearInterval(pollPayment);
-                                            window.location.href = `/pesanan/${orderNumber}/status?status=sukses`;
-                                        }
+                        // 3. Snap popup. Status akhir selalu dibaca halaman status dari server.
+                        const pollPayment = setInterval(async function () {
+                            try {
+                                const checkRes = await fetch(halamanStatus, {
+                                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                                });
+                                if (checkRes.ok) {
+                                    const checkData = await checkRes.json();
+                                    if (checkData.status === '{{ \App\Models\Order::STATUS_DIBAYAR }}' || checkData.is_paid) {
+                                        clearInterval(pollPayment);
+                                        window.location.href = `${halamanStatus}?status=sukses`;
                                     }
-                                } catch (e) {
-                                    // Ignore network transient error
                                 }
-                            }, 2000);
+                            } catch (e) {
+                                // Gangguan jaringan sesaat: polling berikutnya mencoba lagi.
+                            }
+                        }, 2000);
 
-                            window.snap.pay(snapData.token, {
-                                onSuccess: function (result) {
-                                    clearInterval(pollPayment);
-                                    window.location.href = `/pesanan/${orderNumber}/status?status=sukses`;
-                                },
-                                onPending: function (result) {
-                                    // Tetap biarkan pollPayment berjalan jika user membayar di tab lain
-                                },
-                                onError: function (result) {
-                                    clearInterval(pollPayment);
-                                    window.location.href = `/pesanan/${orderNumber}/status?status=gagal`;
-                                },
-                                onClose: function () {
-                                    clearInterval(pollPayment);
-                                    window.location.href = `/pesanan/${orderNumber}/status`;
-                                },
-                            });
-                        } else {
-                            window.location.href = `/pesanan/${orderNumber}/status`;
-                        }
+                        window.snap.pay(snapData.token, {
+                            onSuccess: function () {
+                                clearInterval(pollPayment);
+                                window.location.href = `${halamanStatus}?status=sukses`;
+                            },
+                            onPending: function () {
+                                // Tetap biarkan pollPayment berjalan jika user membayar di tab lain
+                            },
+                            onError: function () {
+                                clearInterval(pollPayment);
+                                window.location.href = `${halamanStatus}?status=gagal`;
+                            },
+                            onClose: function () {
+                                clearInterval(pollPayment);
+                                window.location.href = halamanStatus;
+                            },
+                        });
                     } catch (err) {
-                        alert(err.message || 'Terjadi kesalahan sistem.');
-                        btn.disabled = false;
-                        btnText.textContent = 'Bayar sekarang';
+                        tampilkanGagal('Gagal terhubung ke server. Periksa koneksi internetmu, lalu coba lagi.');
                     }
                 });
             });

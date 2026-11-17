@@ -5,8 +5,12 @@
         $rupiah = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
         $fotoUrl = $order->listing?->primaryPhoto?->url ?? asset('assets/illust/activities/kursi-jati.png');
 
-        $isSukses = $order->status === \App\Models\Order::STATUS_DIBAYAR || request('status') === 'sukses';
-        $isGagal = $order->status === \App\Models\Order::STATUS_DIBATALKAN || request('status') === 'gagal' || ($order->payment && in_array($order->payment->status, [\App\Models\Payment::STATUS_GAGAL, \App\Models\Payment::STATUS_KEDALUWARSA]));
+        // Sukses/gagal hanya dari status di server. ?status= dari callback Snap (sisi browser) cuma petunjuk:
+        // pesanan yang belum terkonfirmasi tetap di state menunggu dengan banner verifikasi atau gagal.
+        $isSukses = $order->status === \App\Models\Order::STATUS_DIBAYAR;
+        $verifikasi = ! $isSukses && request('status') === 'sukses';
+        $snapGagal = request('status') === 'gagal';
+        $isGagal = $order->status === \App\Models\Order::STATUS_DIBATALKAN || ($order->payment && in_array($order->payment->status, [\App\Models\Payment::STATUS_GAGAL, \App\Models\Payment::STATUS_KEDALUWARSA]));
         $isMenunggu = !$isSukses && !$isGagal;
     @endphp
 
@@ -112,6 +116,17 @@
                 <p class="mt-2 text-xs text-slate-500">Lewat batas waktu, pesanan batal otomatis.</p>
             </section>
 
+            @if ($verifikasi)
+                <p id="verifikasi-bayar" role="status" class="flex items-center gap-2.5 rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-600">
+                    <x-spinner class="size-4 text-loop-dark" />
+                    <span><b class="text-ink">Memverifikasi pembayaran…</b> Halaman ini diperbarui otomatis setelah pembayaran terkonfirmasi.</span>
+                </p>
+            @elseif ($snapGagal)
+                <p role="alert" class="rounded-2xl border border-red-200 bg-red-50 px-3.5 py-3 text-sm text-red-700">
+                    Pembayaran belum berhasil. Pesananmu masih menunggu pembayaran, silakan coba lagi.
+                </p>
+            @endif
+
             <!-- Ringkasan pesanan -->
             <section class="rounded-2xl border border-slate-200 p-4 shadow-card">
                 <div class="flex items-center gap-3">
@@ -134,6 +149,7 @@
 
             <!-- Aksi (Fixed Bottom) -->
             <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
+                <p id="bayar-error" role="alert" hidden class="mb-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"></p>
                 <button type="button" id="btn-bayar-snap" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white hover:bg-slate-800 transition disabled:opacity-60">
                     <span id="btn-bayar-label">Lanjut bayar</span>
                 </button>
@@ -179,9 +195,15 @@
                 // Trigger Snap Pay
                 document.getElementById('btn-bayar-snap')?.addEventListener('click', async function () {
                     const btn = this;
-                    const label = document.getElementById('btn-bayar-label');
-                    btn.disabled = true;
-                    label.textContent = 'Menghubungkan Midtrans...';
+                    const errorBox = document.getElementById('bayar-error');
+                    if (btn.disabled) return;
+                    const gagal = (pesan) => {
+                        window.ReloopLoading.idle(btn);
+                        errorBox.textContent = pesan;
+                        errorBox.hidden = false;
+                    };
+                    errorBox.hidden = true;
+                    window.ReloopLoading.busy(btn, 'Membuka pembayaran…');
 
                     try {
                         const res = await fetch("{{ route('order.snap_token', $order->order_number) }}", {
@@ -192,14 +214,14 @@
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             },
                         });
-
-                        const data = await res.json();
+                        const data = await res.json().catch(() => ({}));
 
                         if (!res.ok || !data.token) {
-                            throw new Error(data.message || 'Gagal memuat token pembayaran.');
+                            return gagal(res.status === 419 ? 'Sesi kamu sudah kedaluwarsa. Muat ulang halaman, lalu coba lagi.'
+                                : (data.message || 'Pembayaran belum bisa dibuka. Coba lagi beberapa saat lagi.'));
                         }
 
-                        if (typeof window.snap !== 'undefined' && typeof window.snap.pay === 'function') {
+                        if (typeof window.snap?.pay === 'function') {
                             window.snap.pay(data.token, {
                                 onSuccess: function () {
                                     window.location.href = "{{ route('order.status', $order->order_number) }}?status=sukses";
@@ -211,17 +233,16 @@
                                     window.location.href = "{{ route('order.status', $order->order_number) }}?status=gagal";
                                 },
                                 onClose: function () {
-                                    btn.disabled = false;
-                                    label.textContent = 'Lanjut bayar';
+                                    window.ReloopLoading.idle(btn);
                                 }
                             });
                         } else if (data.redirect_url) {
                             window.location.href = data.redirect_url;
+                        } else {
+                            gagal('Halaman pembayaran Midtrans gagal dimuat. Periksa koneksi internetmu, lalu coba lagi.');
                         }
                     } catch (e) {
-                        alert(e.message);
-                        btn.disabled = false;
-                        label.textContent = 'Lanjut bayar';
+                        gagal('Gagal terhubung ke server. Periksa koneksi internetmu, lalu coba lagi.');
                     }
                 });
 

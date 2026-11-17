@@ -93,7 +93,7 @@
                             <a href="{{ route('barang.detail', $b) }}">
                                 <div class="ph relative h-36 rounded-xl overflow-hidden bg-slate-100">
                                     @if ($b->primaryPhoto)
-                                        <img src="{{ $b->primaryPhoto->url }}" alt="{{ $b->title }}" class="size-full object-cover">
+                                        <img src="{{ $b->primaryPhoto->url }}" alt="{{ $b->title }}" loading="lazy" decoding="async" class="size-full object-cover">
                                     @endif
                                     <span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 {{ $kondisiBadge }}">
                                         {{ $kondisiTxt }}

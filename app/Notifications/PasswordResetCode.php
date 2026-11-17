@@ -24,12 +24,11 @@ class PasswordResetCode extends Notification
     {
         return (new MailMessage)
             ->subject('Kode Atur Ulang Kata Sandi ReLoop')
-            ->greeting('Halo!')
-            ->line('Kami menerima permintaan untuk mengatur ulang kata sandi akunmu.')
-            ->line('Gunakan kode verifikasi berikut:')
-            ->line('**' . $this->code . '**')
-            ->line('Kode ini berlaku selama **10 menit** dan hanya bisa dipakai sekali.')
-            ->line('Jika kamu tidak merasa melakukan permintaan ini, abaikan saja email ini. Akunmu tetap aman.')
-            ->salutation('Salam, Tim ReLoop');
+            ->view('emails.kode', [
+                'judul'   => 'Atur ulang kata sandi',
+                'pembuka' => 'Kami menerima permintaan untuk mengatur ulang kata sandi akunmu. Gunakan kode berikut.',
+                'kode'    => $this->code,
+                'berlaku' => '10 menit',
+            ]);
     }
 }

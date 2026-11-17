@@ -86,13 +86,16 @@
                 @foreach ($foto as $i => $f)
                     <button type="button" data-foto="{{ $i }}" data-src="{{ $f->url }}" aria-label="Foto {{ $i + 1 }}"
                             class="thumb aspect-square overflow-hidden rounded-lg {{ $i === 0 ? 'ring-2 ring-ink' : '' }}">
-                        <img src="{{ $f->url }}" alt="" class="size-full object-cover">
+                        <img src="{{ $f->url }}" alt="" loading="lazy" decoding="async" class="size-full object-cover">
                     </button>
                 @endforeach
             </div>
         @endif
 
         <main class="px-4 pt-4">
+            @if (session('error'))
+                <p role="alert" class="mb-4 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{{ session('error') }}</p>
+            @endif
             {{-- Penanda status: barang tidak lagi tersedia --}}
             @if ($dipesan)
                 <div role="status" class="mb-4 flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
@@ -118,10 +121,10 @@
             <section>
                 <p class="text-xs text-slate-500">{{ $listing->category?->name }}@if ($listing->published_at) · Diunggah {{ $listing->published_at->locale('id')->diffForHumans() }}@endif</p>
                 <h1 class="mt-1.5 text-[22px] font-bold leading-tight">{{ $listing->title }}</h1>
-                <div class="mt-2 flex items-baseline gap-2">
-                    <p class="text-2xl font-bold">{{ $rupiah($listing->price) }}</p>
+                <div class="mt-2 flex items-center gap-2">
+                    <p class="text-xl font-bold leading-none">{{ $rupiah($listing->price) }}</p>
                     @if ($listing->is_negotiable)
-                        <span class="rounded-md bg-loop-soft px-2 py-0.5 text-xs font-semibold text-loop-dark">Bisa nego</span>
+                        <span class="rounded-md bg-loop-soft px-2 py-0.5 text-xs font-bold text-loop-dark">Bisa nego</span>
                     @endif
                 </div>
                 @if ($wilayah || $jarak)
@@ -190,7 +193,6 @@
                             {{ $penjual?->name ?? 'Penjual' }}
                             <svg class="size-4 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="currentColor" aria-label="Terverifikasi"><path d="m12 2 2.4 2.1 3.2-.3.7 3.1 2.8 1.6-1.3 2.9 1.3 2.9-2.8 1.6-.7 3.1-3.2-.3L12 22l-2.4-2.1-3.2.3-.7-3.1-2.8-1.6 1.3-2.9-1.3-2.9 2.8-1.6.7-3.1 3.2.3z"/><path d="m8.5 12 2.5 2.5 4.5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
                         </p>
-                        <p class="text-xs text-slate-500">Online · Gabung sejak {{ $penjual?->created_at ? $penjual->created_at->format('Y') : '2025' }}</p>
                         @if ($daerahPenjual)
                             <p class="mt-0.5 flex items-center gap-1 truncate text-xs text-slate-500">
                                 <svg class="size-3 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">{!! $ikonLokasi !!}</svg>{{ $daerahPenjual }}
@@ -258,7 +260,7 @@
                             <a href="{{ route('barang.detail', $s) }}" class="w-40 shrink-0">
                                 <div class="ph relative h-36 rounded-xl overflow-hidden bg-slate-100">
                                     @if ($s->primaryPhoto)
-                                        <img src="{{ $s->primaryPhoto->url }}" alt="{{ $s->title }}" class="size-full object-cover">
+                                        <img src="{{ $s->primaryPhoto->url }}" alt="{{ $s->title }}" loading="lazy" decoding="async" class="size-full object-cover">
                                     @endif
                                     <span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ring-1 {{ $kondisiBadge }}">
                                         {{ $kondisiTxt }}
@@ -293,14 +295,14 @@
                 @endif
                 <a href="{{ route('barang.index') }}" class="flex-1 rounded-full bg-ink py-3 text-center font-semibold text-white">Barang saya</a>
             @else
-                <a href="{{ route('pesan.mulai', $listing) }}" aria-label="Chat penjual" class="grid size-12 shrink-0 place-items-center rounded-full border border-slate-200 hover:bg-slate-50 transition active:scale-95">
+                <a href="{{ route('pesan.mulai', $listing) }}" aria-label="Chat penjual" data-loading-text="" class="grid size-12 shrink-0 place-items-center rounded-full border border-slate-200 hover:bg-slate-50 transition active:scale-95">
                     <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
                 </a>
                 @if ($aktif)
                     @if ($listing->is_negotiable)
-                        <a href="{{ route('pesan.mulai', ['listing' => $listing, 'tawar' => 1]) }}" class="flex-1 rounded-full border border-slate-300 py-3 text-center font-semibold hover:bg-slate-50 transition">Tawar</a>
+                        <a href="{{ route('pesan.mulai', ['listing' => $listing, 'tawar' => 1]) }}" data-loading-text="Membuka…" class="flex-1 rounded-full border border-slate-300 py-3 text-center font-semibold hover:bg-slate-50 transition">Tawar</a>
                     @endif
-                    <a href="{{ route('order.checkout', $listing) }}" class="flex-[1.4] rounded-full bg-ink py-3 text-center font-semibold text-white">Beli sekarang</a>
+                    <a href="{{ route('order.checkout', $listing) }}" data-loading-text="Membuka…" class="flex-[1.4] rounded-full bg-ink py-3 text-center font-semibold text-white">Beli sekarang</a>
                 @else
                     <button type="button" disabled class="flex-1 cursor-not-allowed rounded-full bg-slate-100 py-3 text-center font-semibold text-slate-400">{{ $dipesan ? 'Sudah dipesan' : 'Sudah terjual' }}</button>
                 @endif

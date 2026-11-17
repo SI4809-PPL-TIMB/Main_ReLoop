@@ -9,7 +9,10 @@ use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
+use App\Models\WilayahKecamatan;
+use App\Models\WilayahKelurahan;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\WilayahSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -83,6 +86,42 @@ class CheckoutSnapViewTest extends TestCase
             ->assertSee('Rp 350.000')
             ->assertSee('Bayar sekarang')
             ->assertSee('Cara serah terima');
+    }
+
+    public function test_checkout_hanya_memuat_wilayah_di_bawah_alamat_pembeli(): void
+    {
+        $this->seed(WilayahSeeder::class);
+        $kelurahan = WilayahKelurahan::with('kecamatan')->firstOrFail();
+        $this->buyer->profile->update(['kelurahan_id' => $kelurahan->id]);
+
+        $response = $this->actingAs($this->buyer)
+            ->get(route('order.checkout', $this->listing));
+
+        $response->assertOk();
+        $this->assertSame(
+            WilayahKecamatan::where('kabupaten_id', $kelurahan->kecamatan->kabupaten_id)
+                ->orderBy('nama')->pluck('id')->all(),
+            $response->viewData('kecamatans')->pluck('id')->all(),
+        );
+        $this->assertSame(
+            WilayahKelurahan::where('kecamatan_id', $kelurahan->kecamatan_id)
+                ->orderBy('nama')->pluck('id')->all(),
+            $response->viewData('kelurahans')->pluck('id')->all(),
+        );
+        $this->assertLessThan(WilayahKelurahan::count(), $response->viewData('kelurahans')->count());
+    }
+
+    public function test_checkout_tanpa_alamat_tidak_memuat_seluruh_kecamatan_dan_kelurahan(): void
+    {
+        $this->seed(WilayahSeeder::class);
+
+        $response = $this->actingAs($this->buyer)
+            ->get(route('order.checkout', $this->listing));
+
+        $response->assertOk();
+        $this->assertCount(0, $response->viewData('kecamatans'));
+        $this->assertCount(0, $response->viewData('kelurahans'));
+        $this->assertNotEmpty($response->viewData('kabupatens'));
     }
 
     public function test_checkout_menggunakan_harga_tawaran_disepakati(): void

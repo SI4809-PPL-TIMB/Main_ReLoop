@@ -144,7 +144,7 @@
         <div class="fixed bottom-0 left-1/2 z-30 flex w-full max-w-[420px] -translate-x-1/2 gap-2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
             <button type="button" id="prev" class="hidden shrink-0 rounded-full border border-slate-300 px-6 py-3.5 font-semibold">Kembali</button>
             <button type="button" id="next" class="flex-1 rounded-full bg-ink py-3.5 font-semibold text-white">Lanjut</button>
-            <button type="submit" id="kirim" name="action" value="publish" class="hidden flex-1 rounded-full bg-ink py-3.5 font-semibold text-white">{{ $ubah ? 'Simpan perubahan' : 'Pasang Sekarang' }}</button>
+            <button type="submit" id="kirim" name="action" value="publish" data-loading-text="{{ $ubah ? 'Menyimpan…' : 'Memasang barang…' }}" class="hidden flex-1 rounded-full bg-ink py-3.5 font-semibold text-white">{{ $ubah ? 'Simpan perubahan' : 'Pasang Sekarang' }}</button>
         </div>
     </form>
 

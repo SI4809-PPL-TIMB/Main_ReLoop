@@ -14,7 +14,7 @@ class PenjualController extends Controller
 {
     public function show(Request $request, User $user): View
     {
-        $user->loadMissing(['profile.kelurahan.kecamatan.kabupaten.provinsi']);
+        $user->loadMissing(['profile.kelurahan.kecamatan.kabupaten']); // provinsi tidak ditampilkan
 
         $profil = $user->profile;
         $kel = $profil?->kelurahan;

@@ -32,7 +32,7 @@
                 <input name="email" type="email" required maxlength="255" autocomplete="email" value="{{ old('email') }}" placeholder="nama@email.com" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-ink">
             </label>
             <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
-                <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Kirim kode</button>
+                <button data-loading-text="Mengirim kode…" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Kirim kode</button>
                 <p class="mt-3 text-center text-sm text-slate-500">Ingat kata sandimu? <a href="{{ route('login') }}" class="font-semibold text-ink underline">Masuk</a></p>
             </div>
         </form>
@@ -54,7 +54,7 @@
                 <button type="submit" form="resend-code" data-resend-countdown="{{ $retryAfter }}" @disabled($retryAfter > 0) class="font-semibold text-brand-600 disabled:text-slate-400">{{ $retryAfter > 0 ? 'Kirim ulang dalam '.$retryAfter.' dtk' : 'Kirim ulang' }}</button>
             </div>
             <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
-                <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Verifikasi</button>
+                <button data-loading-text="Memverifikasi…" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Verifikasi</button>
                 <a href="{{ route('login') }}" class="mt-2 block rounded-full border border-slate-200 py-3 text-center font-semibold">Kembali ke Masuk</a>
             </div>
         </form>
@@ -79,7 +79,7 @@
                 <a href="{{ route('password.request') }}" class="text-sm font-semibold text-brand-600 underline">Minta kode baru</a>
             @endif
             <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
-                <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Simpan kata sandi</button>
+                <button data-loading-text="Menyimpan…" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Simpan kata sandi</button>
             </div>
         </form>
     @else
