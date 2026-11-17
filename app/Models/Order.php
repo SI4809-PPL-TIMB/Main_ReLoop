@@ -4,11 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 class Order extends Model
 {
+    public const STATUS_MENUNGGU_BAYAR = 'menunggu_bayar';
+    public const STATUS_DIBAYAR = 'dibayar';
+    public const STATUS_DISERAHKAN = 'diserahkan';
+    public const STATUS_SELESAI = 'selesai';
+    public const STATUS_DIBATALKAN = 'dibatalkan';
+
+    public const DELIVERY_COD = 'cod';
+    public const DELIVERY_AMBIL = 'ambil';
+    public const DELIVERY_KIRIM = 'kirim';
+
     protected $fillable = [
         'order_number',
         'listing_id',
@@ -25,6 +36,16 @@ class Order extends Model
         'cancel_reason',
     ];
 
+    public static function generateOrderNumber(): string
+    {
+        $prefix = 'RL-' . now()->format('Ymd') . '-';
+        do {
+            $number = $prefix . strtoupper(Str::random(4));
+        } while (static::where('order_number', $number)->exists());
+
+        return $number;
+    }
+
     protected function casts(): array
     {
         return [
@@ -34,6 +55,15 @@ class Order extends Model
             'auto_complete_at'    => 'datetime',
             'cancelled_at'        => 'datetime',
         ];
+    }
+
+    public function deliveryLabel(): string
+    {
+        return match ($this->delivery_method) {
+            self::DELIVERY_AMBIL => 'Ambil di tempat penjual',
+            self::DELIVERY_KIRIM => 'Kirim pakai delivery',
+            default => 'Ketemuan (COD lokasi)',
+        };
     }
 
     public function listing(): BelongsTo

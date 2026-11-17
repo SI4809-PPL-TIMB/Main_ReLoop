@@ -1,4 +1,4 @@
-@props(['nav' => null, 'title' => null])
+@props(['nav' => null, 'title' => null, 'bodyClass' => null, 'shellClass' => null])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -70,8 +70,8 @@
 
         @livewireStyles
     </head>
-    <body class="bg-[#e9ebe8] font-sans text-ink antialiased">
-        <div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white {{ $nav ? 'pb-24' : '' }}">
+    <body class="{{ $bodyClass ?? 'bg-[#e9ebe8]' }} font-sans text-ink antialiased">
+        <div class="{{ $shellClass ?? ('relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white ' . ($nav ? 'pb-24' : '')) }}">
             {{ $header ?? '' }}
 
             {{ $slot }}

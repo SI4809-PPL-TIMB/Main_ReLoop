@@ -4,23 +4,19 @@ namespace App\Livewire;
 
 use App\Models\Conversation;
 use App\Models\Offer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
-/**
- * 6.1 + 6.2 — Komponen chat dengan dukungan tawaran harga.
- */
 class ChatRoom extends Component
 {
     public Conversation $conversation;
     public string $body = '';
+    public bool $showOffer = false;
+    public string $offerAmount = '';
 
-    // 6.2 — form tawaran
-    public bool  $showTawarForm = false;
-    public string $tawarAmount  = '';
-
-    public function mount(Conversation $conversation): void
+    public function mount(Conversation $conversation, bool $bukaTawar = false): void
     {
         $userId = Auth::id();
         if ((int) $conversation->buyer_id !== (int) $userId && (int) $conversation->seller_id !== (int) $userId) {
@@ -28,6 +24,7 @@ class ChatRoom extends Component
         }
 
         $this->conversation = $conversation;
+        $this->showOffer = $bukaTawar && (int) $conversation->buyer_id === (int) $userId;
         $this->markAsRead();
     }
 
@@ -70,107 +67,85 @@ class ChatRoom extends Component
         $this->dispatch('message-sent');
     }
 
-    /** 6.2 — Pembeli membuka / menutup form tawaran harga. */
-    public function toggleTawarForm(): void
+    private function activeOffer(): ?Offer
     {
-        $this->showTawarForm = ! $this->showTawarForm;
-        $this->reset('tawarAmount');
-        $this->resetValidation('tawarAmount');
+        return $this->conversation->offers()->where('status', 'menunggu')
+            ->where('expires_at', '>', now())->latest('id')->first();
     }
 
-    /** 6.2 — Pembeli mengajukan tawaran langsung dari Livewire. */
-    public function ajukanTawar(): void
+    public function openOffer(): void
     {
-        $userId = Auth::id();
+        $this->resetErrorBag();
+        $this->offerAmount = '';
+        $this->showOffer = true;
+    }
 
-        // Hanya pembeli
-        if ((int) $this->conversation->buyer_id !== (int) $userId) {
-            abort(403, 'Hanya pembeli yang dapat mengajukan tawaran.');
-        }
+    public function closeOffer(): void
+    {
+        $this->showOffer = false;
+    }
 
-        $listing = $this->conversation->listing;
-        if (! $listing || $listing->status !== \App\Models\Listing::AKTIF) {
-            $this->addError('tawarAmount', 'Barang ini sudah tidak tersedia untuk ditawar.');
-            return;
-        }
-        if (! $listing->is_negotiable) {
-            $this->addError('tawarAmount', 'Barang ini tidak dapat ditawar.');
-            return;
-        }
+    /** Tawar (pembeli) atau tawar balik (jawab tawaran lawan). */
+    public function submitOffer(): void
+    {
+        $uid = (int) Auth::id();
+        $price = (int) $this->conversation->listing?->price;
+        $isBuyer = (int) $this->conversation->buyer_id === $uid;
+        $amount = (int) preg_replace('/\D/', '', $this->offerAmount);
 
-        // Bersihkan format rupiah (pisahkan titik ribuan)
-        $rawAmount = preg_replace('/[^\d]/', '', $this->tawarAmount);
+        DB::transaction(function () use ($uid, $price, $isBuyer, $amount) {
+            $c = Conversation::lockForUpdate()->find($this->conversation->id);
+            $pending = $c->offers()->where('status', 'menunggu')->where('expires_at', '>', now())->latest('id')->first();
 
-        $this->validate([
-            'tawarAmount' => ['required'],
-        ], [
-            'tawarAmount.required' => 'Masukkan harga tawaran.',
-        ]);
+            if ($c->offers()->where('status', 'diterima')->exists()) {
+                $this->addError('offerAmount', 'Tawaran sudah disepakati.');
+                return;
+            }
+            if ($pending && (int) $pending->offerer_id === $uid) {
+                $this->addError('offerAmount', 'Tunggu jawaban dulu, atau batalkan tawaranmu.');
+                return;
+            }
+            if (! $pending && ! $isBuyer) {
+                $this->addError('offerAmount', 'Penjual hanya bisa menawar balik.');
+                return;
+            }
+            if ($amount < 1000 || $amount >= $price) {
+                $this->addError('offerAmount', 'Tawaran harus di bawah harga barang (Rp ' . number_format($price, 0, ',', '.') . ').');
+                return;
+            }
 
-        $amount = (int) $rawAmount;
-        if ($amount < 1000) {
-            $this->addError('tawarAmount', 'Harga tawaran minimal Rp 1.000.');
-            return;
-        }
-        if ($amount > 999999999) {
-            $this->addError('tawarAmount', 'Harga tawaran terlalu besar.');
-            return;
-        }
-
-        // Batalkan tawaran lama yang masih menunggu
-        $this->conversation->offers()
-            ->where('status', Offer::MENUNGGU)
-            ->update(['status' => Offer::DIBATALKAN]);
-
-        $this->conversation->offers()->create([
-            'offerer_id' => $userId,
-            'amount'     => $amount,
-            'status'     => Offer::MENUNGGU,
-            'expires_at' => now()->addHours(24),
-        ]);
-
-        $this->conversation->touch();
-        $this->showTawarForm = false;
-        $this->reset('tawarAmount');
-
+            $pending?->update(['status' => 'ditolak']);
+            $c->offers()->create([
+                'offerer_id' => $uid,
+                'amount'     => $amount,
+                'expires_at' => now()->addHours(24),
+            ]);
+            $c->touch();
+            $this->showOffer = false;
+        });
         $this->dispatch('message-sent');
     }
 
-    /** 6.2 — Penjual menerima tawaran. */
-    public function terimaTawar(int $offerId): void
+    private function respond(int $id, string $status): void
     {
-        $this->respondTawar($offerId, Offer::DITERIMA);
+        $offer = $this->conversation->offers()->findOrFail($id);
+        abort_if((int) $offer->offerer_id === (int) Auth::id(), 403);
+        if ($offer->status === 'menunggu' && $offer->expires_at?->isFuture()) {
+            $offer->update(['status' => $status]);
+        }
     }
 
-    /** 6.2 — Penjual menolak tawaran. */
-    public function tolakTawar(int $offerId): void
+    public function acceptOffer(int $id): void { $this->respond($id, 'diterima'); }
+
+    public function rejectOffer(int $id): void { $this->respond($id, 'ditolak'); }
+
+    public function cancelOffer(int $id): void
     {
-        $this->respondTawar($offerId, Offer::DITOLAK);
-    }
-
-    private function respondTawar(int $offerId, string $status): void
-    {
-        $userId = Auth::id();
-
-        if ((int) $this->conversation->seller_id !== (int) $userId) {
-            abort(403, 'Hanya penjual yang dapat merespons tawaran.');
+        $offer = $this->conversation->offers()->findOrFail($id);
+        abort_if((int) $offer->offerer_id !== (int) Auth::id(), 403);
+        if ($offer->status === 'menunggu') {
+            $offer->update(['status' => 'dibatalkan']);
         }
-
-        $offer = $this->conversation->offers()->findOrFail($offerId);
-
-        if ($offer->status !== Offer::MENUNGGU) {
-            return; // sudah diproses
-        }
-
-        if ($offer->expires_at && $offer->expires_at->isPast()) {
-            $offer->update(['status' => Offer::KEDALUWARSA]);
-            return;
-        }
-
-        $offer->update(['status' => $status]);
-        $this->conversation->touch();
-
-        $this->dispatch('message-sent');
     }
 
     public function render(): View
@@ -178,38 +153,23 @@ class ChatRoom extends Component
         // Setiap polling siklus, tandai pesan yang masuk sebagai terbaca
         $this->markAsRead();
 
-        $userId   = Auth::id();
-        $isPembeli = (int) $this->conversation->buyer_id === (int) $userId;
+        $this->conversation->offers()->where('status', 'menunggu')
+            ->where('expires_at', '<=', now())->update(['status' => 'dibatalkan']);
 
         $messages = $this->conversation->messages()
             ->with('sender.profile')
             ->get();
-
-        // Muat semua tawaran percakapan ini, diurutkan dari terbaru
-        $offers = $this->conversation->offers()
-            ->with('offerer')
-            ->latest()
-            ->get();
-
-        // Tawaran aktif (menunggu + belum kedaluwarsa)
-        $activeoffer = $offers->first(fn ($o) =>
-            $o->status === Offer::MENUNGGU
-            && (! $o->expires_at || $o->expires_at->isFuture())
-        );
-
-        // Tawaran terakhir yang diterima (untuk harga checkout)
-        $acceptedOffer = $offers->first(fn ($o) => $o->status === Offer::DITERIMA);
-
-        $listing = $this->conversation->listing;
+        $offers = $this->conversation->offers()->get();
+        $timeline = $messages->concat($offers)->sortBy('created_at')->values();
 
         return view('livewire.chat-room', [
-            'listing'       => $listing,
-            'other'         => $this->conversation->otherUser(),
-            'messages'      => $messages,
-            'offers'        => $offers,
-            'activeOffer'   => $activeoffer,
-            'acceptedOffer' => $acceptedOffer,
-            'isPembeli'     => $isPembeli,
+            'listing'  => $this->conversation->listing,
+            'other'    => $this->conversation->otherUser(),
+            'messages' => $messages,
+            'timeline' => $timeline,
+            'pending'  => $this->activeOffer(),
+            'accepted' => $offers->firstWhere('status', 'diterima'),
         ]);
     }
 }
+

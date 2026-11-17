@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Reloop · Pembayaran</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white pb-40">
+
+  <!-- Menunggu pembayaran (Midtrans sandbox, VA) -->
+  <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-100 bg-white px-4 py-4">
+    <a href="checkout.html" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <div><h1 class="text-xl font-bold leading-tight">Pembayaran</h1><p class="text-xs text-slate-500">#RL-20261020-0142</p></div>
+  </header>
+
+  <main class="space-y-4 px-4 pt-5">
+    <!-- Lewat 24 jam: pesanan batal otomatis -->
+    <section data-state="kedaluwarsa" class="pt-6 text-center">
+      <div class="ph mx-auto size-24 rounded-2xl"></div>
+      <h2 class="mt-3 text-xl font-bold">Pesanan dibatalkan</h2>
+      <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-600">Batas bayar 24 jam terlewat</p>
+      <p class="mx-auto mt-3 max-w-[300px] text-sm text-slate-500">Pembayaran untuk Kursi Kayu Jati Ukir tidak kami terima, jadi pesanan batal otomatis. Kamu tidak dikenai biaya apa pun.</p>
+    </section>
+
+    <div data-state="ok berhasil" class="space-y-4">
+    <section class="text-center">
+      <div class="ph mx-auto size-24 rounded-2xl"></div>
+      <h2 class="mt-3 text-xl font-bold">Menunggu pembayaran</h2>
+      <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-800">
+        <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Bayar sebelum <span data-countdown="85270" data-end="kedaluwarsa">23:41:10</span></p>
+      <p class="mt-2 text-xs text-slate-500">Lewat batas waktu, pesanan batal otomatis.</p>
+    </section>
+
+    <!-- Metode dari checkout (?bayar=va|qris|ewallet) -->
+    <div data-seg="bayar" hidden><button value="va"></button><button value="qris"></button><button value="ewallet"></button></div>
+
+    <!-- QRIS -->
+    <section data-bayar="qris" class="rounded-2xl border border-slate-200 p-4 text-center shadow-card">
+      <p class="font-semibold">Scan QRIS</p>
+      <p class="text-xs text-slate-500">Pakai aplikasi bank atau e-wallet apa pun</p>
+      <div class="ph mx-auto mt-4 size-52 rounded-xl"></div>
+      <div class="mt-4 flex items-center justify-between border-t border-dashed border-slate-200 pt-3 text-left">
+        <p class="text-sm text-slate-500">Jumlah bayar</p>
+        <p data-total class="text-lg font-bold">Rp 320.000</p>
+      </div>
+    </section>
+
+    <!-- E-wallet -->
+    <section data-bayar="ewallet" class="rounded-2xl border border-slate-200 p-4 shadow-card">
+      <p class="font-semibold">Bayar dengan e-wallet</p>
+      <div class="mt-3 grid grid-cols-2 gap-2 text-sm font-semibold">
+        <button type="button" data-toast="Membuka GoPay…" class="rounded-xl border border-slate-200 py-3">GoPay</button>
+        <button type="button" data-toast="Membuka ShopeePay…" class="rounded-xl border border-slate-200 py-3">ShopeePay</button>
+      </div>
+      <div class="mt-4 flex items-center justify-between border-t border-dashed border-slate-200 pt-3">
+        <p class="text-sm text-slate-500">Jumlah bayar</p>
+        <p data-total class="text-lg font-bold">Rp 320.000</p>
+      </div>
+    </section>
+
+    <!-- Nomor VA -->
+    <section data-bayar="va" class="rounded-2xl border border-slate-200 p-4 shadow-card">
+      <div class="flex items-center gap-3">
+        <span title="Logo BCA" aria-hidden="true" class="ph h-8 w-12 shrink-0 rounded-lg !bg-[length:18px]"></span>
+        <div class="flex-1"><p class="font-semibold">BCA Virtual Account</p><p class="text-xs text-slate-500">Diproses Midtrans</p></div>
+      </div>
+      <p class="mt-4 text-xs text-slate-500">Nomor virtual account</p>
+      <div class="mt-1 flex items-center justify-between gap-3">
+        <p id="va" class="text-xl font-bold tracking-wide">8077 0812 3456 7890</p>
+        <button type="button" data-copy="8077081234567890" data-toast="Nomor VA disalin" class="shrink-0 rounded-full border border-slate-300 px-4 py-1.5 text-sm font-semibold">Salin</button>
+      </div>
+      <div class="mt-4 flex items-center justify-between border-t border-dashed border-slate-200 pt-3">
+        <p class="text-sm text-slate-500">Jumlah bayar</p>
+        <p data-total class="text-lg font-bold">Rp 320.000</p>
+      </div>
+    </section>
+
+    <!-- Cara bayar -->
+    <section id="cara-bayar" data-bayar="va" class="rounded-2xl border border-slate-200 text-sm">
+      <h2 class="px-4 pt-4 font-bold">Cara bayar</h2>
+      <details class="group border-b border-slate-100 px-4 py-3" open>
+        <summary class="flex cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden justify-between font-semibold">m-BCA
+          <svg class="size-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <ol class="mt-2 list-decimal space-y-1 pl-5 text-slate-600">
+          <li>Buka m-BCA, pilih m-Transfer.</li>
+          <li>Pilih BCA Virtual Account.</li>
+          <li>Masukkan nomor VA di atas.</li>
+          <li>Cek nama dan jumlah, lalu masukkan PIN.</li>
+        </ol>
+      </details>
+      <details class="group border-b border-slate-100 px-4 py-3">
+        <summary class="flex cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden justify-between font-semibold">ATM BCA
+          <svg class="size-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <ol class="mt-2 list-decimal space-y-1 pl-5 text-slate-600">
+          <li>Pilih Transaksi Lainnya, lalu Transfer.</li>
+          <li>Pilih Ke Rek BCA Virtual Account.</li>
+          <li>Masukkan nomor VA dan konfirmasi.</li>
+        </ol>
+      </details>
+      <details class="group px-4 py-3">
+        <summary class="flex cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden justify-between font-semibold">KlikBCA
+          <svg class="size-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <ol class="mt-2 list-decimal space-y-1 pl-5 text-slate-600">
+          <li>Pilih Transfer Dana, lalu Transfer ke BCA Virtual Account.</li>
+          <li>Masukkan nomor VA dan konfirmasi dengan KeyBCA.</li>
+        </ol>
+      </details>
+    </section>
+
+    <section class="flex gap-3 rounded-2xl bg-loop-soft p-4">
+      <svg class="size-6 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+      <p class="text-sm text-slate-600">Dana ditahan Reloop sampai kamu konfirmasi barang diterima.</p>
+    </section>
+    </div>
+  </main>
+
+  <form data-done="lunas" data-state="ok berhasil" class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+    <button class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Cek status pembayaran</button>
+    <a href="#cara-bayar" data-bayar="va" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">Lihat cara bayar</a>
+  </form>
+  <div data-state="kedaluwarsa" class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+    <a href="cari.html" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Cari barang lain</a>
+    <a href="../reloop-ecommerce-flow/detail-barang.html" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">Lihat barang ini lagi</a>
+  </div>
+
+  <!-- Pembayaran terkonfirmasi Midtrans -->
+  <dialog id="lunas" class="w-[min(92vw,360px)] rounded-3xl p-0">
+    <div class="p-6 text-center">
+      <div class="ph mx-auto size-24 rounded-2xl"></div>
+      <h2 class="mt-3 text-xl font-bold">Pembayaran berhasil!</h2>
+      <p class="mt-1 text-sm text-slate-500"><b data-total class="text-ink">Rp 320.000</b> sudah diterima dan ditahan Reloop. Penjual kami kabari untuk menyiapkan serah terima.</p>
+      <a id="ke-pesanan" href="../reloop-ecommerce-flow/pesanan.html?step=1" class="mt-5 block rounded-full bg-ink py-3 font-semibold text-white">Lihat pesanan</a>
+    </div>
+  </dialog>
+</div>
+<script src="js/app.js?v=3"></script>
+<script>
+  // Jumlah dari checkout (?total=); ?state=berhasil langsung buka dialog sukses
+  if (params.get('total')) $$('[data-total]').forEach((el) => (el.textContent = rupiah(params.get('total'))));
+  document.getElementById('ke-pesanan').href += '&bayar=' + (segs.bayar || 'va');
+  if (params.get('state') === 'berhasil') document.getElementById('lunas').showModal();
+</script>
+</body>
+</html>

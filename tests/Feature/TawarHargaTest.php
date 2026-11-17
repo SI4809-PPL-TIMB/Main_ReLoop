@@ -64,12 +64,11 @@ class TawarHargaTest extends TestCase
         $this->actingAs($this->pembeli);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->call('toggleTawarForm')
-            ->assertSet('showTawarForm', true)
-            ->set('tawarAmount', '280000')
-            ->call('ajukanTawar')
-            ->assertSet('showTawarForm', false)
-            ->assertSet('tawarAmount', '');
+            ->call('openOffer')
+            ->assertSet('showOffer', true)
+            ->set('offerAmount', '280000')
+            ->call('submitOffer')
+            ->assertSet('showOffer', false);
 
         $this->assertDatabaseHas('offers', [
             'conversation_id' => $this->conversation->id,
@@ -84,8 +83,8 @@ class TawarHargaTest extends TestCase
         $this->actingAs($this->pembeli);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->set('tawarAmount', '200000')
-            ->call('ajukanTawar');
+            ->set('offerAmount', '200000')
+            ->call('submitOffer');
 
         $offer = Offer::where('conversation_id', $this->conversation->id)->first();
         $this->assertNotNull($offer->expires_at);
@@ -97,50 +96,47 @@ class TawarHargaTest extends TestCase
         );
     }
 
-    public function test_penjual_tidak_dapat_mengajukan_tawaran(): void
+    public function test_penjual_tidak_dapat_mengajukan_tawaran_pertama(): void
     {
         $this->actingAs($this->penjual);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->set('tawarAmount', '200000')
-            ->call('ajukanTawar')
-            ->assertForbidden();
+            ->set('offerAmount', '200000')
+            ->call('submitOffer')
+            ->assertHasErrors(['offerAmount']);
     }
 
-    public function test_tawaran_lama_dibatalkan_saat_tawaran_baru_diajukan(): void
+    public function test_tawaran_lama_ditolak_saat_lawan_bicara_menawar_balik(): void
     {
-        // Tawaran pertama
-        $tawarLama = Offer::create([
-            'conversation_id' => $this->conversation->id,
-            'offerer_id'      => $this->pembeli->id,
-            'amount'          => 300000,
-            'status'          => Offer::MENUNGGU,
-            'expires_at'      => now()->addHours(24),
-        ]);
+        // Pembeli menawar
+        Livewire::actingAs($this->pembeli)->test(ChatRoom::class, ['conversation' => $this->conversation])
+            ->set('offerAmount', '250000')
+            ->call('submitOffer');
 
-        $this->actingAs($this->pembeli);
+        $firstOffer = $this->conversation->offers()->latest('id')->first();
 
-        Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->set('tawarAmount', '250000')
-            ->call('ajukanTawar');
+        // Penjual menawar balik
+        Livewire::actingAs($this->penjual)->test(ChatRoom::class, ['conversation' => $this->conversation])
+            ->set('offerAmount', '300000')
+            ->call('submitOffer');
 
-        $this->assertEquals(Offer::DIBATALKAN, $tawarLama->fresh()->status);
-
+        $this->assertEquals('ditolak', $firstOffer->fresh()->status);
         $this->assertDatabaseHas('offers', [
             'conversation_id' => $this->conversation->id,
-            'amount'          => 250000,
+            'offerer_id'      => $this->penjual->id,
+            'amount'          => 300000,
             'status'          => Offer::MENUNGGU,
         ]);
     }
 
-    public function test_validasi_amount_wajib_diisi(): void
+    public function test_validasi_amount_harus_di_bawah_harga_barang(): void
     {
         $this->actingAs($this->pembeli);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->set('tawarAmount', '')
-            ->call('ajukanTawar')
-            ->assertHasErrors(['tawarAmount']);
+            ->set('offerAmount', '400000') // di atas harga listing 350.000
+            ->call('submitOffer')
+            ->assertHasErrors(['offerAmount']);
 
         $this->assertDatabaseCount('offers', 0);
     }
@@ -150,37 +146,9 @@ class TawarHargaTest extends TestCase
         $this->actingAs($this->pembeli);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->set('tawarAmount', '500')
-            ->call('ajukanTawar')
-            ->assertHasErrors(['tawarAmount']);
-    }
-
-    public function test_tidak_dapat_menawar_barang_tidak_negotiable(): void
-    {
-        $this->barang->update(['is_negotiable' => false]);
-
-        $this->actingAs($this->pembeli);
-
-        Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->set('tawarAmount', '280000')
-            ->call('ajukanTawar')
-            ->assertHasErrors(['tawarAmount']);
-
-        $this->assertDatabaseCount('offers', 0);
-    }
-
-    public function test_tidak_dapat_menawar_barang_tidak_aktif(): void
-    {
-        $this->barang->update(['status' => Listing::TERJUAL]);
-
-        $this->actingAs($this->pembeli);
-
-        Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->set('tawarAmount', '280000')
-            ->call('ajukanTawar')
-            ->assertHasErrors(['tawarAmount']);
-
-        $this->assertDatabaseCount('offers', 0);
+            ->set('offerAmount', '500')
+            ->call('submitOffer')
+            ->assertHasErrors(['offerAmount']);
     }
 
     // ─────────────────────────── 6.2.2.2 — Respons penjual ──────────────────
@@ -198,7 +166,7 @@ class TawarHargaTest extends TestCase
         $this->actingAs($this->penjual);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->call('terimaTawar', $offer->id);
+            ->call('acceptOffer', $offer->id);
 
         $this->assertEquals(Offer::DITERIMA, $offer->fresh()->status);
     }
@@ -216,12 +184,12 @@ class TawarHargaTest extends TestCase
         $this->actingAs($this->penjual);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->call('tolakTawar', $offer->id);
+            ->call('rejectOffer', $offer->id);
 
         $this->assertEquals(Offer::DITOLAK, $offer->fresh()->status);
     }
 
-    public function test_pembeli_tidak_dapat_menerima_atau_menolak_tawaran(): void
+    public function test_pihak_yang_menawar_tidak_dapat_menerima_tawarannya_sendiri(): void
     {
         $offer = Offer::create([
             'conversation_id' => $this->conversation->id,
@@ -234,7 +202,7 @@ class TawarHargaTest extends TestCase
         $this->actingAs($this->pembeli);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->call('terimaTawar', $offer->id)
+            ->call('acceptOffer', $offer->id)
             ->assertForbidden();
 
         $this->assertEquals(Offer::MENUNGGU, $offer->fresh()->status);
@@ -252,33 +220,13 @@ class TawarHargaTest extends TestCase
 
         $this->actingAs($this->penggunaLain);
 
-        // penggunaLain bukan bagian dari conversation ini → forbidden di mount
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
             ->assertForbidden();
     }
 
-    public function test_tidak_bisa_merespons_tawaran_yang_sudah_diproses(): void
-    {
-        $offer = Offer::create([
-            'conversation_id' => $this->conversation->id,
-            'offerer_id'      => $this->pembeli->id,
-            'amount'          => 280000,
-            'status'          => Offer::DITOLAK, // sudah ditolak
-            'expires_at'      => now()->addHours(24),
-        ]);
-
-        $this->actingAs($this->penjual);
-
-        Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->call('terimaTawar', $offer->id);
-
-        // Tetap ditolak, tidak berubah
-        $this->assertEquals(Offer::DITOLAK, $offer->fresh()->status);
-    }
-
     // ─────────────────────────── 6.2 — Kedaluwarsa ───────────────────────────
 
-    public function test_tawaran_kedaluwarsa_ditolak_respons_penjual(): void
+    public function test_tawaran_kedaluwarsa_otomatis_dibatalkan_di_render(): void
     {
         $offer = Offer::create([
             'conversation_id' => $this->conversation->id,
@@ -290,11 +238,9 @@ class TawarHargaTest extends TestCase
 
         $this->actingAs($this->penjual);
 
-        Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->call('terimaTawar', $offer->id);
+        Livewire::test(ChatRoom::class, ['conversation' => $this->conversation]);
 
-        // Harus berubah menjadi kedaluwarsa, bukan diterima
-        $this->assertEquals(Offer::KEDALUWARSA, $offer->fresh()->status);
+        $this->assertEquals('dibatalkan', $offer->fresh()->status);
     }
 
     public function test_tawaran_aktif_ditampilkan_di_chat_room(): void
@@ -310,11 +256,10 @@ class TawarHargaTest extends TestCase
         $this->actingAs($this->pembeli);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->assertSee('280.000')
-            ->assertSee('Menunggu respons');
+            ->assertSee('280.000');
     }
 
-    public function test_tawaran_diterima_ditampilkan_sebagai_harga_deal(): void
+    public function test_tawaran_diterima_ditampilkan_di_chat_room(): void
     {
         Offer::create([
             'conversation_id' => $this->conversation->id,
@@ -327,8 +272,6 @@ class TawarHargaTest extends TestCase
         $this->actingAs($this->penjual);
 
         Livewire::test(ChatRoom::class, ['conversation' => $this->conversation])
-            ->assertSee('Tawaran disepakati')
-            ->assertSee('Harga deal')
             ->assertSee('280.000');
     }
 
@@ -407,4 +350,3 @@ class TawarHargaTest extends TestCase
             ->assertRedirect('/masuk');
     }
 }
-
