@@ -67,6 +67,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/pesanan/{orderNumber}/status', [OrderController::class, 'paymentStatus'])->name('order.status');
     Route::post('/pesanan/{orderNumber}/snap-token', [OrderController::class, 'getSnapToken'])->name('order.snap_token');
 
+    // 7.2 · Kelola Pesanan: status, dana tertahan, serah terima, komisi, pembatalan (PPLTIMB-65)
+    Route::post('/pesanan/{orderNumber}/diserahkan', [OrderController::class, 'markDiserahkan'])->name('order.diserahkan');
+    Route::post('/pesanan/{orderNumber}/terima', [OrderController::class, 'markDiterima'])->name('order.terima');
+    Route::post('/pesanan/{orderNumber}/batal', [OrderController::class, 'cancel'])->name('order.batal');
+
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');

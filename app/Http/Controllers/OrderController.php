@@ -267,5 +267,179 @@ class OrderController extends Controller
             ], 502);
         }
     }
+
+    /**
+     * 7.2.2 — Penjual menandai barang pesanan telah diserahkan (PPLTIMB-99).
+     */
+    public function markDiserahkan(Request $request, string $orderNumber): JsonResponse|RedirectResponse
+    {
+        $order = Order::with(['listing', 'seller.profile', 'buyer.profile', 'payment'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        $user = $request->user();
+
+        // Hanya penjual yang berhak menandai serah terima barang
+        if ($user->id !== $order->seller_id) {
+            abort(403, 'Hanya penjual yang dapat menandai barang telah diserahkan.');
+        }
+
+        // Pesanan harus dalam status sudah dibayar
+        if ($order->status !== Order::STATUS_DIBAYAR) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Hanya pesanan yang sudah dibayar yang dapat diserahkan.',
+                ], 422);
+            }
+
+            return back()->withErrors(['order' => 'Hanya pesanan yang sudah dibayar yang dapat diserahkan.']);
+        }
+
+        DB::transaction(function () use ($order) {
+            $order->update([
+                'status'              => Order::STATUS_DISERAHKAN,
+                'seller_confirmed_at' => now(),
+                'auto_complete_at'    => now()->addDays(3),
+            ]);
+        });
+
+        $order->refresh();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Barang berhasil ditandai diserahkan. Menunggu konfirmasi pembeli.',
+                'order'   => $order,
+            ]);
+        }
+
+        return redirect()->route('order.show', $order->order_number)
+            ->with('success', 'Barang berhasil ditandai diserahkan. Pembeli diberi waktu 3 hari untuk konfirmasi.');
+    }
+
+    /**
+     * 7.2.2 — Pembeli mengonfirmasi penerimaan barang dan menyelesaikan pesanan (PPLTIMB-99).
+     * Dana diteruskan ke penjual setelah komisi platform 3%.
+     */
+    public function markDiterima(Request $request, string $orderNumber): JsonResponse|RedirectResponse
+    {
+        $order = Order::with(['listing', 'seller.profile', 'buyer.profile', 'payment'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        $user = $request->user();
+
+        // Hanya pembeli yang berhak mengonfirmasi penerimaan barang
+        if ($user->id !== $order->buyer_id) {
+            abort(403, 'Hanya pembeli yang dapat mengonfirmasi penerimaan barang.');
+        }
+
+        // Pesanan harus dalam status diserahkan
+        if ($order->status !== Order::STATUS_DISERAHKAN) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Pesanan belum diserahkan oleh penjual.',
+                ], 422);
+            }
+
+            return back()->withErrors(['order' => 'Pesanan belum diserahkan oleh penjual.']);
+        }
+
+        DB::transaction(function () use ($order) {
+            $order->update([
+                'status'             => Order::STATUS_SELESAI,
+                'buyer_confirmed_at' => now(),
+            ]);
+
+            // Status barang berubah menjadi terjual
+            $order->listing?->update(['status' => Listing::TERJUAL]);
+
+            // Tambah riwayat penjualan & streak pada penjual
+            if ($order->seller?->profile) {
+                $order->seller->profile->increment('total_sold');
+                $order->seller->profile->increment('streak_count');
+                $order->seller->profile->increment('total_points', 50);
+                $order->seller->profile->update(['streak_last_at' => now()->toDateString()]);
+            }
+
+            // Tambah streak & poin pada pembeli
+            if ($order->buyer?->profile) {
+                $order->buyer->profile->increment('streak_count');
+                $order->buyer->profile->increment('total_points', 30);
+                $order->buyer->profile->update(['streak_last_at' => now()->toDateString()]);
+            }
+        });
+
+        $order->refresh();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Pesanan selesai! Dana telah dicairkan ke penjual.',
+                'order'   => $order,
+            ]);
+        }
+
+        return redirect()->route('order.show', $order->order_number)
+            ->with('success', 'Pesanan selesai! Dana telah diteruskan ke penjual. Terima kasih telah bertransaksi di ReLoop.');
+    }
+
+    /**
+     * 7.2.2 — Batalkan pesanan sebelum serah terima barang (PPLTIMB-99).
+     * Dapat dilakukan oleh pembeli atau penjual jika barang belum diserahkan.
+     */
+    public function cancel(Request $request, string $orderNumber): JsonResponse|RedirectResponse
+    {
+        $order = Order::with(['listing', 'payment'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        $user = $request->user();
+
+        // Hanya pembeli atau penjual yang berhak membatalkan
+        if ($user->id !== $order->buyer_id && $user->id !== $order->seller_id) {
+            abort(403, 'Anda tidak memiliki akses untuk membatalkan pesanan ini.');
+        }
+
+        // Pesanan hanya bisa dibatalkan sebelum diserahkan (menunggu_bayar atau dibayar)
+        if (! $order->canBeCancelled()) {
+            $msg = 'Pesanan yang sudah diserahkan atau selesai tidak dapat dibatalkan.';
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $msg], 422);
+            }
+
+            return back()->withErrors(['order' => $msg]);
+        }
+
+        DB::transaction(function () use ($request, $order, $user) {
+            $defaultReason = $user->id === $order->buyer_id ? 'Dibatalkan oleh pembeli' : 'Dibatalkan oleh penjual';
+            $inputReason = trim((string) $request->input('reason'));
+            $reason = !empty($inputReason) ? $inputReason : $defaultReason;
+
+            $order->update([
+                'status'        => Order::STATUS_DIBATALKAN,
+                'cancelled_at'  => now(),
+                'cancel_reason' => $reason,
+            ]);
+
+            // Kembalikan status barang menjadi aktif di marketplace
+            $order->listing?->update(['status' => Listing::AKTIF]);
+
+            // Jika ada pembayaran yang masih menunggu, tandai gagal
+            if ($order->payment && $order->payment->status === Payment::STATUS_MENUNGGU) {
+                $order->payment->update(['status' => Payment::STATUS_GAGAL]);
+            }
+        });
+
+        $order->refresh();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Pesanan berhasil dibatalkan.',
+                'order'   => $order,
+            ]);
+        }
+
+        return redirect()->route('order.show', $order->order_number)
+            ->with('success', 'Pesanan berhasil dibatalkan.');
+    }
 }
 
