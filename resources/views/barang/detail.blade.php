@@ -6,7 +6,7 @@
          * Tampilan detail barang (5.2.1). Data dari controller (5.2.2): $listing dengan relasi
          * photos, user.profile, kelurahan.kecamatan.kabupaten, category, dan $serupa.
          */
-        $rupiah     = fn ($n) => 'Rp'.number_format($n, 0, ',', '.');
+        $rupiah     = fn ($n) => 'Rp '.number_format($n, 0, ',', '.');
         $dipesan    = $listing->status === \App\Models\Listing::DIPESAN;
         $terjual    = $listing->status === \App\Models\Listing::TERJUAL;
         $aktif      = $listing->status === \App\Models\Listing::AKTIF;
