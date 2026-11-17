@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('conversation_id')->constrained('conversations')->cascadeOnDelete();
             $table->foreignId('offerer_id')->constrained('users')->cascadeOnDelete();
             $table->decimal('amount', 12, 0);
-            $table->enum('status', ['menunggu', 'diterima', 'ditolak', 'dibatalkan'])->default('menunggu');
+            $table->enum('status', ['menunggu', 'diterima', 'ditolak', 'kedaluwarsa', 'dibatalkan'])->default('menunggu');
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
