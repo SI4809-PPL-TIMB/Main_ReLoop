@@ -44,10 +44,13 @@ class ProcessOrdersAutoStatus extends Command
      */
     protected function cancelUnpaidOrders(): int
     {
-        // Cari pesanan menunggu_bayar yang dibuat lebih dari 24 jam lalu
+        // Cari pesanan menunggu_bayar yang dibuat lebih dari 24 jam lalu atau expired_at telah lewat
         $unpaidOrders = Order::with(['listing', 'payment'])
             ->where('status', Order::STATUS_MENUNGGU_BAYAR)
-            ->where('created_at', '<=', now()->subHours(24))
+            ->where(function ($q) {
+                $q->where('created_at', '<=', now()->subHours(24))
+                  ->orWhereHas('payment', fn ($pq) => $pq->whereNotNull('expired_at')->where('expired_at', '<=', now()));
+            })
             ->get();
 
         $count = 0;

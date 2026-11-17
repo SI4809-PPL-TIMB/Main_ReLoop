@@ -18,6 +18,19 @@
         $autoHours = floor($autoCompleteDiff / 3600);
         $autoMins = floor(($autoCompleteDiff % 3600) / 60);
 
+        // URL Chat lawan transaksi (mengarah ke room obrolan spesifik atau mulai obrolan)
+        $chatUrl = route('pesan.index');
+        if ($order->listing) {
+            $conversation = \App\Models\Conversation::where('listing_id', $order->listing_id)
+                ->where('buyer_id', $order->buyer_id)
+                ->first();
+            if ($conversation) {
+                $chatUrl = route('pesan.show', $conversation);
+            } elseif ($isBuyer) {
+                $chatUrl = route('pesan.mulai', $order->listing);
+            }
+        }
+
         // Langkah timeline aktif
         $stepIndex = match ($order->status) {
             \App\Models\Order::STATUS_MENUNGGU_BAYAR => 0,
@@ -31,14 +44,14 @@
     <div class="relative mx-auto min-h-screen max-w-[420px] bg-white pb-36 text-ink antialiased">
         <!-- Header -->
         <header class="sticky top-0 z-20 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-4">
-            <a href="{{ $isBuyer ? route('aktivitas') : route('barang.index') }}" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
+            <a href="{{ $isBuyer ? route('aktivitas') : route('barang.index', ['tab' => $order->status === \App\Models\Order::STATUS_SELESAI ? 'terjual' : 'dipesan']) }}" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </a>
             <div class="text-center">
                 <h1 class="text-lg font-bold leading-tight">Detail Pesanan</h1>
                 <p class="font-mono text-xs text-slate-500">#{{ $order->order_number }}</p>
             </div>
-            <a href="{{ $order->listing ? route('pesan.mulai', $order->listing) : route('pesan.index') }}" aria-label="Chat" class="grid size-10 place-items-center rounded-full border border-slate-200">
+            <a href="{{ $chatUrl }}" aria-label="Chat" class="grid size-10 place-items-center rounded-full border border-slate-200">
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
             </a>
         </header>
@@ -254,7 +267,7 @@
                         {{ $isBuyer ? 'Penjual: ' . ($order->seller?->name ?? 'Penjual') : 'Pembeli: ' . ($order->buyer?->name ?? 'Pembeli') }}
                     </p>
                 </div>
-                <a href="{{ $order->listing ? route('pesan.mulai', $order->listing) : route('pesan.index') }}" aria-label="Chat lawan transaksi" class="grid size-10 place-items-center rounded-full border border-slate-200 hover:bg-slate-50">
+                <a href="{{ $chatUrl }}" aria-label="Chat lawan transaksi" class="grid size-10 place-items-center rounded-full border border-slate-200 hover:bg-slate-50">
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
                 </a>
             </section>
@@ -328,7 +341,7 @@
             @elseif ($order->status === \App\Models\Order::STATUS_DIBAYAR)
                 {{-- Status Dibayar: Siap Serah Terima --}}
                 @if ($isBuyer)
-                    <a href="{{ $order->listing ? route('pesan.mulai', $order->listing) : route('pesan.index') }}" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white shadow hover:bg-slate-800 transition">
+                    <a href="{{ $chatUrl }}" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white shadow hover:bg-slate-800 transition">
                         Chat penjual
                     </a>
                     <div class="mt-1 flex">
@@ -341,7 +354,7 @@
                     </button>
                     <div class="mt-1 flex">
                         <button type="button" onclick="document.getElementById('modal-batal').showModal()" class="flex-1 py-2 text-center text-sm font-semibold text-slate-500 hover:text-red-600">Batalkan pesanan</button>
-                        <a href="{{ $order->listing ? route('pesan.mulai', $order->listing) : route('pesan.index') }}" class="flex-1 py-2 text-center text-sm font-semibold text-slate-500">Chat pembeli</a>
+                        <a href="{{ $chatUrl }}" class="flex-1 py-2 text-center text-sm font-semibold text-slate-500">Chat pembeli</a>
                     </div>
                 @endif
             @elseif ($order->status === \App\Models\Order::STATUS_DISERAHKAN)
@@ -357,7 +370,7 @@
                     <button type="button" disabled class="w-full cursor-not-allowed rounded-full bg-slate-100 py-3.5 text-center font-semibold text-slate-400">
                         Menunggu konfirmasi pembeli
                     </button>
-                    <a href="{{ $order->listing ? route('pesan.mulai', $order->listing) : route('pesan.index') }}" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">
+                    <a href="{{ $chatUrl }}" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">
                         Chat pembeli
                     </a>
                 @endif
@@ -567,5 +580,13 @@
                 }
             </script>
         @endif
+
+        <script>
+            document.querySelectorAll('dialog').forEach(dialog => {
+                dialog.addEventListener('click', (e) => {
+                    if (e.target === dialog) dialog.close();
+                });
+            });
+        </script>
     @endpush
 </x-app-layout>

@@ -411,7 +411,8 @@ class OrderController extends Controller
 
         DB::transaction(function () use ($request, $order, $user) {
             $defaultReason = $user->id === $order->buyer_id ? 'Dibatalkan oleh pembeli' : 'Dibatalkan oleh penjual';
-            $reason = $request->input('reason', $defaultReason);
+            $inputReason = trim((string) $request->input('reason'));
+            $reason = !empty($inputReason) ? $inputReason : $defaultReason;
 
             $order->update([
                 'status'        => Order::STATUS_DIBATALKAN,

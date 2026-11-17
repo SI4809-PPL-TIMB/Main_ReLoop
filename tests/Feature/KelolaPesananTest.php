@@ -309,4 +309,51 @@ class KelolaPesananTest extends TestCase
         $response = $this->actingAs($this->userLain)->get(route('order.show', $order->order_number));
         $response->assertForbidden();
     }
+
+    public function test_chat_url_penjual_mengarahkan_ke_percakapan_atau_inbox_tanpa_error(): void
+    {
+        $order = $this->createOrder(Order::STATUS_DIBAYAR);
+
+        // Buat percakapan antara pembeli dan penjual untuk listing ini
+        $conversation = \App\Models\Conversation::create([
+            'listing_id' => $this->listing->id,
+            'buyer_id'   => $this->pembeli->id,
+            'seller_id'  => $this->penjual->id,
+        ]);
+
+        $responsePenjual = $this->actingAs($this->penjual)->get(route('order.show', $order->order_number));
+        $responsePenjual->assertOk();
+        $responsePenjual->assertSee(route('pesan.show', $conversation));
+
+        $responsePembeli = $this->actingAs($this->pembeli)->get(route('order.show', $order->order_number));
+        $responsePembeli->assertOk();
+        $responsePembeli->assertSee(route('pesan.show', $conversation));
+    }
+
+    public function test_pembatalan_dengan_alasan_kosong_menggunakan_alasan_default(): void
+    {
+        $order = $this->createOrder(Order::STATUS_MENUNGGU_BAYAR);
+
+        $response = $this->actingAs($this->pembeli)->post(route('order.batal', $order->order_number), [
+            'reason' => '   ', // spasi kosong
+        ]);
+
+        $response->assertRedirect(route('order.show', $order->order_number));
+        $order->refresh();
+        $this->assertEquals(Order::STATUS_DIBATALKAN, $order->status);
+        $this->assertEquals('Dibatalkan oleh pembeli', $order->cancel_reason);
+    }
+
+    public function test_scheduler_membatalkan_pesanan_jika_payment_expired_at_terlewati(): void
+    {
+        $order = $this->createOrder(Order::STATUS_MENUNGGU_BAYAR);
+        $order->payment->update(['expired_at' => now()->subMinute()]);
+
+        $this->artisan('orders:process-auto')
+            ->assertSuccessful()
+            ->expectsOutputToContain('1 pesanan dibatalkan otomatis');
+
+        $this->assertEquals(Order::STATUS_DIBATALKAN, $order->fresh()->status);
+        $this->assertEquals(Listing::AKTIF, $this->listing->fresh()->status);
+    }
 }
