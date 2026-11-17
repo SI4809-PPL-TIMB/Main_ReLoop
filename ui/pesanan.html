@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Reloop · Detail Pesanan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white pb-28">
+
+  <!-- (i) Detail pesanan, dana tertahan -->
+  <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-100 bg-white px-4 py-4">
+    <!-- Satu halaman dua sisi: ?peran=penjual (dari Barang saya) -->
+    <div data-seg="peran" hidden><button value="pembeli"></button><button value="penjual"></button></div>
+    <a data-peran="pembeli" href="aktivitas.html" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <a data-peran="penjual" href="barang-saya.html?tab=dipesan" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <div><h1 class="text-xl font-bold leading-tight">Detail Pesanan</h1><p class="text-xs text-slate-500">#RL-20261020-0142</p></div>
+  </header>
+
+  <!-- Langkah: 1 dibayar, menunggu serah terima · 2 diserahkan, menunggu konfirmasimu · 3 selesai -->
+  <main data-flow="2" class="space-y-4 px-4 pt-4">
+    <!-- Dibatalkan -->
+    <section data-state="dibatalkan" class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <svg class="size-9 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+      <div class="flex-1">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Pesanan dibatalkan</p>
+        <p class="text-2xl font-bold">Rp 320.000</p>
+        <p class="text-xs text-slate-600">Dibatalkan sebelum barang diserahkan. Dana kembali ke rekening <span data-peran="pembeli">asal</span><span data-peran="penjual">pembeli</span> dalam 1 sampai 3 hari kerja.<span data-peran="penjual"> Barangmu aktif lagi.</span></p>
+      </div>
+    </section>
+
+    <div data-state="ok" class="space-y-4">
+    <!-- Selesai -->
+    <section data-at="3" class="flex items-center gap-4 rounded-2xl border border-loop bg-loop-soft p-4">
+      <svg class="size-9 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+      <div class="flex-1">
+        <p class="text-xs font-semibold uppercase tracking-wide text-loop-dark">Pesanan selesai</p>
+        <p class="text-2xl font-bold">Rp 320.000</p>
+        <p class="text-xs text-slate-600"><span data-peran="pembeli">Dana sudah diteruskan ke penjual. Streak +1</span><span data-peran="penjual">Rp 310.400 masuk saldomu (setelah komisi 3%). Streak +1</span></p>
+      </div>
+    </section>
+
+    <!-- Dana tertahan -->
+    <section data-at="1 2" class="flex items-center gap-4 rounded-2xl border border-loop bg-loop-soft p-4">
+      <svg class="size-9 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <div class="flex-1">
+        <p class="text-xs font-semibold uppercase tracking-wide text-loop-dark">Dana tertahan</p>
+        <p class="text-2xl font-bold">Rp 320.000</p>
+        <p class="text-xs text-slate-600"><span data-peran="pembeli">Aman di Reloop sampai kamu konfirmasi.</span><span data-peran="penjual">Cair ke saldomu setelah pembeli konfirmasi barang diterima.</span></p>
+      </div>
+    </section>
+
+    <!-- Timeline status -->
+    <section class="rounded-2xl border border-slate-200 p-4">
+      <div class="flex items-center justify-between">
+        <h2 class="font-bold">Status</h2>
+        <span data-peran="pembeli"><button data-at="1" data-step="2" data-toast="Status diperbarui: barang sudah diserahkan" class="text-sm font-semibold text-slate-500">Perbarui</button></span>
+      </div>
+      <ol class="mt-3 space-y-4 text-sm">
+        <li data-tl="0" class="group flex gap-3 data-[s=todo]:text-slate-400">
+          <span class="grid size-7 shrink-0 place-items-center rounded-full border-2 border-slate-200 group-data-[s=now]:border-ink group-data-[s=done]:border-ink group-data-[s=done]:bg-ink group-data-[s=done]:text-white"><svg class="hidden size-4 group-data-[s=done]:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg><span class="hidden size-2 rounded-full bg-ink group-data-[s=now]:block"></span></span>
+          <div><p class="font-semibold">Dibayar</p><p class="text-xs text-slate-500">20 Okt, 09.12 · <span id="metode">BCA Virtual Account</span></p></div>
+        </li>
+        <li data-tl="1" class="group flex gap-3 data-[s=todo]:text-slate-400">
+          <span class="grid size-7 shrink-0 place-items-center rounded-full border-2 border-slate-200 group-data-[s=now]:border-ink group-data-[s=done]:border-ink group-data-[s=done]:bg-ink group-data-[s=done]:text-white"><svg class="hidden size-4 group-data-[s=done]:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg><span class="hidden size-2 rounded-full bg-ink group-data-[s=now]:block"></span></span>
+          <div><p class="font-semibold">Diserahkan penjual</p>
+            <p data-at="1" class="text-xs text-orange-500"><span data-peran="pembeli">Menunggu penjual menyerahkan barang · atur titik temu lewat chat</span><span data-peran="penjual">Serahkan barang ke pembeli, lalu tandai di bawah</span></p>
+            <p data-at="2 3" class="text-xs text-slate-500">20 Okt, 15.40 · COD di Sukamaju</p></div>
+        </li>
+        <li data-tl="2" class="group flex gap-3 data-[s=todo]:text-slate-400">
+          <span class="grid size-7 shrink-0 place-items-center rounded-full border-2 border-slate-200 group-data-[s=now]:border-ink group-data-[s=done]:border-ink group-data-[s=done]:bg-ink group-data-[s=done]:text-white"><svg class="hidden size-4 group-data-[s=done]:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg><span class="hidden size-2 rounded-full bg-ink group-data-[s=now]:block"></span></span>
+          <div><p class="font-semibold">Diterima pembeli</p>
+            <p data-at="1" class="text-xs"><span data-peran="pembeli">Konfirmasi setelah barang kamu cek</span><span data-peran="penjual">Pembeli cek barang lalu konfirmasi</span></p>
+            <p data-at="2" class="text-xs text-orange-500"><span data-peran="pembeli">Menunggu konfirmasimu</span><span data-peran="penjual">Menunggu konfirmasi pembeli</span> · otomatis selesai dalam <span data-countdown="255600" class="tabular-nums">71:00:00</span></p>
+            <p data-at="3" class="text-xs text-slate-500">21 Okt, 10.05 · dikonfirmasi <span data-peran="pembeli">kamu</span><span data-peran="penjual">pembeli</span></p></div>
+        </li>
+        <li data-tl="3" class="group flex gap-3 data-[s=todo]:text-slate-400">
+          <span class="grid size-7 shrink-0 place-items-center rounded-full border-2 border-slate-200 group-data-[s=now]:border-ink group-data-[s=now]:bg-ink group-data-[s=now]:text-white"><svg class="hidden size-4 group-data-[s=now]:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg></span>
+          <div><p class="font-semibold">Selesai</p>
+            <p data-at="1 2" class="text-xs">Dana cair ke <span data-peran="pembeli">penjual</span><span data-peran="penjual">saldomu</span></p>
+            <p data-at="3" class="text-xs text-slate-500">21 Okt, 10.05 · dana cair ke <span data-peran="pembeli">penjual</span><span data-peran="penjual">saldomu</span></p></div>
+        </li>
+      </ol>
+    </section>
+    </div>
+
+    <section class="flex items-center gap-3 rounded-2xl border border-slate-200 p-3">
+      <div class="ph size-14 shrink-0 rounded-lg"></div>
+      <div class="flex-1"><p class="font-semibold">Kursi Kayu Jati Ukir</p><p class="text-xs text-slate-500"><span data-peran="pembeli">Penjual: Siti Rahma · Sukamaju</span><span data-peran="penjual">Pembeli: Bima · Laladon</span></p></div>
+      <a data-peran="pembeli" href="chat.html" aria-label="Chat penjual" class="grid size-10 place-items-center rounded-full border border-slate-200">
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
+      </a>
+      <a data-peran="penjual" href="pesan.html?f=jual" aria-label="Chat pembeli" class="grid size-10 place-items-center rounded-full border border-slate-200">
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
+      </a>
+    </section>
+
+    <section class="rounded-2xl border border-slate-200 p-4 text-sm">
+      <h2 class="font-bold">Rincian pembayaran</h2>
+      <dl class="mt-2 space-y-1.5">
+        <div class="flex justify-between"><dt class="text-slate-500">Harga awal</dt><dd class="text-slate-400 line-through">Rp 350.000</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Harga tawaran</dt><dd>Rp 320.000</dd></div>
+        <div class="flex justify-between border-t border-dashed border-slate-200 pt-2 font-bold"><dt>Total dibayar</dt><dd>Rp 320.000</dd></div>
+      </dl>
+      <p class="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-500">Penjual menerima Rp 310.400 setelah komisi 3%. Pembeli tidak dikenai biaya tambahan.</p>
+    </section>
+  </main>
+
+  <div data-state="ok" class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+   <div data-peran="pembeli">
+    <div data-at="1">
+      <a href="chat.html" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Chat penjual</a>
+      <div class="mt-1 flex">
+        <button data-open="batal" class="flex-1 py-2 text-center text-sm font-semibold text-slate-500">Batalkan pesanan</button>
+        <a href="laporkan.html?jenis=pesanan" class="flex-1 py-2 text-center text-sm font-semibold text-red-500">Laporkan</a>
+      </div>
+    </div>
+    <div data-at="2">
+      <button data-open="konfirmasi" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Barang sudah diterima</button>
+      <a href="laporkan.html?jenis=pesanan" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-red-500">Ada masalah? Laporkan</a>
+    </div>
+    <div data-at="3">
+      <a href="ulasan.html?jenis=barang" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Beri ulasan</a>
+      <a href="cari.html" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">Cari barang lain</a>
+    </div>
+   </div>
+   <div data-peran="penjual">
+    <div data-at="1">
+      <button data-open="serah" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Tandai sudah diserahkan</button>
+      <div class="mt-1 flex">
+        <button data-open="batal" class="flex-1 py-2 text-center text-sm font-semibold text-slate-500">Batalkan pesanan</button>
+        <a href="pesan.html?f=jual" class="flex-1 py-2 text-center text-sm font-semibold text-slate-500">Chat pembeli</a>
+      </div>
+    </div>
+    <div data-at="2">
+      <button disabled class="w-full cursor-not-allowed rounded-full bg-slate-100 py-3.5 font-semibold text-slate-400">Menunggu konfirmasi pembeli</button>
+      <a href="pesan.html?f=jual" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">Chat pembeli</a>
+    </div>
+    <div data-at="3">
+      <a href="pasang-barang.html" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Pasang barang lain</a>
+      <a href="barang-saya.html?tab=terjual" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">Lihat barang terjual</a>
+    </div>
+   </div>
+  </div>
+  <div data-state="dibatalkan" class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+    <a data-peran="pembeli" href="cari.html" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Cari barang lain</a>
+    <a data-peran="penjual" href="barang-saya.html" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white">Ke barang saya</a>
+    <a href="laporkan.html?jenis=pesanan" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">Butuh bantuan?</a>
+  </div>
+
+  <!-- Konfirmasi terima barang -->
+  <!-- Batal sebelum barang diserahkan; dana kembali penuh -->
+  <dialog id="batal" class="w-[min(92vw,360px)] rounded-3xl p-0">
+    <form method="dialog" class="p-5 text-center">
+      <p class="text-lg font-bold">Batalkan pesanan?</p>
+      <p class="mt-1 text-sm text-slate-500">Barang belum diserahkan, jadi Rp 320.000 dikembalikan penuh ke rekening <span data-peran="pembeli">asal</span><span data-peran="penjual">pembeli</span> dalam 1 sampai 3 hari kerja.</p>
+      <div class="mt-5 flex gap-2">
+        <button value="tidak" class="flex-1 rounded-full border border-slate-300 py-3 font-semibold">Tidak</button>
+        <button data-state-go="dibatalkan" data-toast="Pesanan dibatalkan" class="flex-1 rounded-full bg-red-600 py-3 font-semibold text-white">Batalkan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Penjual: tandai serah terima -->
+  <dialog id="serah" class="w-[min(92vw,360px)] rounded-3xl p-0">
+    <form method="dialog" class="p-5 text-center">
+      <p class="text-lg font-bold">Barang sudah diserahkan?</p>
+      <p class="mt-1 text-sm text-slate-500">Pembeli punya 3 hari untuk cek dan konfirmasi. Tanpa komplain, dana otomatis cair ke saldomu.</p>
+      <div class="mt-5 flex gap-2">
+        <button value="batal" class="flex-1 rounded-full border border-slate-300 py-3 font-semibold">Belum</button>
+        <button data-step="2" data-toast="Ditandai diserahkan, pembeli diberi tahu" class="flex-1 rounded-full bg-ink py-3 font-semibold text-white">Sudah</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="konfirmasi" class="w-[min(92vw,360px)] rounded-3xl p-0">
+    <div class="p-6 text-center">
+      <div class="ph mx-auto size-16 rounded-2xl"></div>
+      <h2 class="mt-3 text-xl font-bold">Barang sudah kamu terima?</h2>
+      <p class="mt-1 text-sm text-slate-500">Rp 320.000 akan diteruskan ke Siti Rahma. Setelah dikonfirmasi, pesanan tidak bisa dikomplain lagi.</p>
+      <button data-step="3" data-open="rating" data-close class="mt-5 w-full rounded-full bg-ink py-3 font-semibold text-white">Ya, sudah diterima</button>
+      <button data-close class="mt-1 w-full py-2 text-sm font-semibold text-slate-500">Cek lagi dulu</button>
+    </div>
+  </dialog>
+
+  <!-- Rating setelah selesai -->
+  <dialog id="rating" class="w-[min(92vw,360px)] rounded-3xl p-0">
+    <div class="p-6 text-center">
+      <div class="ph mx-auto size-16 rounded-2xl"></div>
+      <h2 class="mt-3 text-xl font-bold">Pesanan selesai!</h2>
+      <p class="mt-1 text-sm text-slate-500">Dana dicairkan ke penjual. Streak +1</p>
+      <p class="mt-5 text-sm font-semibold">Beri rating Siti Rahma</p>
+      <div class="mt-2 flex justify-center gap-1 text-3xl text-slate-300" aria-label="Pilih rating">
+        <a href="ulasan.html?jenis=barang&amp;bintang=1" aria-label="1 bintang" class="hover:text-orange-400">★</a><a href="ulasan.html?jenis=barang&amp;bintang=2" aria-label="2 bintang" class="hover:text-orange-400">★</a><a href="ulasan.html?jenis=barang&amp;bintang=3" aria-label="3 bintang" class="hover:text-orange-400">★</a><a href="ulasan.html?jenis=barang&amp;bintang=4" aria-label="4 bintang" class="hover:text-orange-400">★</a><a href="ulasan.html?jenis=barang&amp;bintang=5" aria-label="5 bintang" class="hover:text-orange-400">★</a>
+      </div>
+      <a href="ulasan.html?jenis=barang" class="mt-4 block w-full rounded-full bg-ink py-3 font-semibold text-white">Tulis ulasan</a>
+      <button data-close class="mt-1 w-full py-2 text-sm font-semibold text-slate-500">Nanti saja</button>
+    </div>
+  </dialog>
+</div>
+<script src="js/app.js?v=3"></script>
+<script>
+  // Metode bayar dari bayar.html (?bayar=)
+  const METODE = { va: 'BCA Virtual Account', qris: 'QRIS', ewallet: 'E-wallet' };
+  document.getElementById('metode').textContent = METODE[params.get('bayar')] || METODE.va;
+</script>
+</body>
+</html>
