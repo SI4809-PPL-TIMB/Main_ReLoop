@@ -134,7 +134,7 @@ class CariBarangTest extends TestCase
             ->assertSee('Barang tidak ditemukan')
             ->assertSee('Pesawat Terbang')
             ->assertSee('Hapus kata kunci')
-            ->assertSee('Kembali ke Beranda');
+            ->assertSee('Ubah filter');
     }
 
     public function test_pencarian_tanpa_kata_kunci_menampilkan_semua_barang_aktif(): void

@@ -189,7 +189,7 @@ class FilterBarangTest extends TestCase
 
         $response->assertOk()
             ->assertSee('Barang tidak ditemukan')
-            ->assertSee('Reset Semua Filter');
+            ->assertSee('Ubah filter');
     }
 
     public function test_format_nominal_rupiah_dengan_titik_dinormalisasi(): void

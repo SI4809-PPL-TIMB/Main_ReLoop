@@ -57,7 +57,9 @@
         </div>
         <div data-state="error" data-blank="Gagal memuat barang" data-desc="Periksa koneksi internetmu, lalu coba lagi." hidden></div>
 
-        <div data-state="empty" data-busy-hide @class(['px-8 py-12 text-center', 'hidden' => $barang->isNotEmpty()])>
+        <div data-state="empty" data-busy-hide @class(['px-8 text-center', 'hidden' => $barang->isNotEmpty()])>
+            {{-- Tengah vertikal di ruang antara header dan nav bawah. --}}
+            <div class="flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center py-8">
             <div class="ph mx-auto size-28 rounded-3xl bg-slate-100"></div>
             <p class="mt-4 text-lg font-bold">Barang tidak ditemukan</p>
             <p class="mt-1 text-sm text-slate-500">Coba kata kunci lain, longgarkan filter, atau perluas daerah pencarian.</p>
@@ -74,8 +76,7 @@
                         Reset pencarian
                     @endif
                 </a>
-                <a href="{{ route('cari') }}" data-busy-target="#cari-main" class="text-xs text-slate-400 hover:underline">Reset Semua Filter</a>
-                <a href="{{ route('beranda') }}" class="text-xs text-slate-400 hover:underline">Kembali ke Beranda</a>
+            </div>
             </div>
         </div>
 
@@ -114,9 +115,13 @@
                 @endforeach
             </div>
 
-            <div class="mt-6" data-busy-target="#cari-main">
-                {{ $barang->links() }}
-            </div>
+            @if ($barang->hasMorePages())
+                {{-- Tanpa JS tetap jalan sebagai link ke halaman berikutnya; dengan JS hasil ditambahkan ke grid. --}}
+                <div class="mt-6 flex flex-col items-center gap-2">
+                    <a id="muat-lagi" href="{{ $barang->nextPageUrl() }}" class="inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold hover:bg-slate-50">Muat lebih banyak</a>
+                    <p id="muat-lagi-error" class="text-xs text-red-600" role="alert" hidden>Gagal memuat barang. Coba lagi.</p>
+                </div>
+            @endif
         </div>
     </main>
 
@@ -245,6 +250,37 @@
 
     @push('scripts')
     <script>
+        // Muat lebih banyak: ambil halaman berikutnya lalu tambahkan kartunya ke #hasil.
+        document.addEventListener('click', async (event) => {
+            const btn = event.target.closest('#muat-lagi');
+            if (!btn) return;
+            event.preventDefault();
+            if (btn.getAttribute('aria-busy') === 'true') return;
+            const label = btn.textContent;
+            const error = document.getElementById('muat-lagi-error');
+            btn.setAttribute('aria-busy', 'true');
+            btn.innerHTML = '<svg class="reloop-spin size-4" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity=".25" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>Memuat…';
+            error.hidden = true;
+            try {
+                const res = await fetch(btn.href, { headers: { Accept: 'text/html' } });
+                if (!res.ok) throw new Error(res.status);
+                const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+                document.getElementById('hasil').append(...doc.querySelectorAll('#hasil > *'));
+                const next = doc.getElementById('muat-lagi');
+                if (next) {
+                    btn.href = next.href;
+                    btn.textContent = label;
+                    btn.removeAttribute('aria-busy');
+                } else {
+                    btn.parentElement.remove();
+                }
+            } catch {
+                btn.textContent = label;
+                btn.removeAttribute('aria-busy');
+                error.hidden = false;
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             // Dialog Open / Close
             document.querySelectorAll('[data-open]').forEach(btn => {
