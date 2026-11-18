@@ -22,7 +22,8 @@ class PilihAlurTest extends TestCase
     public function test_beranda_menautkan_halaman_pilihan_livewire(): void
     {
         $this->actingAs(User::factory()->create());
-        $this->get('/beranda')->assertOk()->assertSee('href="'.route('kategori.index').'"', false);
+        // PPLTIMB-139: tombol Jual di beranda langsung ke form; halaman pilihan tetap bisa dibuka.
+        $this->get('/beranda')->assertOk()->assertSee('href="'.route('barang.create').'"', false);
         $this->get('/pilih-kategori')->assertOk()->assertSeeLivewire(PilihAlur::class)
             ->assertSee('Barang Bekas')->assertSee('Daur Ulang')
             ->assertSee('name="_token"', false)->assertSee('action="'.route('kategori.pilih').'"', false);

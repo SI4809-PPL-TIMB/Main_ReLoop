@@ -15,9 +15,9 @@
             <h1 class="min-w-0 flex-1 truncate text-center text-xl font-bold leading-tight">{{ $ubah ? 'Ubah Barang' : 'Pasang Barang' }}</h1>
             <span class="size-10 shrink-0" aria-hidden="true"></span>
         </header>
-        <div id="bar" class="flex items-center gap-3 border-b border-slate-100 px-4 pb-3" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1" aria-label="Langkah pengisian">
-            <span class="h-1 flex-1 overflow-hidden rounded-full bg-slate-200"><i id="bar-isi" class="block h-full w-1/4 rounded-full bg-ink transition-[width] duration-300"></i></span>
-            <span id="bar-teks" class="text-xs font-semibold text-brand-700">1/4</span>
+        <div id="bar" class="flex items-center gap-3 border-b border-slate-100 px-4 pb-3" role="progressbar" aria-valuemin="1" aria-valuemax="2" aria-valuenow="1" aria-label="Langkah pengisian">
+            <span class="h-1 flex-1 overflow-hidden rounded-full bg-slate-200"><i id="bar-isi" class="block h-full w-1/2 rounded-full bg-ink transition-[width] duration-300"></i></span>
+            <span id="bar-teks" class="text-xs font-semibold text-brand-700">Langkah 1 dari 2</span>
         </div>
     </div>
 
@@ -26,8 +26,8 @@
         @csrf
         @if ($ubah) @method('PUT') @endif
 
-        {{-- 1. Foto & kategori --}}
-        <section data-step="1" class="space-y-5">
+        {{-- Langkah 1: foto, kategori, info barang. Langkah 2: kondisi dan lokasi. data-cek = validasi di barang.js --}}
+        <section data-step="1" data-cek="foto" data-judul="Foto &amp; info barang" class="space-y-5">
             <div><h2 class="text-xl font-bold">Foto &amp; kategori</h2><p class="mt-0.5 text-sm text-slate-500">Apa yang mau kamu jual?</p></div>
 
             <fieldset>
@@ -45,6 +45,13 @@
                     </button>
                 </div>
                 <input id="foto-input" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple class="sr-only" tabindex="-1">
+                {{-- Sumber foto. Hasilnya digabung ke #foto-input oleh barang.js. capture = kamera langsung terbuka di HP. --}}
+                <input id="foto-kamera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" class="sr-only" tabindex="-1">
+                <input id="foto-galeri" type="file" accept="image/jpeg,image/png,image/webp" multiple class="sr-only" tabindex="-1">
+                <p id="foto-kamera-error" role="alert" hidden class="mt-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
+                    Akses kamera ditolak. Izinkan kamera di pengaturan browser, atau
+                    <button type="button" data-galeri class="font-semibold underline">pilih foto dari galeri</button>.
+                </p>
                 <p class="mt-2 text-xs text-slate-500">Foto otomatis dikompres saat diunggah.</p>
                 {!! $err('photos') !!}@foreach ($errors->get('photos.*') as $m){!! '<p data-err class="mt-2 text-sm text-red-600">'.e($m[0]).'</p>' !!}@break @endforeach
             </fieldset>
@@ -70,8 +77,7 @@
             </fieldset>
         </section>
 
-        {{-- 2. Info barang --}}
-        <section data-step="2" class="hidden space-y-5">
+        <section data-step="1" data-cek="info" class="space-y-5">
             <div><h2 class="text-xl font-bold">Info barang</h2><p class="mt-0.5 text-sm text-slate-500">Judul dan harga yang jelas bikin cepat laku.</p></div>
             <label class="block">
                 <span class="text-sm font-semibold">Judul *</span>
@@ -98,8 +104,7 @@
             </label>
         </section>
 
-        {{-- 3. Kondisi --}}
-        <section data-step="3" class="hidden space-y-5">
+        <section data-step="2" data-cek="kondisi" data-judul="Kondisi &amp; lokasi" class="hidden space-y-5">
             <div><h2 class="text-xl font-bold">Kondisi</h2><p class="mt-0.5 text-sm text-slate-500">Jujur soal kondisi, pembeli lebih percaya.</p></div>
             <fieldset>
                 <legend class="text-sm font-semibold">Kondisi *</legend>
@@ -129,13 +134,12 @@
             </fieldset>
         </section>
 
-        {{-- 4. Lokasi --}}
-        <section data-step="4" class="hidden space-y-5">
-            <div><h2 class="text-xl font-bold">Lokasi</h2><p class="mt-0.5 text-sm text-slate-500">Tinggal satu langkah lagi.</p></div>
+        <section data-step="2" class="hidden space-y-5">
+            <div><h2 class="text-xl font-bold">Lokasi</h2><p class="mt-0.5 text-sm text-slate-500">Di daerah mana barang ini bisa diambil?</p></div>
             <div class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3">
                 <span class="grid size-10 shrink-0 place-items-center rounded-full bg-slate-100"><svg class="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></span>
                 <span class="min-w-0 flex-1"><span class="block text-sm font-semibold">Daerah</span><span class="block truncate text-xs text-slate-500">{{ $lokasi ?? 'Belum diatur' }}</span></span>
-                @unless ($ubah)<a href="{{ route('lokasi', ['from' => 'profil']) }}" class="text-sm font-semibold text-brand-700">{{ $lokasi ? 'Ubah' : 'Atur' }}</a>@endunless
+                @unless ($ubah)<a href="{{ route('lokasi', ['from' => 'jual']) }}" class="text-sm font-semibold text-brand-700">{{ $lokasi ? 'Ubah' : 'Atur' }}</a>@endunless
             </div>
             <p class="text-xs text-slate-500">Pembeli hanya melihat nama daerah dan jarak perkiraan.</p>
             {!! $err('kelurahan_id') !!}
@@ -147,6 +151,24 @@
             <button type="submit" id="kirim" name="action" value="publish" data-loading-text="{{ $ubah ? 'Menyimpan…' : 'Memasang barang…' }}" class="hidden flex-1 rounded-full bg-ink py-3.5 font-semibold text-white">{{ $ubah ? 'Simpan perubahan' : 'Pasang Sekarang' }}</button>
         </div>
     </form>
+
+    <dialog id="sumber-foto" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
+        <div class="p-5">
+            <div class="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200"></div>
+            <h2 class="text-lg font-bold">Tambah foto</h2>
+            <div class="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 text-sm font-medium">
+                <button type="button" data-kamera class="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+                    <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                    Ambil foto
+                </button>
+                <button type="button" data-galeri class="flex w-full items-center gap-3 px-4 py-3.5 text-left">
+                    <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>
+                    Pilih dari galeri
+                </button>
+            </div>
+            <button type="button" data-tutup class="mt-3 w-full rounded-full border border-slate-300 py-3 font-semibold">Batal</button>
+        </div>
+    </dialog>
 
     @push('scripts')
         @vite('resources/js/barang.js')
