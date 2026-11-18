@@ -66,6 +66,35 @@ class LokasiTest extends TestCase
         $this->get('/profil/ubah')->assertSee('Katulampa, Bogor Timur, Kabupaten Bogor');
     }
 
+    /** PPLTIMB-138: tombol kembali dan simpan di Lokasi menuju halaman asal. */
+    public function test_kembali_dan_simpan_lokasi_menuju_halaman_asal(): void
+    {
+        $kel = WilayahKelurahan::first();
+        $asal = [
+            'ubah-profil' => '/profil/ubah',
+            'profil'      => '/profil',
+            'jual'        => '/jual',
+            'beranda'     => '/beranda',
+        ];
+
+        foreach ($asal as $from => $tujuan) {
+            $this->actingAs($this->user)->get('/lokasi?from='.$from)
+                ->assertOk()
+                ->assertSee('href="'.url($tujuan).'" aria-label="Kembali"', false);
+            $this->post('/lokasi', ['kelurahan_id' => $kel->id, 'from' => $from])->assertRedirect($tujuan);
+        }
+
+        // Onboarding (tanpa from): kembali ke halaman selesai daftar.
+        $this->get('/lokasi')->assertSee('href="'.route('selesai').'" aria-label="Kembali"', false);
+    }
+
+    public function test_ubah_profil_membuka_lokasi_dengan_asal_ubah_profil(): void
+    {
+        $this->actingAs($this->user)->get('/profil/ubah')
+            ->assertOk()
+            ->assertSee(route('lokasi', ['from' => 'ubah-profil']), false);
+    }
+
     public function test_simpan_lokasi_onboarding_ke_beranda(): void
     {
         $kel = WilayahKelurahan::first();

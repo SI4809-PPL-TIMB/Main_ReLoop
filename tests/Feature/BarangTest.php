@@ -59,6 +59,28 @@ class BarangTest extends TestCase
         $this->actingAs($this->user)->get('/jual')->assertOk()->assertSee('Pasang Barang')->assertSee('Perabot');
     }
 
+    /** PPLTIMB-139: dua langkah, kamera langsung lewat input capture, jalan pintas Jual di beranda. */
+    public function test_form_dua_langkah_dengan_pilihan_kamera_dan_galeri(): void
+    {
+        $html = $this->actingAs($this->user)->get('/jual')->assertOk()
+            ->assertSee('Langkah 1 dari 2')
+            ->assertSee('aria-valuemax="2"', false)
+            ->assertSee('Ambil foto')->assertSee('Pilih dari galeri')
+            ->assertSee('id="foto-kamera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"', false)
+            ->assertSee('Akses kamera ditolak')
+            ->getContent();
+
+        $this->assertSame(2, substr_count($html, 'data-step="1"'));
+        $this->assertSame(2, substr_count($html, 'data-step="2"'));
+        $this->assertStringNotContainsString('data-step="3"', $html);
+    }
+
+    public function test_jual_di_beranda_langsung_ke_form_pasang_barang(): void
+    {
+        $this->actingAs($this->user)->get('/beranda')->assertOk()
+            ->assertSee('href="'.route('barang.create').'"', false);
+    }
+
     public function test_pasang_barang_menyimpan_data_dan_foto_terkompres(): void
     {
         $this->actingAs($this->user)->post('/jual', $this->payload())->assertRedirect('/barang-saya');

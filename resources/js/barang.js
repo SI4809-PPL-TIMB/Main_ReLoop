@@ -1,39 +1,52 @@
 // Form pasang/ubah barang: langkah per layar, validasi ringan per langkah, pratinjau foto.
 const form = document.getElementById('form-barang');
-const steps = [...form.querySelectorAll('[data-step]')];
+// Satu langkah bisa berisi beberapa <section data-step="n">; jumlah langkah = nilai data-step terbesar.
+const sections = [...form.querySelectorAll('[data-step]')];
+const total = Math.max(...sections.map((s) => Number(s.dataset.step)));
+const bagian = (i) => sections.filter((s) => Number(s.dataset.step) === i + 1);
+const judul = (i) => bagian(i).find((s) => s.dataset.judul)?.dataset.judul ?? '';
+const next = document.getElementById('next');
 let now = 0;
 
 function show(i) {
     now = i;
-    steps.forEach((el, k) => el.classList.toggle('hidden', k !== i));
-    document.getElementById('bar-isi').style.width = `${((i + 1) / steps.length) * 100}%`;
-    document.getElementById('bar-teks').textContent = `${i + 1}/${steps.length}`;
+    sections.forEach((el) => el.classList.toggle('hidden', Number(el.dataset.step) !== i + 1));
+    document.getElementById('bar-isi').style.width = `${((i + 1) / total) * 100}%`;
+    document.getElementById('bar-teks').textContent = `Langkah ${i + 1} dari ${total}`;
     document.getElementById('bar').setAttribute('aria-valuenow', i + 1);
     document.getElementById('prev').classList.toggle('hidden', i === 0);
-    document.getElementById('next').classList.toggle('hidden', i === steps.length - 1);
-    document.getElementById('kirim').classList.toggle('hidden', i !== steps.length - 1);
+    next.classList.toggle('hidden', i === total - 1);
+    if (i < total - 1) next.textContent = `Lanjut: ${judul(i + 1)}`;
+    document.getElementById('kirim').classList.toggle('hidden', i !== total - 1);
     window.scrollTo(0, 0);
 }
 
+const cek = {
+    foto: () => (!form.querySelector('[data-lama] input:not(:checked)') && !fotoBaru.length ? 'Tambahkan minimal 1 foto.' : !form.querySelector('[name=category_id]:checked') ? 'Pilih kategori barang.' : null),
+    info: () => (form.title.value.trim().length < 5 ? 'Judul minimal 5 karakter.' : !form.price.value.trim() ? 'Harga wajib diisi.' : null),
+    kondisi: () => (!form.querySelector('[name=condition]:checked') ? 'Pilih kondisi barang.' : null),
+};
+
 function langkahValid(i) {
-    const kosong = {
-        0: () => !form.querySelector('[data-lama] input:not(:checked)') && !fotoBaru.length ? 'Tambahkan minimal 1 foto.' : !form.querySelector('[name=category_id]:checked') ? 'Pilih kategori barang.' : null,
-        1: () => (form.title.value.trim().length < 5 ? 'Judul minimal 5 karakter.' : !form.price.value.trim() ? 'Harga wajib diisi.' : null),
-        2: () => (!form.querySelector('[name=condition]:checked') ? 'Pilih kondisi barang.' : null),
-        3: () => null,
-    }[i]();
     document.querySelectorAll('[data-js-err]').forEach((e) => e.remove());
-    if (kosong) steps[i].insertAdjacentHTML('beforeend', `<p data-js-err role="alert" class="text-sm text-red-600">${kosong}</p>`);
-    return !kosong;
+    let valid = true;
+    bagian(i).forEach((section) => {
+        const pesan = cek[section.dataset.cek]?.();
+        if (pesan) {
+            section.insertAdjacentHTML('beforeend', `<p data-js-err role="alert" class="text-sm text-red-600">${pesan}</p>`);
+            valid = false;
+        }
+    });
+    return valid;
 }
 
-document.getElementById('next').addEventListener('click', () => langkahValid(now) && show(now + 1));
+next.addEventListener('click', () => langkahValid(now) && show(now + 1));
 document.getElementById('prev').addEventListener('click', () => show(now - 1));
 document.getElementById('back').addEventListener('click', (e) => { if (now > 0) { e.preventDefault(); show(now - 1); } });
 form.addEventListener('submit', (e) => {
     if (e.submitter?.value === 'draft') return;
-    const gagal = steps.findIndex((_, i) => !langkahValid(i));
-    if (gagal >= 0) { e.preventDefault(); show(gagal); }
+    const gagal = [...Array(total).keys()].find((i) => !langkahValid(i));
+    if (gagal !== undefined) { e.preventDefault(); show(gagal); }
 });
 
 // Foto: kumpulkan pilihan ke DataTransfer supaya bisa ditambah bertahap dan dihapus satu per satu.
@@ -53,11 +66,37 @@ function renderFoto() {
     input.files = dt.files;
     grid.querySelector('#foto-add').hidden = lama() + fotoBaru.length >= maks;
 }
-document.getElementById('foto-add').addEventListener('click', () => input.click());
-input.addEventListener('change', () => {
-    fotoBaru = [...fotoBaru, ...input.files].slice(0, Math.max(0, maks - lama()));
-    renderFoto();
+// Tambah > pilih sumber: Ambil foto (kamera langsung, capture) atau galeri.
+const sheet = document.getElementById('sumber-foto');
+const kamera = document.getElementById('foto-kamera');
+const galeri = document.getElementById('foto-galeri');
+const kameraError = document.getElementById('foto-kamera-error');
+
+async function izinKameraDitolak() {
+    try {
+        return (await navigator.permissions?.query({ name: 'camera' }))?.state === 'denied';
+    } catch {
+        return false; // browser tanpa Permissions API untuk kamera: biarkan input capture yang menangani
+    }
+}
+
+document.getElementById('foto-add').addEventListener('click', () => sheet.showModal());
+sheet.addEventListener('click', (e) => { if (e.target === sheet || e.target.closest('[data-tutup]')) sheet.close(); });
+sheet.querySelector('[data-kamera]').addEventListener('click', async () => {
+    sheet.close();
+    kameraError.hidden = !(await izinKameraDitolak());
+    if (kameraError.hidden) kamera.click();
 });
+document.querySelectorAll('[data-galeri]').forEach((b) => b.addEventListener('click', () => {
+    sheet.close();
+    kameraError.hidden = true;
+    galeri.click();
+}));
+[kamera, galeri].forEach((sumber) => sumber.addEventListener('change', () => {
+    fotoBaru = [...fotoBaru, ...sumber.files].slice(0, Math.max(0, maks - lama()));
+    sumber.value = '';
+    renderFoto();
+}));
 grid.addEventListener('click', (e) => {
     const x = e.target.closest('[data-hapus]');
     if (x) { fotoBaru.splice(Number(x.dataset.hapus), 1); renderFoto(); }
@@ -66,5 +105,5 @@ grid.addEventListener('change', (e) => e.target.name === 'remove_photos[]' && re
 
 // Setelah error server, buka langkah yang berisi pesan error pertama.
 const err = form.querySelector('[data-err]');
-show(err ? steps.findIndex((s) => s.contains(err)) : 0);
+show(err ? Number(err.closest('[data-step]').dataset.step) - 1 : 0);
 renderFoto();

@@ -22,6 +22,14 @@ class LokasiController extends Controller
         'kelurahan' => [WilayahKelurahan::class, 'kecamatan_id'],
     ];
 
+    /** Asal halaman (?from=) -> route tujuan tombol kembali dan setelah simpan. Tanpa from = onboarding. */
+    private const ASAL = [
+        'profil'      => 'account',
+        'ubah-profil' => 'account.edit',
+        'jual'        => 'barang.create',
+        'beranda'     => 'beranda',
+    ];
+
     public function edit(Request $request): View
     {
         $kel = $request->user()->profile?->kelurahan?->load('kecamatan.kabupaten.provinsi');
@@ -34,8 +42,10 @@ class LokasiController extends Controller
                 'kecamatan' => $this->opsi($kel->kecamatan),
                 'kelurahan' => $this->opsi($kel),
             ] : null,
-            'dariProfil' => $request->query('from') === 'profil',
-            'from'       => $request->query('from'),
+            // Selain onboarding dan beranda, lokasi dibuka untuk diubah dari halaman lain.
+            'dariProfil' => in_array($from = $request->query('from'), ['profil', 'ubah-profil', 'jual'], true),
+            'from'       => $from,
+            'kembali'    => route(self::ASAL[$from] ?? 'selesai'),
         ]);
     }
 
@@ -53,8 +63,8 @@ class LokasiController extends Controller
 
         $request->user()->profile()->updateOrCreate([], $data);
 
-        // dari profil kembali ke profil; onboarding dan beranda ke beranda
-        return redirect()->route($request->input('from') === 'profil' ? 'account' : 'beranda')->with('success', 'Lokasi tersimpan.');
+        // kembali ke halaman asal; onboarding ke beranda
+        return redirect()->route(self::ASAL[$request->input('from')] ?? 'beranda')->with('success', 'Lokasi tersimpan.');
     }
 
     /** Daftar anak satu level, untuk kaskade provinsi > kab/kota > kecamatan > desa. */
