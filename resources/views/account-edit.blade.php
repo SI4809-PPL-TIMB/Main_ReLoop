@@ -57,7 +57,7 @@
 
             <div>
                 <p class="text-sm font-semibold">Lokasi</p>
-                <a href="{{ route('lokasi', ['from' => 'profil']) }}" class="mt-1.5 flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-3">
+                <a href="{{ route('lokasi', ['from' => 'ubah-profil']) }}" data-simpan-draf class="mt-1.5 flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-3">
                     <svg class="size-5 shrink-0 text-slate-500" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
                     <span class="flex-1 font-medium">{{ $lokasi }}</span>
                     <svg class="size-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
@@ -121,6 +121,21 @@
         <script>
             document.querySelectorAll('[data-open]').forEach((tombol) =>
                 tombol.addEventListener('click', () => document.getElementById(tombol.dataset.open)?.showModal()));
+            // Isian yang belum disimpan dibawa saat pindah ke halaman Lokasi, lalu dipulihkan saat kembali.
+            (() => {
+                const form = document.getElementById('form-profil');
+                const kunci = 'reloop:draf-profil:{{ $user->id }}';
+                const kolom = [...form.querySelectorAll('input[name]:not([type=hidden]), textarea[name]')];
+                const store = (() => { try { return sessionStorage; } catch { return null; } })();
+                const draf = (() => { try { return JSON.parse(store?.getItem(kunci) ?? 'null'); } catch { return null; } })();
+                // Error validasi dari server (old input) lebih baru dari draf; draf hanya dipakai bila tidak ada.
+                if (draf && !{{ $errors->any() ? 'true' : 'false' }}) kolom.forEach((el) => { if (el.name in draf) el.value = draf[el.name]; });
+                store?.removeItem(kunci);
+                form.querySelector('[data-simpan-draf]')?.addEventListener('click', () => {
+                    try { store?.setItem(kunci, JSON.stringify(Object.fromEntries(kolom.map((el) => [el.name, el.value])))); } catch {}
+                });
+            })();
+
             document.querySelectorAll('dialog').forEach((dialog) =>
                 dialog.addEventListener('click', (e) => {
                     if (e.target === dialog || e.target.closest('[data-close]')) dialog.close();
