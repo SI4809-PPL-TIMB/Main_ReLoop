@@ -59,7 +59,7 @@
                 Saya sudah punya akun
             </a>
             <p class="mt-1 text-center text-xs text-slate-500">
-                Dengan lanjut, kamu setuju dengan <a href="#" class="font-semibold text-ink underline">Syarat &amp; Ketentuan</a> Reloop.
+                Dengan lanjut, kamu setuju dengan <a href="{{ route('syarat') }}" class="font-semibold text-ink underline">Syarat &amp; Ketentuan</a> Reloop.
             </p>
         </div>
 

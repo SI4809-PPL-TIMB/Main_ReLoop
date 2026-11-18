@@ -92,6 +92,10 @@ Route::get('/', function () {
 Route::get('/daftar', [RegisterController::class, 'create'])->name('daftar');
 Route::post('/daftar', [RegisterController::class, 'store'])->name('daftar.store');
 
+// PPLTIMB-135 · Syarat & Ketentuan dan Kebijakan Privasi sebagai halaman terpisah (bisa dibuka tanpa login)
+Route::view('/syarat-ketentuan', 'legal.syarat')->name('syarat');
+Route::view('/kebijakan-privasi', 'legal.privasi')->name('privasi');
+
 // 3. Halaman Verifikasi
 Route::get('/verifikasi', [RegisterController::class, 'showVerification'])->name('verifikasi');
 Route::post('/verifikasi', [RegisterController::class, 'storeVerification'])->name('verifikasi.store');

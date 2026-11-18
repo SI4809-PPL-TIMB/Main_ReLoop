@@ -148,9 +148,9 @@
                 >
                 <span class="text-slate-600">
                     Saya setuju dengan
-                    <a href="#" class="font-semibold text-ink underline">Syarat &amp; Ketentuan</a>
+                    <a href="{{ route('syarat') }}" class="font-semibold text-ink underline">Syarat &amp; Ketentuan</a>
                     dan
-                    <a href="#" class="font-semibold text-ink underline">Kebijakan Privasi</a>
+                    <a href="{{ route('privasi') }}" class="font-semibold text-ink underline">Kebijakan Privasi</a>
                     Reloop.
                 </span>
             </label>

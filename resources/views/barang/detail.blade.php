@@ -67,7 +67,7 @@
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
                 </a>
                 <div class="flex gap-2">
-                    <button type="button" id="bagikan" data-url="{{ url()->current() }}" aria-label="Bagikan" class="grid size-10 place-items-center rounded-full border border-slate-200 bg-white">
+                    <button type="button" id="bagikan" data-url="{{ url()->current() }}" data-title="{{ $listing->title }}" data-text="Lihat {{ $listing->title }} di ReLoop" aria-label="Bagikan" class="grid size-10 place-items-center rounded-full border border-slate-200 bg-white">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
                     </button>
                     <button type="button" id="simpan" aria-label="Simpan" aria-pressed="false" class="group grid size-10 place-items-center rounded-full border border-slate-200 bg-white">
@@ -342,10 +342,37 @@
                     if (hitung) hitung.textContent = `${Number(b.dataset.foto) + 1}/${thumbs.length}`;
                 }));
 
-                // Bagikan: salin tautan halaman
-                document.getElementById('bagikan')?.addEventListener('click', (e) => {
-                    navigator.clipboard?.writeText(e.currentTarget.dataset.url).catch(() => {});
-                    toast('Link barang disalin');
+                // Bagikan (PPLTIMB-135): menu share bawaan perangkat (Web Share API),
+                // cadangan salin tautan bila browser tidak mendukung.
+                const salinTautan = async (url) => {
+                    try {
+                        await navigator.clipboard.writeText(url);
+                        return true;
+                    } catch (_) {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.setAttribute('readonly', '');
+                        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+                        document.body.append(ta);
+                        ta.select();
+                        let ok = false;
+                        try { ok = document.execCommand('copy'); } catch (_) {}
+                        ta.remove();
+                        return ok;
+                    }
+                };
+                document.getElementById('bagikan')?.addEventListener('click', async (e) => {
+                    const btn = e.currentTarget;
+                    const data = { title: btn.dataset.title || document.title, text: btn.dataset.text || '', url: btn.dataset.url };
+                    if (navigator.share && (!navigator.canShare || navigator.canShare(data))) {
+                        try {
+                            await navigator.share(data);
+                            return;
+                        } catch (err) {
+                            if (err && err.name === 'AbortError') return; // pengguna menutup menu share
+                        }
+                    }
+                    toast(await salinTautan(data.url) ? 'Link barang disalin' : 'Gagal menyalin link');
                 });
 
                 // Simpan: tampilan saja (belum tersimpan ke database)
