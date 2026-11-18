@@ -93,7 +93,9 @@ class PencarianPerformanceTest extends TestCase
         $resPage1 = $this->actingAs($this->pembeli)->get('/cari?q=Paginasi&kategori='.$kat->slug);
         $resPage1->assertOk()
             ->assertSee('Barang Paginasi Ke-1')
-            ->assertSee('page=2'); // link ke halaman 2 ada
+            ->assertSee('page=2') // link ke halaman 2 ada
+            ->assertSee('Muat lebih banyak')
+            ->assertDontSee('Previous');
 
         // Halaman 2
         $resPage2 = $this->actingAs($this->pembeli)->get('/cari?q=Paginasi&kategori='.$kat->slug.'&page=2');

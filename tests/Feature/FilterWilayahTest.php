@@ -223,7 +223,7 @@ class FilterWilayahTest extends TestCase
 
         $response->assertOk()
             ->assertSee('Barang tidak ditemukan')
-            ->assertSee('Reset Semua Filter');
+            ->assertSee('Ubah filter');
     }
 }
 

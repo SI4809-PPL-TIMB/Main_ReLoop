@@ -34,7 +34,7 @@
                         $waktu = ($latest?->created_at ?? $conv->updated_at);
                     @endphp
                     <li data-jenis="{{ $jenis }}" data-teks="{{ strtolower(($other?->name ?? '').' '.($listing?->title ?? '')) }}">
-                        <a href="{{ route('pesan.show', $conv) }}" class="flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50 active:bg-slate-100">
+                        <a href="{{ route('pesan.show', $conv) }}" class="flex items-center gap-3 px-4 py-4 transition hover:bg-slate-50 active:bg-slate-100">
                             <div class="relative shrink-0">
                                 @if ($other?->avatarUrl())
                                     <img src="{{ $other->avatarUrl() }}" alt="" class="size-12 rounded-full object-cover">
@@ -45,14 +45,16 @@
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-baseline justify-between gap-2">
-                                    <p class="truncate font-bold">{{ $other?->name ?? 'Pengguna' }}</p>
+                                    <div class="flex min-w-0 items-center gap-2.5">
+                                        <p class="truncate font-bold">{{ $other?->name ?? 'Pengguna' }}</p>
+                                        @if ($tawar)
+                                            <span class="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-600">Menunggu Tawaran</span>
+                                        @endif
+                                    </div>
                                     <span class="shrink-0 text-xs {{ $conv->unread_count > 0 ? 'font-semibold text-ink' : 'text-slate-400' }}">{{ $waktu->isToday() ? $waktu->format('H.i') : $waktu->locale('id')->translatedFormat('j M') }}</span>
                                 </div>
-                                <p class="truncate text-xs text-slate-500">{{ $listing?->title ?? 'Barang tidak tersedia' }}</p>
-                                @if ($tawar)
-                                    <p class="truncate text-xs font-semibold text-amber-600">Tawaran Rp {{ number_format($tawar->amount, 0, ',', '.') }} · menunggu</p>
-                                @endif
-                                <div class="mt-0.5 flex items-center justify-between gap-2">
+                                <p class="mt-1 truncate text-xs text-slate-500">{{ $listing?->title ?? 'Barang tidak tersedia' }}</p>
+                                <div class="mt-1.5 flex items-center justify-between gap-2">
                                     <p class="truncate text-sm {{ $conv->unread_count > 0 ? 'font-medium text-ink' : 'text-slate-500' }}">
                                         @if ($latest)
                                             @if ((int) $latest->sender_id === (int) auth()->id())<span class="text-slate-400">Kamu:</span> @endif{{ $latest->body }}
