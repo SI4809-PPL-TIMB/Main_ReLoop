@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 
 /**
  * Seeder data master kategori ReLoop sesuai kriteria tugas 1.3:
- * - 7 Kategori Barang Bekas: Perabot, Pakaian, Buku, Elektronik, Mainan, Sepeda, Gadget
+ * - 7 Kategori Barang Bekas: Perabot, Pakaian, Buku, Elektronik & Gadget, Mainan, Sepeda, Lainnya
  * - 5 Kategori Sampah Daur Ulang: Plastik, Kertas, Logam, Kaca, Elektronik bekas
  *
  * Idempoten: aman dijalankan berulang tanpa membuat data duplikat.
@@ -40,7 +40,7 @@ class CategorySeeder extends Seeder
                 'sort_order' => 3,
             ],
             [
-                'name'       => 'Elektronik',
+                'name'       => 'Elektronik & Gadget',
                 'slug'       => 'elektronik',
                 'type'       => Category::TYPE_BEKAS,
                 'icon'       => 'tv',
@@ -59,13 +59,6 @@ class CategorySeeder extends Seeder
                 'type'       => Category::TYPE_BEKAS,
                 'icon'       => 'bicycle',
                 'sort_order' => 6,
-            ],
-            [
-                'name'       => 'Gadget',
-                'slug'       => 'gadget',
-                'type'       => Category::TYPE_BEKAS,
-                'icon'       => 'smartphone',
-                'sort_order' => 7,
             ],
             [
                 'name'       => 'Lainnya',

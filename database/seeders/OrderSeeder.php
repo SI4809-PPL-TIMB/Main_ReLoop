@@ -28,7 +28,7 @@ class OrderSeeder extends Seeder
         $kelurahan = WilayahKelurahan::where('nama', 'Paledang')->first();
 
         // 1. Pesanan DIBAYAR (Dana Tertahan / Escrow - Siap Diserahkan Penjual)
-        $listingDibayar = Listing::create([
+        $listingDibayar = Listing::firstOrCreate(['user_id' => $seller->id, 'title' => 'Kursi Kayu Jati Ukir Jepara'], [
             'user_id'        => $seller->id,
             'category_id'    => $kategoriPerabot->id,
             'kelurahan_id'   => $kelurahan?->id,
@@ -41,7 +41,9 @@ class OrderSeeder extends Seeder
             'published_at'   => now()->subDays(2),
         ]);
 
-        $orderDibayar = Order::create([
+        DemoListingPhotos::attach($listingDibayar, 'kursi-kayu');
+
+        $orderDibayar = Order::firstOrCreate(['order_number' => 'RL-20261020-0142'], [
             'order_number'     => 'RL-20261020-0142',
             'listing_id'       => $listingDibayar->id,
             'buyer_id'         => $buyer->id,
@@ -53,7 +55,7 @@ class OrderSeeder extends Seeder
             'created_at'       => now()->subHours(5),
         ]);
 
-        Payment::create([
+        Payment::firstOrCreate(['order_id' => $orderDibayar->id], [
             'order_id'     => $orderDibayar->id,
             'amount'       => 320000,
             'platform_fee' => 9600, // 3% dari 320.000
@@ -64,7 +66,7 @@ class OrderSeeder extends Seeder
         ]);
 
         // 2. Pesanan DISERAHKAN (Menunggu Konfirmasi Pembeli)
-        $listingDiserahkan = Listing::create([
+        $listingDiserahkan = Listing::firstOrCreate(['user_id' => $seller->id, 'title' => 'Meja Belajar Minimalis Kayu Pinus'], [
             'user_id'        => $seller->id,
             'category_id'    => $kategoriPerabot->id,
             'kelurahan_id'   => $kelurahan?->id,
@@ -77,7 +79,9 @@ class OrderSeeder extends Seeder
             'published_at'   => now()->subDays(3),
         ]);
 
-        $orderDiserahkan = Order::create([
+        DemoListingPhotos::attach($listingDiserahkan, 'meja-belajar');
+
+        $orderDiserahkan = Order::firstOrCreate(['order_number' => 'RL-20261019-0089'], [
             'order_number'        => 'RL-20261019-0089',
             'listing_id'          => $listingDiserahkan->id,
             'buyer_id'            => $buyer->id,
@@ -91,7 +95,7 @@ class OrderSeeder extends Seeder
             'created_at'          => now()->subDay(),
         ]);
 
-        Payment::create([
+        Payment::firstOrCreate(['order_id' => $orderDiserahkan->id], [
             'order_id'     => $orderDiserahkan->id,
             'amount'       => 250000,
             'platform_fee' => 7500, // 3% dari 250.000

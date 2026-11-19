@@ -62,10 +62,7 @@ class CariController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        $daftarKategori = Category::bekas()
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->get();
+        $daftarKategori = Category::forSelect(Category::TYPE_BEKAS);
 
         $kategoriTerpilih = null;
         if (! empty($kategori)) {

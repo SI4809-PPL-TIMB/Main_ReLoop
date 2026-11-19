@@ -60,16 +60,19 @@ class CategoryMasterTest extends TestCase
     {
         $this->seed(CategorySeeder::class);
 
-        $this->assertSame(8, Category::bekas()->count());
+        $this->assertSame(7, Category::bekas()->count());
         $this->assertSame(5, Category::daurUlang()->count());
-        $this->assertSame(13, Category::count());
+        $this->assertSame(12, Category::count());
 
-        $expectedBekas = ['perabot', 'pakaian', 'buku', 'elektronik', 'mainan', 'sepeda', 'gadget'];
+        $expectedBekas = ['perabot', 'pakaian', 'buku', 'elektronik', 'mainan', 'sepeda', 'lainnya'];
         foreach ($expectedBekas as $slug) {
             $cat = Category::where('slug', $slug)->first();
             $this->assertNotNull($cat, "Kategori {$slug} tidak ditemukan.");
             $this->assertSame(Category::TYPE_BEKAS, $cat->type);
         }
+
+        $this->assertDatabaseHas('categories', ['slug' => 'elektronik', 'name' => 'Elektronik & Gadget']);
+        $this->assertDatabaseMissing('categories', ['slug' => 'gadget']);
 
         $expectedSampah = ['plastik', 'kertas', 'logam', 'kaca', 'elektronik-bekas'];
         foreach ($expectedSampah as $slug) {
@@ -85,10 +88,10 @@ class CategoryMasterTest extends TestCase
     public function test_category_seeder_is_idempotent(): void
     {
         $this->seed(CategorySeeder::class);
-        $this->assertSame(13, Category::count());
+        $this->assertSame(12, Category::count());
 
         $this->seed(CategorySeeder::class);
-        $this->assertSame(13, Category::count());
+        $this->assertSame(12, Category::count());
     }
 
     /**
@@ -99,7 +102,7 @@ class CategoryMasterTest extends TestCase
         $this->seed(CategorySeeder::class);
 
         $bekas = Category::forSelect(Category::TYPE_BEKAS);
-        $this->assertCount(8, $bekas);
+        $this->assertCount(7, $bekas);
 
         $daurUlang = Category::forSelect(Category::TYPE_DAUR_ULANG);
         $this->assertCount(5, $daurUlang);
@@ -107,7 +110,7 @@ class CategoryMasterTest extends TestCase
         $grouped = Category::groupedByType();
         $this->assertArrayHasKey(Category::TYPE_BEKAS, $grouped);
         $this->assertArrayHasKey(Category::TYPE_DAUR_ULANG, $grouped);
-        $this->assertCount(8, $grouped[Category::TYPE_BEKAS]);
+        $this->assertCount(7, $grouped[Category::TYPE_BEKAS]);
         $this->assertCount(5, $grouped[Category::TYPE_DAUR_ULANG]);
     }
 
@@ -123,6 +126,7 @@ class CategoryMasterTest extends TestCase
         Livewire::test(CategorySelect::class)
             ->assertSee('Perabot')
             ->assertSee('Pakaian')
+            ->assertSee('Elektronik & Gadget')
             ->call('selectCategory', $perabot->id)
             ->assertSet('selectedCategoryId', $perabot->id)
             ->assertDispatched('category-selected')
@@ -145,6 +149,8 @@ class CategoryMasterTest extends TestCase
             ->assertSee('Semua')
             ->assertSee('Barang Bekas')
             ->assertSee('Sampah Daur Ulang')
+            ->assertSee('Elektronik & Gadget')
+            ->assertSee('Elektronik bekas')
             ->call('setType', Category::TYPE_DAUR_ULANG)
             ->assertSet('activeType', Category::TYPE_DAUR_ULANG)
             ->assertSee('Plastik')

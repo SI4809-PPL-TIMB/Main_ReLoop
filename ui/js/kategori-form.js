@@ -1,10 +1,10 @@
 // Hanya interaksi mockup 4.1.1. Form asli berasal dari reloop-ecommerce-flow.
-const categorySlugs = ['perabot', 'pakaian', 'buku', 'elektronik', 'mainan', 'sepeda', 'gadget'];
+const categorySlugs = ['perabot', 'pakaian', 'buku', 'elektronik', 'mainan', 'sepeda', 'lainnya'];
 const chosenCategory = new URLSearchParams(location.search).get('kategori');
 const categoryInputs = [...document.querySelectorAll('input[name="kat"]')];
 categoryInputs.forEach((input, index) => {
   if (!categorySlugs[index]) {
-    input.closest('label').remove(); // Lainnya tidak ada di master kategori 1.3.
+    input.closest('label').remove();
     return;
   }
   input.value = categorySlugs[index];
