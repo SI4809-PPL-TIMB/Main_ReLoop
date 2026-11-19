@@ -11,6 +11,10 @@ class ListingPhoto extends Model
 
     public function getUrlAttribute(): string
     {
+        if (str_starts_with($this->path, 'assets/demo/barang/')) {
+            return asset($this->path);
+        }
+
         return asset('storage/'.$this->path);
     }
 

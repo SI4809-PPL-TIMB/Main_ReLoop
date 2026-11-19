@@ -21,7 +21,7 @@ class WilayahSeeder extends Seeder
         // -------------------------
         // Provinsi Jawa Barat
         // -------------------------
-        $jabar = WilayahProvinsi::create([
+        $jabar = WilayahProvinsi::updateOrCreate(['kode' => '32'], [
             'nama' => 'Jawa Barat',
             'kode' => '32',
         ]);
@@ -29,13 +29,13 @@ class WilayahSeeder extends Seeder
         // -------------------------
         // Kabupaten Bogor
         // -------------------------
-        $kabBogor = WilayahKabupaten::create([
+        $kabBogor = WilayahKabupaten::updateOrCreate(['kode' => '3201'], [
             'provinsi_id' => $jabar->id,
             'nama'        => 'Kabupaten Bogor',
             'kode'        => '3201',
         ]);
 
-        $kecCibinong = WilayahKecamatan::create([
+        $kecCibinong = WilayahKecamatan::updateOrCreate(['kode' => '3201010'], [
             'kabupaten_id' => $kabBogor->id,
             'nama'         => 'Cibinong',
             'kode'         => '3201010',
@@ -48,10 +48,10 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Harapan Jaya',  'kode' => '3201010005'],
         ];
         foreach ($kelCibinong as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecCibinong->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecCibinong->id]));
         }
 
-        $kecBogorTimur = WilayahKecamatan::create([
+        $kecBogorTimur = WilayahKecamatan::updateOrCreate(['kode' => '3201020'], [
             'kabupaten_id' => $kabBogor->id,
             'nama'         => 'Bogor Timur',
             'kode'         => '3201020',
@@ -62,10 +62,10 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Sindangsari',   'kode' => '3201020003'],
         ];
         foreach ($kelBogorTimur as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecBogorTimur->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecBogorTimur->id]));
         }
 
-        $kecLeuwiliang = WilayahKecamatan::create([
+        $kecLeuwiliang = WilayahKecamatan::updateOrCreate(['kode' => '3201030'], [
             'kabupaten_id' => $kabBogor->id,
             'nama'         => 'Leuwiliang',
             'kode'         => '3201030',
@@ -76,19 +76,19 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Karehkel',      'kode' => '3201030003'],
         ];
         foreach ($kelLeuwiliang as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecLeuwiliang->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecLeuwiliang->id]));
         }
 
         // -------------------------
         // Kota Bogor
         // -------------------------
-        $kotaBogor = WilayahKabupaten::create([
+        $kotaBogor = WilayahKabupaten::updateOrCreate(['kode' => '3271'], [
             'provinsi_id' => $jabar->id,
             'nama'        => 'Kota Bogor',
             'kode'        => '3271',
         ]);
 
-        $kecBogorTengah = WilayahKecamatan::create([
+        $kecBogorTengah = WilayahKecamatan::updateOrCreate(['kode' => '3271010'], [
             'kabupaten_id' => $kotaBogor->id,
             'nama'         => 'Bogor Tengah',
             'kode'         => '3271010',
@@ -102,10 +102,10 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Ciwaringin',     'kode' => '3271010006'],
         ];
         foreach ($kelBogorTengah as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecBogorTengah->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecBogorTengah->id]));
         }
 
-        $kecBogorSelatan = WilayahKecamatan::create([
+        $kecBogorSelatan = WilayahKecamatan::updateOrCreate(['kode' => '3271020'], [
             'kabupaten_id' => $kotaBogor->id,
             'nama'         => 'Bogor Selatan',
             'kode'         => '3271020',
@@ -118,10 +118,10 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Muarasari',      'kode' => '3271020005'],
         ];
         foreach ($kelBogorSelatan as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecBogorSelatan->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecBogorSelatan->id]));
         }
 
-        $kecBogorUtara = WilayahKecamatan::create([
+        $kecBogorUtara = WilayahKecamatan::updateOrCreate(['kode' => '3271030'], [
             'kabupaten_id' => $kotaBogor->id,
             'nama'         => 'Bogor Utara',
             'kode'         => '3271030',
@@ -133,19 +133,19 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Tegal Gundil',   'kode' => '3271030004'],
         ];
         foreach ($kelBogorUtara as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecBogorUtara->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecBogorUtara->id]));
         }
 
         // -------------------------
         // Kota Depok
         // -------------------------
-        $kotaDepok = WilayahKabupaten::create([
+        $kotaDepok = WilayahKabupaten::updateOrCreate(['kode' => '3276'], [
             'provinsi_id' => $jabar->id,
             'nama'        => 'Kota Depok',
             'kode'        => '3276',
         ]);
 
-        $kecBeji = WilayahKecamatan::create([
+        $kecBeji = WilayahKecamatan::updateOrCreate(['kode' => '3276010'], [
             'kabupaten_id' => $kotaDepok->id,
             'nama'         => 'Beji',
             'kode'         => '3276010',
@@ -159,10 +159,10 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Kemiri Muka',    'kode' => '3276010006'],
         ];
         foreach ($kelBeji as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecBeji->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecBeji->id]));
         }
 
-        $kecSukmajaya = WilayahKecamatan::create([
+        $kecSukmajaya = WilayahKecamatan::updateOrCreate(['kode' => '3276020'], [
             'kabupaten_id' => $kotaDepok->id,
             'nama'         => 'Sukmajaya',
             'kode'         => '3276020',
@@ -176,10 +176,10 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Cisalak',        'kode' => '3276020006'],
         ];
         foreach ($kelSukmajaya as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecSukmajaya->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecSukmajaya->id]));
         }
 
-        $kecDepokJaya = WilayahKecamatan::create([
+        $kecDepokJaya = WilayahKecamatan::updateOrCreate(['kode' => '3276030'], [
             'kabupaten_id' => $kotaDepok->id,
             'nama'         => 'Pancoran Mas',
             'kode'         => '3276030',
@@ -193,7 +193,7 @@ class WilayahSeeder extends Seeder
             ['nama' => 'Rangkapan Jaya Baru', 'kode' => '3276030006'],
         ];
         foreach ($kelDepokJaya as $kel) {
-            WilayahKelurahan::create(array_merge($kel, ['kecamatan_id' => $kecDepokJaya->id]));
+            WilayahKelurahan::updateOrCreate(['kode' => $kel['kode']], array_merge($kel, ['kecamatan_id' => $kecDepokJaya->id]));
         }
     }
 }

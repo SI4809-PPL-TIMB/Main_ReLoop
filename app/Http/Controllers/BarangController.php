@@ -87,7 +87,7 @@ class BarangController extends Controller
 
     private function kategori()
     {
-        return Category::where('type', Category::TYPE_BEKAS)->orderBy('id')->get();
+        return Category::forSelect(Category::TYPE_BEKAS);
     }
 
     private function data(ListingRequest $request): array

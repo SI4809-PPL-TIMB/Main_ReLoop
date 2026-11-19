@@ -35,7 +35,7 @@ class BerandaController extends Controller
             'poin'       => $profile?->total_points ?? 0,
             'level'      => $profile?->level ?? 1,
             'streak'     => $profile?->streak_count ?? 0,
-            'kategori'   => Category::where('type', Category::TYPE_BEKAS)->orderBy('id')->limit(7)->get(),
+            'kategori'   => Category::forSelect(Category::TYPE_BEKAS)->take(7),
             'barang'     => $barang->isNotEmpty() ? $barang : $this->contohBarang(),
             'pengepul'   => $this->contohPengepul(),
             'kondisi'    => self::KONDISI,

@@ -167,7 +167,6 @@
     <dialog id="filter" data-busy-target="#cari-main" class="m-0 mt-auto w-full max-w-[420px] rounded-t-3xl p-0 sm:mx-auto">
         <form method="GET" action="{{ route('cari') }}" class="p-5">
             @if ($keyword !== '')<input type="hidden" name="q" value="{{ $keyword }}">@endif
-            @if (! empty($kategori))<input type="hidden" name="kategori" value="{{ $kategori }}">@endif
             @if (! empty($provinsi))<input type="hidden" name="provinsi_id" value="{{ $provinsi }}">@endif
             @if (! empty($kabupaten))<input type="hidden" name="kabupaten_id" value="{{ $kabupaten }}">@endif
             @if (! empty($kecamatan))<input type="hidden" name="kecamatan_id" value="{{ $kecamatan }}">@endif
@@ -179,6 +178,14 @@
                 <h2 class="text-lg font-bold">Filter</h2>
                 <a href="{{ route('cari', array_filter(['q' => $keyword])) }}" class="text-sm font-semibold text-slate-400">Reset</a>
             </div>
+
+            <label for="filter-kategori" class="mt-4 block text-sm font-semibold">Kategori</label>
+            <select id="filter-kategori" name="kategori" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-medium">
+                <option value="">Semua kategori</option>
+                @foreach ($daftarKategori as $k)
+                    <option value="{{ $k->slug }}" @selected($kategoriTerpilih?->id === $k->id)>{{ $k->name }}</option>
+                @endforeach
+            </select>
 
             <p class="mt-4 text-sm font-semibold">Harga</p>
             <div class="mt-2 flex items-center gap-2 text-sm">

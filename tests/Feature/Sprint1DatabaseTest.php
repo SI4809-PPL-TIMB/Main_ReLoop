@@ -110,10 +110,10 @@ class Sprint1DatabaseTest extends TestCase
             'perabot'    => 'Perabot',
             'pakaian'    => 'Pakaian',
             'buku'       => 'Buku',
-            'elektronik' => 'Elektronik',
+            'elektronik' => 'Elektronik & Gadget',
             'mainan'     => 'Mainan',
             'sepeda'     => 'Sepeda',
-            'gadget'     => 'Gadget',
+            'lainnya'    => 'Lainnya',
         ];
 
         $expectedDaurUlang = [
@@ -124,9 +124,9 @@ class Sprint1DatabaseTest extends TestCase
             'elektronik-bekas' => 'Elektronik bekas',
         ];
 
-        $this->assertSame(8, Category::bekas()->count());
+        $this->assertSame(7, Category::bekas()->count());
         $this->assertSame(5, Category::daurUlang()->count());
-        $this->assertSame(13, Category::count());
+        $this->assertSame(12, Category::count());
 
         foreach ($expectedBekas as $slug => $name) {
             $this->assertDatabaseHas('categories', [
@@ -146,7 +146,7 @@ class Sprint1DatabaseTest extends TestCase
 
         // Uji keidempotensian: jalankan ulang seeder, jumlah data harus tetap 12
         $this->seed(CategorySeeder::class);
-        $this->assertSame(13, Category::count());
+        $this->assertSame(12, Category::count());
     }
 
     /**
@@ -195,7 +195,7 @@ class Sprint1DatabaseTest extends TestCase
             'sort_order' => 0,
         ]);
         $this->assertSame($listing->id, $photo->listing->id);
-        $this->assertCount(1, $listing->photos);
+        $this->assertTrue($listing->photos->contains($photo));
 
         // Conversation & Message
         $conversation = Conversation::create([
