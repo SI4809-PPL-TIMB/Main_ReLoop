@@ -97,15 +97,7 @@ class CategoryFilter extends Component
      */
     public function getCategoriesProperty(): Collection
     {
-        $query = Category::query()->orderBy('sort_order')->orderBy('name');
-
-        if ($this->activeType === Category::TYPE_BEKAS) {
-            $query->bekas();
-        } elseif ($this->activeType === Category::TYPE_DAUR_ULANG) {
-            $query->daurUlang();
-        }
-
-        return $query->get();
+        return Category::forSelect($this->activeType);
     }
 
     public function render(): View

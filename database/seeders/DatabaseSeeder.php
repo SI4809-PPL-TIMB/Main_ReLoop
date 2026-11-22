@@ -27,7 +27,10 @@ class DatabaseSeeder extends Seeder
         $this->seedDemoAccounts();
 
         // 3. Barang dummy milik akun penjual
-        $this->call(ListingSeeder::class);
+        $this->call([
+            ListingSeeder::class,
+            BarangDemoSeeder::class,
+        ]);
 
         // 4. Pesanan demo untuk testing alur kelola pesanan (7.2)
         $this->call(OrderSeeder::class);
@@ -42,14 +45,14 @@ class DatabaseSeeder extends Seeder
         // -----------------------------------------------
         // Akun Demo Pembeli
         // -----------------------------------------------
-        $buyer = User::create([
+        $buyer = User::firstOrCreate(['email' => 'pembeli@reloop.test'], [
             'name'     => 'Demo Pembeli',
             'email'    => 'pembeli@reloop.test',
             'phone'    => '081200000001',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        Profile::create([
+        Profile::firstOrCreate(['user_id' => $buyer->id], [
             'user_id'      => $buyer->id,
             'kelurahan_id' => $kelBeji?->id,
             'bio'          => 'Akun demo untuk role pembeli di ReLoop.',
@@ -63,14 +66,14 @@ class DatabaseSeeder extends Seeder
         // -----------------------------------------------
         // Akun Demo Penjual
         // -----------------------------------------------
-        $seller = User::create([
+        $seller = User::firstOrCreate(['email' => 'penjual@reloop.test'], [
             'name'     => 'Demo Penjual',
             'email'    => 'penjual@reloop.test',
             'phone'    => '081200000002',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        Profile::create([
+        Profile::firstOrCreate(['user_id' => $seller->id], [
             'user_id'      => $seller->id,
             'kelurahan_id' => $kelBogorTengah?->id,
             'bio'          => 'Akun demo untuk role penjual di ReLoop.',
@@ -89,7 +92,7 @@ class DatabaseSeeder extends Seeder
         $catBuku       = Category::where('slug', 'buku')->first();
 
         if ($catElektronik) {
-            Listing::create([
+            $laptop = Listing::firstOrCreate(['user_id' => $seller->id, 'title' => 'Laptop Bekas ASUS VivoBook 14 — Mulus'], [
                 'user_id'       => $seller->id,
                 'category_id'   => $catElektronik->id,
                 'kelurahan_id'  => $kelBogorTengah?->id,
@@ -102,10 +105,11 @@ class DatabaseSeeder extends Seeder
                 'status'        => 'aktif',
                 'published_at'  => now(),
             ]);
+            DemoListingPhotos::attach($laptop, 'laptop-asus');
         }
 
         if ($catBuku) {
-            Listing::create([
+            $books = Listing::firstOrCreate(['user_id' => $seller->id, 'title' => 'Paket Buku Pemrograman Laravel & Vue.js'], [
                 'user_id'       => $seller->id,
                 'category_id'   => $catBuku->id,
                 'kelurahan_id'  => $kelBogorTengah?->id,
@@ -118,6 +122,7 @@ class DatabaseSeeder extends Seeder
                 'status'        => 'aktif',
                 'published_at'  => now(),
             ]);
+            DemoListingPhotos::attach($books, 'buku-pelajaran');
         }
 
         $this->command->info('✅ Akun demo berhasil dibuat:');
