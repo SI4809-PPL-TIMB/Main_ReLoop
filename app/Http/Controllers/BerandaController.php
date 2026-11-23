@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Listing;
+use App\Models\MitraPengepul;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class BerandaController extends Controller
@@ -37,7 +39,8 @@ class BerandaController extends Controller
             'streak'     => $profile?->streak_count ?? 0,
             'kategori'   => Category::forSelect(Category::TYPE_BEKAS)->take(7),
             'barang'     => $barang->isNotEmpty() ? $barang : $this->contohBarang(),
-            'pengepul'   => $this->contohPengepul(),
+            'pengepul'   => $this->pengepulTerdekat($profile),
+            'kecamatan'  => $profile?->kelurahan?->kecamatan?->nama,
             'kondisi'    => self::KONDISI,
         ]);
     }
@@ -52,12 +55,39 @@ class BerandaController extends Controller
         ]);
     }
 
-    // shortcut: belum ada model pengepul; data contoh dari mockup.
-    private function contohPengepul(): array
+    /**
+     * Mitra terverifikasi yang melayani kecamatan pengguna (tanpa lokasi: semua mitra terverifikasi).
+     * Lapak di kecamatan yang sama tampil lebih dulu. Mitra belum punya koordinat, jadi jarak diganti
+     * nama daerah lapak. Pencarian lengkap + "Lihat semua" dikerjakan di 8.3.
+     */
+    private function pengepulTerdekat(?\App\Models\Profile $profile): \Illuminate\Support\Collection
     {
-        return [
-            ['nama' => 'Bank Sampah Hijau Lestari', 'harga' => 3500, 'gambar' => 'hijau-lestari', 'jarak' => '0,8 km'],
-            ['nama' => 'CV Daur Jaya', 'harga' => 3800, 'gambar' => 'daur-jaya', 'jarak' => '1,6 km'],
-        ];
+        $kecamatan = $profile?->kelurahan?->kecamatan_id;
+
+        return MitraPengepul::terverifikasi()
+            ->with(['kelurahan.kecamatan', 'harga' => fn ($q) => $q->join('categories', 'categories.id', '=', 'mitra_harga.category_id')
+                ->orderBy('categories.sort_order')->select('mitra_harga.*', 'categories.name as jenis')])
+            ->when($kecamatan, fn ($q) => $q->whereHas('area', fn ($a) => $a->whereKey($kecamatan)))
+            ->get()
+            ->sortBy(fn ($m) => [$m->kelurahan?->kecamatan_id === $kecamatan ? 0 : 1, $m->nama_usaha])
+            ->take(5)
+            ->map(fn (MitraPengepul $m) => [
+                'nama'   => $m->nama_usaha,
+                'harga'  => $m->harga->first()?->harga_per_kg,
+                'jenis'  => $m->harga->first()?->jenis,
+                'gambar' => $this->gambarPengepul($m->nama_usaha),
+                'lokasi' => $m->kelurahan ? $m->kelurahan->nama.', '.$m->kelurahan->kecamatan->nama : null,
+                'layanan' => $m->layananLabel(),
+            ])->values();
+    }
+
+    /** Ilustrasi dari public/assets/illust/collectors yang cocok dengan nama usaha, mis. "hijau-lestari". */
+    private function gambarPengepul(string $nama): ?string
+    {
+        $slug = Str::slug($nama);
+
+        return collect(glob(public_path('assets/illust/collectors/*.png')) ?: [])
+            ->map(fn ($f) => pathinfo($f, PATHINFO_FILENAME))
+            ->first(fn ($g) => str_contains($slug, $g));
     }
 }

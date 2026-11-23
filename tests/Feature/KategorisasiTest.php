@@ -69,7 +69,7 @@ class KategorisasiTest extends TestCase
         $this->getJson('/pasang-barang?tipe=daur_ulang')->assertOk()
             ->assertJsonPath('tipe', 'bekas')
             ->assertJsonPath('status', 'menunggu_form_4_2')
-            ->assertJsonCount(8, 'kategori')
+            ->assertJsonCount(7, 'kategori') // Gadget digabung ke Elektronik (PPLTIMB-136)
             ->assertJsonPath('kategori.0.name', 'Perabot diperbarui');
         $this->getJson('/pengepul/sementara?tipe=bekas')->assertOk()
             ->assertJsonPath('tipe', 'daur_ulang')
