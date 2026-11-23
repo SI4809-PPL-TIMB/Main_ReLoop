@@ -51,7 +51,7 @@ class KategorisasiSecurityTest extends TestCase
             'title' => 'Barang tidak boleh dibuat pada langkah ini',
         ])->assertRedirect(route('barang.create', ['tipe' => 'bekas']));
         $this->assertDatabaseCount('listings', 0);
-        $this->assertDatabaseCount('categories', 13);
+        $this->assertDatabaseCount('categories', 12); // 7 bekas + 5 daur ulang (Gadget digabung, PPLTIMB-136)
     }
 
     public function test_query_tidak_valid_diabaikan_dan_tipe_valid_dipulihkan(): void

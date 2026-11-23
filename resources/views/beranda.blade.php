@@ -132,16 +132,20 @@
                 <h2 class="text-lg font-bold">Pengepul terdekat</h2>
                 <a href="#" class="shrink-0 text-sm font-semibold text-loop-dark">Lihat semua</a>
             </div>
-            <p class="text-sm text-slate-500">Terverifikasi{{ $lokasi ? ', melayani '.$lokasi : '' }}</p>
+            <p class="text-sm text-slate-500">Terverifikasi{{ $kecamatan ? ', melayani Kec. '.$kecamatan : '' }}</p>
             <ul class="mt-3 space-y-3">
-                @foreach ($pengepul as $p)
+                @forelse ($pengepul as $p)
                     <li class="rounded-2xl border border-slate-200">
                         <a href="#" class="flex gap-3 p-4">
-                            <img src="{{ asset('assets/illust/collectors/'.$p['gambar'].'.png') }}" class="size-12 shrink-0 rounded-lg object-contain" width="48" height="48" alt="">
+                            @if ($p['gambar'])
+                                <img src="{{ asset('assets/illust/collectors/'.$p['gambar'].'.png') }}" class="size-12 shrink-0 rounded-lg object-contain" width="48" height="48" alt="">
+                            @else
+                                <span class="grid size-12 shrink-0 place-items-center rounded-lg bg-loop-soft text-loop-dark" aria-hidden="true"><x-category-icon name="recycle" class="size-6" /></span>
+                            @endif
                             <div class="min-w-0 flex-1 space-y-1">
                                 <p class="truncate font-semibold">{{ $p['nama'] }}</p>
                                 <p class="flex items-center gap-1.5 text-xs text-slate-600"><svg class="size-3 shrink-0 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>Terverifikasi</p>
-                                <p class="flex items-center gap-1.5 text-xs text-slate-500"><svg class="size-3 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>{{ $p['jarak'] }}</p>
+                                <p class="flex items-center gap-1.5 text-xs text-slate-500"><svg class="size-3 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg><span class="truncate">{{ $p['lokasi'] ? 'Lapak di '.$p['lokasi'] : 'Lokasi lapak belum diatur' }}</span><span aria-hidden="true">·</span><span class="shrink-0">{{ $p['layanan'] }}</span></p>
                             </div>
                         </a>
                         <div class="relative border-t border-dashed border-slate-300" aria-hidden="true">
@@ -149,11 +153,16 @@
                             <span class="absolute -top-2 right-[-1px] h-4 w-[9px] overflow-hidden"><span class="absolute -right-2 top-0 size-4 rounded-full border border-slate-200 bg-white"></span></span>
                         </div>
                         <div class="flex items-center justify-between p-4">
-                            <p class="font-semibold">{{ $rupiah($p['harga']) }}<span class="text-xs font-normal text-slate-500">/kg</span></p>
+                            <p class="font-semibold">@if ($p['harga']){{ $rupiah($p['harga']) }}<span class="text-xs font-normal text-slate-500">/kg {{ mb_strtolower($p['jenis']) }}</span>@else<span class="text-sm font-normal text-slate-500">Harga belum diatur</span>@endif</p>
                             <a href="#" class="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">Setor</a>
                         </div>
                     </li>
-                @endforeach
+                @empty
+                    <li class="rounded-2xl border border-dashed border-slate-300 px-6 py-8 text-center">
+                        <p class="font-semibold">Belum ada pengepul di daerahmu</p>
+                        <p class="mt-1 text-sm text-slate-500">Pengepul terverifikasi yang melayani daerahmu akan muncul di sini.</p>
+                    </li>
+                @endforelse
             </ul>
         </section>
     </main>

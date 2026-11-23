@@ -1,3 +1,42 @@
+# ReLoop
+
+## Data demo
+
+Isi database dengan data demo (wilayah, kategori, akun, barang, pesanan, pengepul):
+
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+Seeder idempoten: aman dijalankan berulang, tidak membuat data dobel, dan tidak menimpa perubahan yang dibuat saat demo.
+
+### Reset data demo
+
+Kembalikan **semua** data ke kondisi awal (database dikosongkan, diisi ulang, dan file unggahan foto barang/avatar dihapus):
+
+```bash
+php artisan demo:reset            # lokal, akan minta konfirmasi
+php artisan demo:reset --force    # Laravel Cloud / server: jalankan dari menu Commands, tanpa konfirmasi
+```
+
+> Perintah ini menghapus semua data, termasuk akun dan barang yang dibuat manual. Jangan dijalankan di database yang berisi data asli.
+
+### Akun demo
+
+Kata sandi semua akun: `password`.
+
+| Peran | Email |
+|---|---|
+| Pembeli | `pembeli@reloop.test` |
+| Penjual | `penjual@reloop.test` |
+| Admin | `admin@reloop.test` |
+| Pengepul (menunggu verifikasi) | `pengepul@reloop.test` |
+
+Daftar lengkap pengepul contoh (harga, area layanan, jam operasional, status): [docs/DataDemoPengepul.md](docs/DataDemoPengepul.md).
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
