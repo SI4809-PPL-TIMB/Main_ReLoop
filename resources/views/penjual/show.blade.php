@@ -49,11 +49,16 @@
             {{-- 3 Kolom Statistik --}}
             <section class="mt-5 grid grid-cols-3 divide-x divide-slate-100 rounded-2xl border border-slate-200 py-3 text-center">
                 <div>
-                    <p class="font-bold">★ {{ $profil?->avg_rating > 0 ? number_format($profil->avg_rating, 1, ',') : '4,8' }}</p>
-                    <p class="text-[11px] text-slate-500">dari 126 ulasan</p>
+                    @if (($totalUlasan ?? 0) > 0)
+                        <p class="font-bold">★ {{ number_format($profil?->avg_rating, 1, ',') }}</p>
+                        <p class="text-[11px] text-slate-500">dari {{ $totalUlasan }} ulasan</p>
+                    @else
+                        <p class="font-bold text-slate-400">-</p>
+                        <p class="text-[11px] text-slate-500">Belum ada ulasan</p>
+                    @endif
                 </div>
                 <div>
-                    <p class="font-bold">{{ $profil?->total_sold ?? 23 }}</p>
+                    <p class="font-bold">{{ $profil?->total_sold ?? 0 }}</p>
                     <p class="text-[11px] text-slate-500">Transaksi selesai</p>
                 </div>
                 <div>
@@ -68,7 +73,7 @@
                     Barang ({{ $barang->count() }})
                 </button>
                 <button type="button" id="tab-btn-ulasan" role="tab" aria-selected="false" class="py-3 text-slate-500">
-                    Ulasan (126)
+                    Ulasan ({{ $totalUlasan ?? 0 }})
                 </button>
             </div>
 
@@ -115,44 +120,58 @@
             {{-- Konten Tab Ulasan --}}
             <div id="tab-panel-ulasan" class="hidden mt-5">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-base font-bold">Ulasan terbaru</h2>
-                    <p class="text-sm font-semibold text-slate-500">★ 4,8 · 126</p>
+                    <h2 class="text-base font-bold">Ulasan pembeli</h2>
+                    @if (($totalUlasan ?? 0) > 0)
+                        <p class="text-sm font-semibold text-slate-500">★ {{ number_format($profil?->avg_rating, 1, ',') }} · {{ $totalUlasan }} ulasan</p>
+                    @endif
                 </div>
-                <ul class="mt-3 space-y-3">
-                    <li class="rounded-2xl border border-slate-200 p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="grid size-9 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-bold">D</div>
-                            <div class="min-w-0 flex-1">
-                                <p class="text-sm font-semibold">Dika</p>
-                                <p class="text-xs text-slate-500">18 Okt 2026 · Buku Pemrograman</p>
-                            </div>
-                            <p class="text-sm text-orange-400" aria-label="5 dari 5">★★★★★</p>
-                        </div>
-                        <p class="mt-2 text-sm text-slate-600">Barang sesuai foto, penjual ramah dan tepat waktu saat COD.</p>
-                    </li>
-                    <li class="rounded-2xl border border-slate-200 p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="grid size-9 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-bold">A</div>
-                            <div class="min-w-0 flex-1">
-                                <p class="text-sm font-semibold">Ayu Lestari</p>
-                                <p class="text-xs text-slate-500">12 Okt 2026 · Laptop ASUS</p>
-                            </div>
-                            <p class="text-sm text-orange-400" aria-label="4 dari 5">★★★★<span class="text-slate-200">★</span></p>
-                        </div>
-                        <p class="mt-2 text-sm text-slate-600">Masih berfungsi baik. Ada lecet kecil, tapi sudah diinfokan sebelumnya.</p>
-                    </li>
-                    <li class="rounded-2xl border border-slate-200 p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="grid size-9 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-bold">B</div>
-                            <div class="min-w-0 flex-1">
-                                <p class="text-sm font-semibold">Bagus</p>
-                                <p class="text-xs text-slate-500">3 Okt 2026 · Aksesoris</p>
-                            </div>
-                            <p class="text-sm text-orange-400" aria-label="5 dari 5">★★★★★</p>
-                        </div>
-                        <p class="mt-2 text-sm text-slate-600">Fast respon, nego enak dan amanah.</p>
-                    </li>
-                </ul>
+
+                @if (($ulasan ?? collect())->isEmpty())
+                    <div class="py-12 text-center text-slate-500">
+                        <p class="font-semibold text-slate-700">Belum ada ulasan</p>
+                        <p class="mt-1 text-xs">Penjual ini belum memiliki ulasan dari pembeli.</p>
+                    </div>
+                @else
+                    <ul class="mt-3 space-y-3">
+                        @foreach ($ulasan as $u)
+                            @php
+                                $reviewer = $u->reviewer;
+                            @endphp
+                            <li class="rounded-2xl border border-slate-200 p-4">
+                                <div class="flex items-center gap-3">
+                                    @if ($reviewer?->avatarUrl())
+                                        <img src="{{ $reviewer->avatarUrl() }}" alt="" class="size-9 shrink-0 rounded-full object-cover">
+                                    @else
+                                        <div class="grid size-9 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-bold text-slate-700">
+                                            {{ $reviewer?->initials() ?? 'U' }}
+                                        </div>
+                                    @endif
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-sm font-semibold">{{ $reviewer?->name ?? 'Pembeli' }}</p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ $u->created_at->locale('id')->translatedFormat('d M Y') }}
+                                            @if ($u->listing)
+                                                · {{ $u->listing->title }}
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <p class="text-sm text-amber-400" aria-label="{{ $u->rating }} dari 5">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= $u->rating)
+                                                ★
+                                            @else
+                                                <span class="text-slate-200">★</span>
+                                            @endif
+                                        @endfor
+                                    </p>
+                                </div>
+                                @if ($u->body)
+                                    <p class="mt-2 text-sm text-slate-600">{{ $u->body }}</p>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
             </div>
 
             <button type="button" data-soon class="mt-8 flex w-full items-center justify-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600">

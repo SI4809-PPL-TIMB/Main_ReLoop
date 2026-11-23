@@ -44,7 +44,15 @@ class PenjualController extends Controller
             ->latest()
             ->get();
 
-        return view('penjual.show', compact('user', 'profil', 'daerah', 'jarak', 'barang'));
+        // Ambil ulasan yang diterima penjual
+        $ulasan = $user->receivedReviews()
+            ->with(['reviewer.profile', 'listing'])
+            ->latest()
+            ->get();
+
+        $totalUlasan = $ulasan->count();
+
+        return view('penjual.show', compact('user', 'profil', 'daerah', 'jarak', 'barang', 'ulasan', 'totalUlasan'));
     }
 }
 
