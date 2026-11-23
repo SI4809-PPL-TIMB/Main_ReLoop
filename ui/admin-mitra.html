@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ReLoop · Kelola Mitra Pengepul</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<!--
+  8.1.1 · Panel admin mitra pengepul (PPLTIMB-147).
+  ?layar=daftar (bawaan) | detail | tambah
+  ?status=menunggu|terverifikasi|ditolak  → status mitra di layar detail
+-->
+<div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white">
+
+  <!-- ============ DAFTAR ============ -->
+  <section data-layar="daftar">
+    <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-4">
+      <a href="#" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></a>
+      <h1 class="flex-1 truncate text-xl font-bold">Mitra Pengepul</h1>
+      <a href="?layar=tambah" class="flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Tambah</a>
+    </header>
+    <main class="space-y-4 px-4 pb-10 pt-4">
+      <label class="flex items-center gap-2 rounded-full border border-slate-200 px-4">
+        <svg class="size-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" placeholder="Cari nama usaha, pemilik, atau email" class="w-full bg-transparent py-3 text-sm outline-none">
+      </label>
+      <nav class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+        <a class="shrink-0 rounded-full border border-ink bg-ink px-4 py-2 text-sm font-semibold text-white">Semua <span class="ml-1 text-white/70">4</span></a>
+        <a class="shrink-0 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Menunggu <span class="ml-1 text-slate-400">2</span></a>
+        <a class="shrink-0 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Terverifikasi <span class="ml-1 text-slate-400">1</span></a>
+        <a class="shrink-0 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Ditolak <span class="ml-1 text-slate-400">1</span></a>
+      </nav>
+      <!-- Menunggu verifikasi diurutkan paling atas -->
+      <a href="?layar=detail&status=menunggu" class="flex items-center gap-3 rounded-2xl border border-slate-200 p-4">
+        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-loop-soft text-loop-dark">♻</span>
+        <span class="min-w-0 flex-1"><span class="block truncate font-semibold">Bank Sampah Melati</span><span class="block truncate text-xs text-slate-500">Siti Aminah · Beji, Beji</span></span>
+        <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-800 ring-1 ring-inset ring-amber-200">Menunggu verifikasi</span>
+      </a>
+      <a href="?layar=detail&status=menunggu" class="flex items-center gap-3 rounded-2xl border border-slate-200 p-4">
+        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-loop-soft text-loop-dark">♻</span>
+        <span class="min-w-0 flex-1"><span class="block truncate font-semibold">Pengepul Jaya Abadi</span><span class="block truncate text-xs text-slate-500">Budi Santoso · Cibinong, Cibinong</span></span>
+        <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-800 ring-1 ring-inset ring-amber-200">Menunggu verifikasi</span>
+      </a>
+      <a href="?layar=detail&status=terverifikasi" class="flex items-center gap-3 rounded-2xl border border-slate-200 p-4">
+        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-loop-soft text-loop-dark">♻</span>
+        <span class="min-w-0 flex-1"><span class="block truncate font-semibold">Hijau Lestari</span><span class="block truncate text-xs text-slate-500">Andi Wijaya · Paledang, Bogor Tengah</span></span>
+        <span class="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-800 ring-1 ring-inset ring-brand-200">Terverifikasi</span>
+      </a>
+      <a href="?layar=detail&status=ditolak" class="flex items-center gap-3 rounded-2xl border border-slate-200 p-4">
+        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-loop-soft text-loop-dark">♻</span>
+        <span class="min-w-0 flex-1"><span class="block truncate font-semibold">Daur Jaya</span><span class="block truncate text-xs text-slate-500">Rudi Hartono · Pancoran Mas</span></span>
+        <span class="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 ring-1 ring-inset ring-red-200">Ditolak</span>
+      </a>
+    </main>
+  </section>
+
+  <!-- ============ DETAIL ============ -->
+  <section data-layar="detail" hidden>
+    <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-4">
+      <a href="?layar=daftar" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></a>
+      <h1 class="flex-1 text-xl font-bold">Detail Mitra</h1>
+      <a href="?layar=tambah" class="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold">Ubah</a>
+    </header>
+    <main class="space-y-5 px-4 pb-10 pt-4">
+      <section class="rounded-2xl border border-slate-200 p-4">
+        <div class="flex items-start gap-3">
+          <span class="grid size-12 shrink-0 place-items-center rounded-full bg-loop-soft text-xl text-loop-dark">♻</span>
+          <div class="min-w-0 flex-1"><h2 class="text-lg font-bold leading-tight">Bank Sampah Melati</h2><p class="text-sm text-slate-500">Siti Aminah</p></div>
+          <span data-badge class="rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset"></span>
+        </div>
+        <dl class="mt-4 space-y-2.5 text-sm">
+          <div class="flex gap-3"><dt class="w-20 shrink-0 text-slate-500">Email</dt><dd>siti@melati.id</dd></div>
+          <div class="flex gap-3"><dt class="w-20 shrink-0 text-slate-500">Nomor HP</dt><dd>081234567890</dd></div>
+          <div class="flex gap-3"><dt class="w-20 shrink-0 text-slate-500">Alamat</dt><dd>Jl. Melati No. 12<span class="block text-slate-500">Beji, Beji, Kota Depok, Jawa Barat</span></dd></div>
+        </dl>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="px-1 text-xs font-medium text-slate-500">Verifikasi</h2>
+        <p data-status="menunggu" class="rounded-2xl bg-amber-50 p-4 text-sm text-amber-800">Belum diverifikasi. Periksa data usaha sebelum memverifikasi. Mitra belum muncul di pencarian.</p>
+        <p data-status="terverifikasi" class="rounded-2xl bg-brand-50 p-4 text-sm text-brand-800">Terverifikasi 23 Nov 2026, 10.15 oleh Demo Admin. Mitra ini tampil di pencarian pengepul.</p>
+        <div data-status="ditolak" class="rounded-2xl bg-red-50 p-4 text-sm text-red-700"><p class="font-semibold">Ditolak 23 Nov 2026</p><p class="mt-1">Alamat lapak tidak bisa dihubungi.</p></div>
+        <div class="grid grid-cols-2 gap-2">
+          <a data-bukan="terverifikasi" href="?layar=detail&status=terverifikasi" class="rounded-full bg-ink py-3 text-center text-sm font-semibold text-white">Verifikasi</a>
+          <button data-bukan="ditolak" type="button" data-open="tolak" class="rounded-full border border-red-200 py-3 text-sm font-semibold text-red-600">Tolak</button>
+          <a data-bukan="menunggu" href="?layar=detail&status=menunggu" class="rounded-full border border-slate-300 py-3 text-center text-sm font-semibold">Kembalikan ke menunggu</a>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="px-1 text-xs font-medium text-slate-500">Pengaturan layanan <span class="font-normal">· diisi pengepul</span></h2>
+        <div class="divide-y divide-slate-100 rounded-2xl border border-slate-200 text-sm">
+          <div class="p-4"><p class="text-slate-500">Layanan</p><p class="mt-1 font-semibold">Jemput · Antar Sendiri</p></div>
+          <div class="p-4"><p class="text-slate-500">Area layanan</p>
+            <div class="mt-2 flex flex-wrap gap-1.5"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium">Beji</span><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium">Pancoran Mas</span></div>
+          </div>
+          <div class="p-4"><p class="text-slate-500">Harga per kg</p>
+            <div class="mt-2 flex justify-between"><span>Plastik</span><span class="font-semibold">Rp 3.500/kg</span></div>
+            <div class="mt-2 flex justify-between"><span>Kertas</span><span class="font-semibold">Rp 2.000/kg</span></div>
+            <div class="mt-2 flex justify-between"><span>Logam</span><span class="font-semibold">Rp 8.000/kg</span></div>
+          </div>
+          <div class="p-4"><p class="text-slate-500">Jam operasional</p>
+            <div class="mt-2 flex justify-between"><span>Senin – Jumat</span><span class="font-semibold">08.00–16.00</span></div>
+            <div class="mt-2 flex justify-between"><span>Sabtu</span><span class="font-semibold">09.00–12.00</span></div>
+            <div class="mt-2 flex justify-between"><span>Minggu</span><span class="text-slate-400">Libur</span></div>
+          </div>
+        </div>
+      </section>
+      <button type="button" data-open="hapus" class="w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-left text-sm font-semibold text-red-500">Hapus mitra</button>
+    </main>
+  </section>
+
+  <!-- ============ TAMBAH / UBAH ============ -->
+  <section data-layar="tambah" hidden>
+    <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-4">
+      <a href="?layar=daftar" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></a>
+      <h1 class="flex-1 text-xl font-bold">Tambah Mitra</h1>
+    </header>
+    <form class="space-y-6 px-4 pb-32 pt-4" onsubmit="event.preventDefault(); location.href='?layar=detail&status=menunggu'">
+      <section class="space-y-4">
+        <div><h2 class="text-lg font-bold">Data usaha</h2><p class="mt-0.5 text-sm text-slate-500">Tampil ke pengguna saat mencari pengepul.</p></div>
+        <label class="block"><span class="text-sm font-semibold">Nama usaha *</span><input placeholder="mis. Bank Sampah Hijau Lestari" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+        <label class="block"><span class="text-sm font-semibold">Nomor HP usaha *</span><input type="tel" placeholder="081234567890" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+        <label class="block"><span class="text-sm font-semibold">Kelurahan lapak *</span>
+          <select class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"><option>Pilih kelurahan</option><optgroup label="Beji, Kota Depok"><option>Beji</option><option>Kemiri Muka</option></optgroup></select>
+        </label>
+        <label class="block"><span class="text-sm font-semibold">Alamat lapak *</span><textarea rows="2" placeholder="Nama jalan, nomor, patokan" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></textarea><span class="mt-1 block text-xs text-slate-500">Pengguna yang memilih Antar Sendiri datang ke alamat ini.</span></label>
+      </section>
+      <section class="space-y-4 border-t border-slate-100 pt-6">
+        <div><h2 class="text-lg font-bold">Akun pengepul</h2><p class="mt-0.5 text-sm text-slate-500">Dipakai pengepul untuk masuk dan mengatur harga, area, serta jam operasional.</p></div>
+        <label class="block"><span class="text-sm font-semibold">Nama pemilik *</span><input class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+        <label class="block"><span class="text-sm font-semibold">Email *</span><input type="email" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></label>
+        <label class="block"><span class="text-sm font-semibold">Kata sandi awal *</span><input type="password" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"><span class="mt-1 block text-xs text-slate-500">Minimal 8 karakter. Sampaikan ke pengepul dan minta diganti setelah masuk.</span></label>
+        <p class="rounded-xl bg-slate-50 p-3 text-xs text-slate-500">Mitra baru berstatus <strong>Menunggu verifikasi</strong> dan belum muncul di pencarian sampai kamu memverifikasinya.</p>
+      </section>
+      <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+        <button class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Tambah mitra</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<dialog id="tolak" class="m-auto w-[min(92vw,360px)] rounded-3xl p-0">
+  <form method="dialog" class="p-6" onsubmit="location.href='?layar=detail&status=ditolak'">
+    <h2 class="text-lg font-bold">Tolak mitra ini?</h2>
+    <p class="mt-1 text-sm text-slate-500">Alasan akan dilihat pengepul di halaman pengaturannya.</p>
+    <label class="mt-4 block"><span class="text-sm font-semibold">Alasan penolakan *</span><textarea required rows="3" placeholder="mis. Alamat lapak tidak bisa dihubungi" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm"></textarea></label>
+    <div class="mt-5 grid gap-2">
+      <button class="rounded-full bg-red-500 py-3 font-semibold text-white">Tolak mitra</button>
+      <button type="button" data-close class="rounded-full border border-slate-300 py-3 font-semibold">Batal</button>
+    </div>
+  </form>
+</dialog>
+<dialog id="hapus" class="m-auto w-[min(92vw,360px)] rounded-3xl p-0">
+  <div class="p-6 text-center">
+    <h2 class="text-lg font-bold">Hapus Bank Sampah Melati?</h2>
+    <p class="mt-1 text-sm text-slate-500">Data mitra, harga, area, dan jam operasional dihapus. Akun siti@melati.id tetap ada sebagai pengguna biasa.</p>
+    <div class="mt-5 grid gap-2">
+      <a href="?layar=daftar" class="rounded-full bg-red-500 py-3 font-semibold text-white">Ya, hapus</a>
+      <button type="button" data-close class="rounded-full border border-slate-300 py-3 font-semibold">Batal</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  const layar = q.get('layar') || 'daftar';
+  const status = q.get('status') || 'menunggu';
+  document.querySelectorAll('[data-layar]').forEach((el) => { el.hidden = el.dataset.layar !== layar; });
+  document.querySelectorAll('[data-status]').forEach((el) => { el.hidden = el.dataset.status !== status; });
+  document.querySelectorAll('[data-bukan]').forEach((el) => { el.hidden = el.dataset.bukan === status; });
+  const badge = document.querySelector('[data-badge]');
+  const gaya = {
+    menunggu: ['Menunggu verifikasi', 'bg-amber-50 text-amber-800 ring-amber-200'],
+    terverifikasi: ['Terverifikasi', 'bg-brand-50 text-brand-800 ring-brand-200'],
+    ditolak: ['Ditolak', 'bg-red-50 text-red-700 ring-red-200'],
+  }[status];
+  badge.textContent = gaya[0];
+  badge.classList.add(...gaya[1].split(' '));
+  document.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => document.getElementById(b.dataset.open).showModal()));
+  document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-close]')) d.close(); }));
+</script>
+</body>
+</html>

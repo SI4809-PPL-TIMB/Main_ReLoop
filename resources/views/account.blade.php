@@ -10,7 +10,9 @@
         ],
         'Daur ulang' => [
             ['Riwayat setoran', '#', '<path d="M3 11a9 9 0 1 1 2.6 7.4M3 4v7h7"/><path d="M12 7v5l3 2"/>'],
-            ['Jadi pengepul mitra', '#', '<path d="M3 9 5 4h14l2 5M3 9h18v11H3zM9 20v-6h6v6"/>'],
+            $user->isPengepul()
+                ? ['Pengaturan mitra', route('mitra.pengaturan'), '<path d="M3 9 5 4h14l2 5M3 9h18v11H3zM9 20v-6h6v6"/>']
+                : ['Jadi pengepul mitra', '#', '<path d="M3 9 5 4h14l2 5M3 9h18v11H3zM9 20v-6h6v6"/>'],
         ],
         'Akun' => [
             ['Lokasi & alamat', route('lokasi', ['from' => 'profil']), '<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>'],
@@ -19,6 +21,13 @@
             ['Syarat & privasi', '#', '<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>'],
         ],
     ];
+
+    // 8.1 · Menu khusus admin
+    if ($user->isAdmin()) {
+        $grup = ['Admin' => [
+            ['Kelola mitra pengepul', route('admin.mitra.index'), '<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z"/><path d="M9 12h6M12 9v6"/>'],
+        ]] + $grup;
+    }
 @endphp
 
 @component('layouts.app', ['title' => 'ReLoop · Akun', 'nav' => 'user'])

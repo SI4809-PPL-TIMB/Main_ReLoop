@@ -24,12 +24,13 @@ class DatabaseSeederIdempotencyTest extends TestCase
             'wilayah_kecamatan' => 9,
             'wilayah_kelurahan' => 44,
             'categories' => 12,
-            'users' => 2,
+            'users' => 4, // pembeli, penjual, admin, pengepul (8.1)
             'profiles' => 2,
             'listings' => 64,
             'listing_photos' => 64,
             'orders' => 2,
             'payments' => 2,
+            'mitra_pengepul' => 1,
         ];
 
         $ids = [];
@@ -74,7 +75,7 @@ class DatabaseSeederIdempotencyTest extends TestCase
         $this->assertSame($passwordHash, $buyer->fresh()->password);
         $this->assertSame('Profil sudah disesuaikan', $buyer->profile->fresh()->bio);
         $this->assertDatabaseHas('users', ['id' => $other->id, 'email' => $other->email]);
-        $this->assertDatabaseCount('users', 3);
+        $this->assertDatabaseCount('users', 5);
         $this->assertSame(Order::STATUS_SELESAI, $order->fresh()->status);
         $this->assertSame(Listing::TERJUAL, $order->listing->fresh()->status);
         foreach ($soldListings as $listing) {

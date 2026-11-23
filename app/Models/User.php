@@ -15,6 +15,21 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    // 8.1.2 · Peran akun. Sengaja tidak ada di $fillable agar tidak bisa diisi dari form pendaftaran/profil.
+    public const PENGGUNA = 'pengguna';
+    public const PENGEPUL = 'pengepul';
+    public const ADMIN = 'admin';
+
+    public const PERAN = [
+        self::PENGGUNA => 'Pengguna',
+        self::PENGEPUL => 'Pengepul',
+        self::ADMIN    => 'Admin',
+    ];
+
+    protected $attributes = [
+        'role' => self::PENGGUNA,
+    ];
+
     protected $fillable = [
         'name',
         'email',
@@ -40,6 +55,38 @@ class User extends Authenticatable
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);
+    }
+
+    public function mitra(): HasOne
+    {
+        return $this->hasOne(MitraPengepul::class);
+    }
+
+    // --- Peran ---
+
+    public function hasRole(string ...$peran): bool
+    {
+        return in_array($this->role, $peran, true);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole(self::ADMIN);
+    }
+
+    public function isPengepul(): bool
+    {
+        return $this->hasRole(self::PENGEPUL);
+    }
+
+    /** Halaman awal setelah login sesuai peran. */
+    public function beranda(): string
+    {
+        return match ($this->role) {
+            self::ADMIN    => route('admin.mitra.index'),
+            self::PENGEPUL => route('mitra.pengaturan'),
+            default        => route('account'),
+        };
     }
 
     // --- Helper Profil & Avatar ---

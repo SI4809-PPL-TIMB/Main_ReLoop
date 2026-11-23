@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MitraController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\CariController;
 use App\Http\Controllers\KategorisasiController;
 use App\Http\Controllers\LokasiController;
+use App\Http\Controllers\MitraPengaturanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfilController;
@@ -78,6 +80,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/wilayah/cari', [LokasiController::class, 'cari'])->name('wilayah.cari');
     Route::get('/wilayah/{level}', [LokasiController::class, 'anak'])->name('wilayah.anak');
     Route::post('/keluar', [AuthController::class, 'destroy'])->name('logout');
+});
+
+// 8.1 · Data pengepul mitra (PPLTIMB-147). Halaman dibatasi sesuai peran akun.
+Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/mitra', [MitraController::class, 'index'])->name('mitra.index');
+    Route::get('/mitra/tambah', [MitraController::class, 'create'])->name('mitra.create');
+    Route::post('/mitra', [MitraController::class, 'store'])->name('mitra.store');
+    Route::get('/mitra/{mitra}', [MitraController::class, 'show'])->name('mitra.show');
+    Route::get('/mitra/{mitra}/ubah', [MitraController::class, 'edit'])->name('mitra.edit');
+    Route::put('/mitra/{mitra}', [MitraController::class, 'update'])->name('mitra.update');
+    Route::post('/mitra/{mitra}/verifikasi', [MitraController::class, 'verifikasi'])->name('mitra.verifikasi');
+    Route::delete('/mitra/{mitra}', [MitraController::class, 'destroy'])->name('mitra.destroy');
+});
+
+Route::middleware(['auth', 'peran:pengepul'])->prefix('mitra')->name('mitra.')->group(function () {
+    Route::get('/pengaturan', [MitraPengaturanController::class, 'edit'])->name('pengaturan');
+    Route::put('/pengaturan', [MitraPengaturanController::class, 'update'])->name('pengaturan.update');
 });
 
 Route::get('/', function () {
