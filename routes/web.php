@@ -74,6 +74,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/pesanan/{orderNumber}/terima', [OrderController::class, 'markDiterima'])->name('order.terima');
     Route::post('/pesanan/{orderNumber}/batal', [OrderController::class, 'cancel'])->name('order.batal');
 
+    // 10.1 · Rating dan ulasan penjual setelah pesanan selesai (PPLTIMB-148)
+    Route::get('/pesanan/{orderNumber}/ulasan', [\App\Http\Controllers\ReviewController::class, 'create'])->name('ulasan.create');
+    Route::post('/pesanan/{orderNumber}/ulasan', [\App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
+
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');
