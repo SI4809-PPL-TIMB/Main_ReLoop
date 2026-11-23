@@ -63,3 +63,25 @@ Sesuai kriteria penerimaan PPLTIMB-65 (Story 7.2):
 
 Gaya tampilan selaras dengan design system Reloop: font Figtree, warna `loop` (`#9be600`), mobile viewport 420px, dan arsitektur token Tailwind CSS.
 
+
+---
+
+# 8.1.1 Desain UI/UX data pengepul mitra
+
+Buka `admin-mitra.html` (panel admin) dan `pengaturan-mitra.html` (pengaturan pengepul).
+
+Sesuai kriteria penerimaan PPLTIMB-147 (Story 8.1):
+1. **Peran akun**: `pengguna`, `pengepul`, `admin`. Admin dan pengepul masing-masing punya halaman sendiri; peran lain tidak bisa membukanya.
+2. **Panel admin (`admin-mitra.html`)**:
+   - `?layar=daftar`: daftar mitra, cari nama/pemilik/email, filter status (Semua, Menunggu, Terverifikasi, Ditolak). Yang menunggu verifikasi tampil paling atas.
+   - `?layar=tambah`: tambah mitra sekaligus membuat akun pengepul (nama, email, kata sandi awal).
+   - `?layar=detail&status=menunggu|terverifikasi|ditolak`: data usaha, tombol Verifikasi / Tolak (wajib isi alasan) / Kembalikan ke menunggu, ringkasan pengaturan dari pengepul (hanya baca), dan Hapus mitra.
+3. **Pengaturan pengepul (`pengaturan-mitra.html?status=…`)**:
+   - Banner status verifikasi; alasan penolakan admin ikut ditampilkan.
+   - Layanan Jemput dan/atau Antar Sendiri (minimal satu).
+   - Area layanan per kecamatan (data wilayah Bogor & Depok).
+   - Harga per kg untuk tiap kategori daur ulang; dikosongkan = tidak menerima.
+   - Jam operasional per hari; hari yang tidak dicentang = libur.
+4. **Hanya mitra terverifikasi yang bisa dicari** (dipakai 8.3).
+
+Gaya mengikuti design system Reloop: font Figtree, warna `ink` dan `loop`, viewport 420px, pola header/kartu/toggle dari `pasang-barang.html` dan `pesanan.html`.

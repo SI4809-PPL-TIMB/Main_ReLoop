@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo('/masuk');
         $middleware->redirectUsersTo('/profil');
+        $middleware->alias([
+            'peran' => \App\Http\Middleware\EnsureRole::class,
+        ]);
         $middleware->validateCsrfTokens(except: [
             'api/midtrans/webhook',
             'midtrans/webhook',

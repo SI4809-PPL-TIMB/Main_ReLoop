@@ -77,7 +77,8 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('account'));
+        // 8.1 · Admin ke kelola mitra, pengepul ke pengaturan mitra, pengguna ke akun.
+        return redirect()->intended($user->beranda());
     }
 
     public function destroy(Request $request): RedirectResponse
