@@ -207,11 +207,16 @@
                 </div>
                 <div class="mt-4 grid grid-cols-3 divide-x divide-slate-100 text-center">
                     <div>
-                        <p class="font-bold">★ {{ $profil?->avg_rating > 0 ? number_format($profil->avg_rating, 1, ',') : '4,8' }}</p>
-                        <p class="text-[11px] text-slate-500">{{ $profil?->avg_rating > 0 ? 'Rating' : 'Belum ada ulasan' }}</p>
+                        @if ($profil?->avg_rating > 0)
+                            <p class="font-bold">★ {{ number_format($profil->avg_rating, 1, ',') }}</p>
+                            <p class="text-[11px] text-slate-500">Rating</p>
+                        @else
+                            <p class="font-bold text-slate-400">-</p>
+                            <p class="text-[11px] text-slate-500">Belum ada ulasan</p>
+                        @endif
                     </div>
                     <div>
-                        <p class="font-bold">{{ $profil?->total_sold ?? 23 }}</p>
+                        <p class="font-bold">{{ $profil?->total_sold ?? 0 }}</p>
                         <p class="text-[11px] text-slate-500">Terjual</p>
                     </div>
                     <div>

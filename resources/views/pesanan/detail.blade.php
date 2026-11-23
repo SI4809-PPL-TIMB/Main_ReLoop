@@ -375,11 +375,24 @@
                     </a>
                 @endif
             @elseif ($order->status === \App\Models\Order::STATUS_SELESAI)
+                @php
+                    $userReview = $order->reviews->firstWhere('reviewer_id', auth()->id());
+                @endphp
                 {{-- Status Selesai --}}
                 @if ($isBuyer)
-                    <button type="button" onclick="document.getElementById('modal-rating').showModal()" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white shadow hover:bg-slate-800 transition">
-                        Beri ulasan
-                    </button>
+                    @if ($userReview)
+                        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+                            <p class="text-xs font-semibold text-emerald-800">Ulasanmu telah terkirim</p>
+                            <p class="mt-1 text-sm font-bold text-amber-500">★ {{ $userReview->rating }}/5</p>
+                            @if ($userReview->body)
+                                <p class="mt-1 text-xs text-slate-600 italic">"{{ $userReview->body }}"</p>
+                            @endif
+                        </div>
+                    @else
+                        <a href="{{ route('ulasan.create', $order->order_number) }}" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white shadow hover:bg-slate-800 transition">
+                            Beri ulasan
+                        </a>
+                    @endif
                     <a href="{{ route('cari') }}" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-slate-500">
                         Cari barang lain
                     </a>
@@ -492,14 +505,17 @@
                 <p class="mt-1 text-xs text-slate-500">Dana telah diteruskan ke penjual. Streak +1!</p>
                 <p class="mt-4 text-xs font-semibold text-slate-700">Beri rating untuk {{ $order->seller?->name ?? 'penjual' }}</p>
                 <div class="mt-2 flex justify-center gap-1.5 text-3xl text-amber-400">
-                    <a href="{{ route('aktivitas') }}" title="1 bintang" class="hover:scale-110 transition">★</a>
-                    <a href="{{ route('aktivitas') }}" title="2 bintang" class="hover:scale-110 transition">★</a>
-                    <a href="{{ route('aktivitas') }}" title="3 bintang" class="hover:scale-110 transition">★</a>
-                    <a href="{{ route('aktivitas') }}" title="4 bintang" class="hover:scale-110 transition">★</a>
-                    <a href="{{ route('aktivitas') }}" title="5 bintang" class="hover:scale-110 transition">★</a>
+                    <a href="{{ route('ulasan.create', ['orderNumber' => $order->order_number, 'rating' => 1]) }}" title="1 bintang" class="hover:scale-110 transition">★</a>
+                    <a href="{{ route('ulasan.create', ['orderNumber' => $order->order_number, 'rating' => 2]) }}" title="2 bintang" class="hover:scale-110 transition">★</a>
+                    <a href="{{ route('ulasan.create', ['orderNumber' => $order->order_number, 'rating' => 3]) }}" title="3 bintang" class="hover:scale-110 transition">★</a>
+                    <a href="{{ route('ulasan.create', ['orderNumber' => $order->order_number, 'rating' => 4]) }}" title="4 bintang" class="hover:scale-110 transition">★</a>
+                    <a href="{{ route('ulasan.create', ['orderNumber' => $order->order_number, 'rating' => 5]) }}" title="5 bintang" class="hover:scale-110 transition">★</a>
                 </div>
-                <button type="button" onclick="document.getElementById('modal-rating').close()" class="mt-5 w-full rounded-full bg-ink py-2.5 text-xs font-semibold text-white">
-                    Tutup
+                <a href="{{ route('ulasan.create', $order->order_number) }}" class="mt-4 block w-full rounded-full bg-ink py-2.5 text-xs font-semibold text-white">
+                    Tulis ulasan
+                </a>
+                <button type="button" onclick="document.getElementById('modal-rating').close()" class="mt-2 w-full py-2 text-xs font-semibold text-slate-500">
+                    Nanti saja
                 </button>
             </div>
         </dialog>
