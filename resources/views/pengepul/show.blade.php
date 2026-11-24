@@ -40,7 +40,6 @@
             <div>
                 <dt class="text-slate-500">Lapak</dt>
                 <dd class="font-semibold">{{ $kel ? $kel->nama.', Kec. '.$kel->kecamatan->nama.', '.$kel->kecamatan->kabupaten->nama : 'Belum diatur' }}</dd>
-                <dd class="text-xs text-slate-500">{{ \App\Models\MitraPengepul::KEDEKATAN[$jarak] }} dari lokasimu</dd>
             </div>
             <div>
                 <dt class="text-slate-500">Layanan</dt>

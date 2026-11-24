@@ -50,7 +50,7 @@ class PengepulController extends Controller
         ]);
     }
 
-    public function show(Request $request, MitraPengepul $mitra): View
+    public function show(MitraPengepul $mitra): View
     {
         // Mitra menunggu / ditolak tidak boleh bisa dibuka lewat URL.
         abort_unless($mitra->status === MitraPengepul::TERVERIFIKASI, 404);
@@ -66,7 +66,6 @@ class PengepulController extends Controller
 
         return view('pengepul.show', [
             'mitra'       => $mitra,
-            'jarak'       => $mitra->kedekatan($request->user()->profile?->kelurahan?->load('kecamatan')),
             'jumlahUlasan' => $mitra->user?->receivedReviews()->count() ?? 0,
         ]);
     }
