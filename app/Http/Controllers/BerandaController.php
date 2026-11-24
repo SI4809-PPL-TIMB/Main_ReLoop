@@ -71,6 +71,7 @@ class BerandaController extends Controller
             ->sortBy(fn ($m) => [$m->kelurahan?->kecamatan_id === $kecamatan ? 0 : 1, $m->nama_usaha])
             ->take(5)
             ->map(fn (MitraPengepul $m) => [
+                'id'     => $m->id,
                 'nama'   => $m->nama_usaha,
                 'harga'  => $m->harga->first()?->harga_per_kg,
                 'jenis'  => $m->harga->first()?->jenis,
