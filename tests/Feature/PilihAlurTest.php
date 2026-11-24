@@ -46,8 +46,9 @@ class PilihAlurTest extends TestCase
         $this->followingRedirects()->post('/pilih-kategori', ['tipe' => 'bekas'])
             ->assertOk()->assertSee('Pasang Barang')
             ->assertSee(route('barang.store'), false); // alur bekas langsung ke form 4.2
+        // 8.3: daur ulang langsung ke pencarian pengepul, tombol kembali ke pilihan daur ulang.
         $this->followingRedirects()->post('/pilih-kategori', ['tipe' => 'daur_ulang'])
-            ->assertOk()->assertSee('Pencarian mitra segera hadir')
+            ->assertOk()->assertSee('Cari Pengepul')
             ->assertSee(route('kategori.index', ['tipe' => 'daur_ulang']), false);
         $this->get('/pilih-kategori?tipe=daur_ulang')->assertOk()->assertSee('Lanjut ke Mitra Pengepul');
         $this->get('/pilih-kategori?tipe[]=bekas')->assertOk();
