@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ReLoop · Cari Pengepul</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white pb-10">
+  <!-- 8.3.1 · Daftar mitra pengepul. Header + chip filter memakai pola cari.html, kartu memakai pola "Pengepul terdekat" di beranda. -->
+  <header class="sticky top-0 z-20 space-y-3 border-b border-slate-100 bg-white px-4 pb-3 pt-4">
+    <div class="flex items-center gap-3">
+      <a href="pilih-kategori.html?tipe=daur_ulang" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <h1 class="flex-1 text-xl font-bold">Cari Pengepul</h1>
+    </div>
+    <!-- Daerah: kecamatan yang dilayani. Default = kecamatan di profil pengguna. -->
+    <button type="button" class="flex w-full items-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 text-left text-sm">
+      <svg class="size-4 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+      <span class="min-w-0 flex-1 truncate"><span class="text-slate-500">Daerah</span> <b>Kec. Beji, Kota Depok</b></span>
+      <span class="font-semibold text-brand-700">Ubah</span>
+    </button>
+    <!-- Jenis sampah: satu pilihan, "Semua" = tanpa filter. -->
+    <div class="-mx-4 flex gap-2 overflow-x-auto px-4 text-sm font-semibold">
+      <a class="shrink-0 rounded-full bg-ink px-4 py-2 text-white">Semua</a>
+      <a class="shrink-0 rounded-full border border-slate-200 px-4 py-2">Plastik</a>
+      <a class="shrink-0 rounded-full border border-slate-200 px-4 py-2">Kertas</a>
+      <a class="shrink-0 rounded-full border border-slate-200 px-4 py-2">Logam</a>
+      <a class="shrink-0 rounded-full border border-slate-200 px-4 py-2">Kaca</a>
+      <a class="shrink-0 rounded-full border border-slate-200 px-4 py-2">Elektronik Bekas</a>
+    </div>
+  </header>
+
+  <main class="space-y-3 px-4 pt-4">
+    <p class="text-sm"><b>2 pengepul</b> <span class="text-slate-500">terverifikasi melayani Kec. Beji</span></p>
+
+    <!-- Kartu: nama, daerah lapak, jarak perkiraan, harga per kg, rating. -->
+    <a href="profil-pengepul.html" class="block rounded-2xl border border-slate-200 p-4">
+      <div class="flex gap-3">
+        <img src="../public/assets/illust/collectors/hijau-lestari.png" class="size-12 shrink-0 rounded-lg object-contain" alt="">
+        <div class="min-w-0 flex-1 space-y-1">
+          <p class="truncate font-semibold">Bank Sampah Hijau Lestari</p>
+          <p class="text-xs text-slate-500">Lapak di Kukusan, Beji · <b class="font-semibold text-ink">Satu kecamatan</b></p>
+          <p class="text-xs"><span class="rounded-md bg-brand-600 px-1.5 py-0.5 font-bold text-white">★ 4.8</span> <span class="text-slate-500">· Jemput · Antar Sendiri</span></p>
+        </div>
+      </div>
+      <div class="mt-3 flex items-center justify-between border-t border-dashed border-slate-300 pt-3">
+        <p class="font-semibold">Rp 500–8.000<span class="text-xs font-normal text-slate-500">/kg</span></p>
+        <p class="text-xs text-slate-500">Plastik, Kertas, Logam, Kaca</p>
+      </div>
+    </a>
+
+    <a href="profil-pengepul.html" class="block rounded-2xl border border-slate-200 p-4">
+      <div class="flex gap-3">
+        <img src="../public/assets/illust/collectors/daur-jaya.png" class="size-12 shrink-0 rounded-lg object-contain" alt="">
+        <div class="min-w-0 flex-1 space-y-1">
+          <p class="truncate font-semibold">CV Daur Jaya</p>
+          <p class="text-xs text-slate-500">Lapak di Depok Jaya, Pancoran Mas · <b class="font-semibold text-ink">Kecamatan lain</b></p>
+          <p class="text-xs"><span class="rounded-md bg-slate-100 px-1.5 py-0.5 font-semibold text-slate-600">Belum ada rating</span> <span class="text-slate-500">· Jemput · Antar Sendiri</span></p>
+        </div>
+      </div>
+      <div class="mt-3 flex items-center justify-between border-t border-dashed border-slate-300 pt-3">
+        <p class="font-semibold">Rp 2.200–15.000<span class="text-xs font-normal text-slate-500">/kg</span></p>
+        <p class="text-xs text-slate-500">Plastik, Kertas, Logam, Elektronik Bekas</p>
+      </div>
+    </a>
+
+    <!-- Saat filter jenis aktif, harga di kartu = harga jenis itu saja, mis. "Rp 3.500/kg plastik". -->
+    <!-- Empty state (mis. Cibinong): "Belum ada pengepul di daerah ini" + tombol Ubah daerah / Semua jenis. -->
+  </main>
+</div>
+</body>
+</html>

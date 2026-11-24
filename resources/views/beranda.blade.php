@@ -62,7 +62,7 @@
                 <a href="{{ route('barang.index') }}" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/>', 'Barang saya') !!}</a>
             </div>
             <div data-mode="daur" hidden class="flex gap-4 text-center text-xs font-medium">
-                <a href="#" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M12 19V5M6 11l6-6 6 6"/>', 'Setor') !!}</a>
+                <a href="{{ route('pengepul.index') }}" class="flex flex-col items-center gap-1">{!! $aksi('<path d="M12 19V5M6 11l6-6 6 6"/>', 'Setor') !!}</a>
                 <a href="#" class="flex flex-col items-center gap-1">{!! $aksi('<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>', 'Riwayat') !!}</a>
             </div>
         </section>
@@ -130,13 +130,13 @@
         <section data-mode="daur" hidden class="pt-2">
             <div class="flex items-baseline justify-between gap-3">
                 <h2 class="text-lg font-bold">Pengepul terdekat</h2>
-                <a href="#" class="shrink-0 text-sm font-semibold text-loop-dark">Lihat semua</a>
+                <a href="{{ route('pengepul.index') }}" class="shrink-0 text-sm font-semibold text-loop-dark">Lihat semua</a>
             </div>
             <p class="text-sm text-slate-500">Terverifikasi{{ $kecamatan ? ', melayani Kec. '.$kecamatan : '' }}</p>
             <ul class="mt-3 space-y-3">
                 @forelse ($pengepul as $p)
                     <li class="rounded-2xl border border-slate-200">
-                        <a href="#" class="flex gap-3 p-4">
+                        <a href="{{ route('pengepul.show', $p['id']) }}" class="flex gap-3 p-4">
                             @if ($p['gambar'])
                                 <img src="{{ asset('assets/illust/collectors/'.$p['gambar'].'.png') }}" class="size-12 shrink-0 rounded-lg object-contain" width="48" height="48" alt="">
                             @else
@@ -154,7 +154,7 @@
                         </div>
                         <div class="flex items-center justify-between p-4">
                             <p class="font-semibold">@if ($p['harga']){{ $rupiah($p['harga']) }}<span class="text-xs font-normal text-slate-500">/kg {{ mb_strtolower($p['jenis']) }}</span>@else<span class="text-sm font-normal text-slate-500">Harga belum diatur</span>@endif</p>
-                            <a href="#" class="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">Setor</a>
+                            <a href="{{ route('pengepul.show', $p['id']) }}" class="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">Setor</a>
                         </div>
                     </li>
                 @empty

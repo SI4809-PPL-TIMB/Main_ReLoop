@@ -36,9 +36,10 @@ class KategorisasiController extends Controller
     public function pilih(PilihTipeKategoriRequest $request): RedirectResponse
     {
         $type = $request->validated('tipe');
-        $target = $type === Category::TYPE_BEKAS ? 'barang.create' : 'pengepul.sementara';
-
-        return redirect()->route($target, ['tipe' => $type]);
+        // 8.3: daur ulang langsung ke pencarian pengepul.
+        return $type === Category::TYPE_BEKAS
+            ? redirect()->route('barang.create', ['tipe' => $type])
+            : redirect()->route('pengepul.index');
     }
 
     // Titik integrasi form 4.2.5. Tidak membuat listing atau menyimpan draft.

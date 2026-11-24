@@ -37,7 +37,7 @@ class KategorisasiSecurityTest extends TestCase
         $this->postJson('/pilih-kategori', ['tipe' => 'bekas'])
             ->assertUnprocessable()->assertJsonValidationErrors('tipe');
         $this->post('/pilih-kategori', ['tipe' => 'daur_ulang'])
-            ->assertRedirect(route('pengepul.sementara', ['tipe' => 'daur_ulang']));
+            ->assertRedirect(route('pengepul.index')); // 8.3: langsung ke cari pengepul
     }
 
     public function test_parameter_tambahan_tidak_mengganti_tujuan_atau_membuat_barang(): void

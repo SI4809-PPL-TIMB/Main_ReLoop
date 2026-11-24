@@ -42,7 +42,7 @@ class KategorisasiTest extends TestCase
         $this->post('/pilih-kategori', ['tipe' => 'bekas'])
             ->assertRedirect(route('barang.create', ['tipe' => 'bekas']));
         $this->post('/pilih-kategori', ['tipe' => 'daur_ulang'])
-            ->assertRedirect(route('pengepul.sementara', ['tipe' => 'daur_ulang']));
+            ->assertRedirect(route('pengepul.index')); // 8.3: langsung ke cari pengepul
     }
 
     public function test_pilihan_tidak_valid_ditolak(): void

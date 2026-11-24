@@ -85,3 +85,21 @@ Sesuai kriteria penerimaan PPLTIMB-147 (Story 8.1):
 4. **Hanya mitra terverifikasi yang bisa dicari** (dipakai 8.3).
 
 Gaya mengikuti design system Reloop: font Figtree, warna `ink` dan `loop`, viewport 420px, pola header/kartu/toggle dari `pasang-barang.html` dan `pesanan.html`.
+
+---
+
+# 8.3.1 Desain UI/UX pencarian pengepul (PPLTIMB-165)
+
+Buka `cari-pengepul.html` lalu klik salah satu kartu untuk `profil-pengepul.html`.
+
+Sesuai kriteria penerimaan PPLTIMB-150 (Story 8.3):
+1. **Filter daerah**: kecamatan yang dilayani mitra (tabel `mitra_area`). Default = kecamatan di profil pengguna, bisa diubah lewat tombol Daerah.
+2. **Filter jenis sampah**: chip kategori daur ulang (Plastik, Kertas, Logam, Kaca, Elektronik Bekas). "Semua" = tanpa filter.
+3. **Kartu hasil**: nama usaha, daerah lapak, jarak perkiraan, rentang harga per kg (atau harga jenis yang dipilih), rating, layanan.
+   - Mitra belum punya koordinat, jadi jarak perkiraan memakai kedekatan wilayah: Satu kelurahan / Satu kecamatan / Kecamatan lain.
+   - Rating diambil dari profil akun mitra; mitra tanpa ulasan menampilkan "Belum ada rating".
+4. **Profil mitra**: jenis sampah + harga per kg, jam operasional per hari (hari ini disorot, hari tanpa jadwal = Libur), rating, layanan, daerah layanan.
+5. **Hanya mitra terverifikasi** yang muncul; profil mitra yang belum terverifikasi tidak bisa dibuka.
+6. Dari Pilih Kategori › Daur Ulang langsung ke halaman ini (menggantikan `pengepul-sementara.html`).
+
+Tombol "Setor ke pengepul ini" masih nonaktif, disambungkan di 9.1.

@@ -11,6 +11,7 @@ use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\MitraPengaturanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\PengepulController;
 use App\Http\Controllers\ProfilController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/pilih-kategori', [KategorisasiController::class, 'pilih'])->name('kategori.pilih');
     Route::get('/pasang-barang', [KategorisasiController::class, 'pasangBarang'])->name('barang.pasang');
     Route::get('/pengepul/sementara', [KategorisasiController::class, 'pengepul'])->name('pengepul.sementara');
+    // 8.3 · Cari pengepul per daerah dan jenis sampah (PPLTIMB-150)
+    Route::get('/pengepul', [PengepulController::class, 'index'])->name('pengepul.index');
+    Route::get('/pengepul/{mitra}', [PengepulController::class, 'show'])->whereNumber('mitra')->name('pengepul.show');
     Route::get('/profil', [ProfilController::class, 'show'])->name('account');
     Route::get('/profil/ubah', [ProfilController::class, 'edit'])->name('account.edit');
     Route::match(['post', 'put'], '/profil', [ProfilController::class, 'update'])->name('account.update');
