@@ -21,7 +21,7 @@
                 <span class="grid size-16 shrink-0 place-items-center rounded-xl bg-loop-soft text-loop-dark" aria-hidden="true"><x-category-icon name="recycle" class="size-8" /></span>
             @endif
             <div class="min-w-0 space-y-1">
-                <h1 class="text-lg font-bold leading-tight">{{ $mitra->nama_usaha }}</h1>
+                <h1 class="text-2xl font-bold leading-tight">{{ $mitra->nama_usaha }}</h1>
                 <p class="flex items-center gap-1.5 text-xs font-semibold text-brand-700">
                     <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>Terverifikasi
                 </p>
