@@ -13,7 +13,7 @@
     <x-slot name="header">
         <header class="sticky top-0 z-20 space-y-3 border-b border-slate-100 bg-white px-4 pb-3 pt-4">
             <div class="flex items-center gap-3">
-                <a href="{{ route('kategori.index', ['tipe' => 'daur_ulang']) }}" aria-label="Kembali" class="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200">
+                <a href="{{ route('beranda', ['mode' => 'daur']) }}" aria-label="Kembali" class="grid size-10 shrink-0 place-items-center rounded-full border border-slate-200">
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
                 </a>
                 <h1 class="flex-1 text-xl font-bold">Cari Pengepul</h1>

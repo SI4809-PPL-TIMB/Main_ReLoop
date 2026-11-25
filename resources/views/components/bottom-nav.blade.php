@@ -17,7 +17,7 @@
         @foreach ($tabs as $key => $tab)
             @php($on = $active === $key)
             <li>
-                <a href="{{ $tab['href'] }}" @if ($on) aria-current="page" @endif
+                <a href="{{ $tab['href'] }}" data-tab="{{ $key }}" @if ($on) aria-current="page" @endif
                    class="flex flex-col items-center gap-1 text-[11px] leading-none {{ $on ? 'font-semibold text-ink' : 'font-medium text-slate-400' }}">
                     <span class="grid h-8 w-14 place-items-center">
                         <svg class="size-[22px]" viewBox="0 0 24 24" fill="none" stroke="{{ $on ? '#9be600' : 'currentColor' }}"
@@ -29,3 +29,9 @@
         @endforeach
     </ul>
 </nav>
+<script>
+    // Mode Daur Ulang (disimpan beranda): tab Cari membuka cari pengepul, bukan katalog barang.
+    document.querySelector('#bottom-nav [data-tab=search]').addEventListener('click', (e) => {
+        try { if (localStorage.getItem('reloop-mode') === 'daur') e.currentTarget.href = '{{ route('pengepul.index') }}'; } catch {}
+    });
+</script>

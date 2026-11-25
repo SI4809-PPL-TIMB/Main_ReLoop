@@ -125,6 +125,13 @@ class CariPengepulTest extends TestCase
         $this->get('/pengepul/999999')->assertNotFound();
     }
 
+    public function test_beranda_daur_ulang_menautkan_cari_dan_setor_ke_pengepul(): void
+    {
+        $html = $this->actingAs(User::factory()->create())->get('/beranda')->assertOk()->getContent();
+        // Cari daur ulang, judul streak, Setor sekarang, aksi cepat Setor, Lihat semua.
+        $this->assertSame(5, substr_count($html, 'href="'.route('pengepul.index').'"'));
+    }
+
     public function test_pilih_kategori_daur_ulang_langsung_ke_cari_pengepul(): void
     {
         $this->actingAs($this->pembeli)
