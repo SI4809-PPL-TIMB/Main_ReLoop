@@ -42,7 +42,7 @@
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">{!! $cari !!}</svg>
             <span class="text-sm text-slate-500">Cari kursi, buku, sepeda…</span>
         </a>
-        <a href="#" data-mode="daur" hidden class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm">
+        <a href="{{ route('pengepul.index') }}" data-mode="daur" hidden class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm">
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">{!! $cari !!}</svg>
             <span class="text-sm text-slate-500">Cari pengepul atau jenis sampah…</span>
         </a>
@@ -90,7 +90,7 @@
 
         {{-- Streak (mode daur ulang) --}}
         <section data-mode="daur" hidden class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-            <a href="#" class="flex items-center gap-2 text-base font-bold">Kamu sudah setor {{ $streak }} hari</a>
+            <a href="{{ route('pengepul.index') }}" class="flex items-center gap-2 text-base font-bold">Kamu sudah setor {{ $streak }} hari</a>
             <ul class="mt-3 grid grid-cols-7 gap-1.5">
                 @foreach ($poinHari as $i => $p)
                     @if ($i < $selesai)
@@ -102,7 +102,7 @@
                     @endif
                 @endforeach
             </ul>
-            <a href="#" class="mt-4 block rounded-full bg-ink py-3 text-center font-semibold text-white">Setor sekarang</a>
+            <a href="{{ route('pengepul.index') }}" class="mt-4 block rounded-full bg-ink py-3 text-center font-semibold text-white">Setor sekarang</a>
         </section>
 
         {{-- Barang di sekitarmu --}}
