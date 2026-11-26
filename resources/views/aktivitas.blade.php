@@ -133,8 +133,8 @@
             </ul>
         @empty
             <div class="flex min-h-[calc(100dvh-270px)] flex-col items-center justify-center px-6 text-center">
-                <p class="text-base font-semibold">{{ $f === 'setor' ? 'Belum ada setoran sampah' : 'Belum ada aktivitas di sini' }}</p>
-                <p class="mt-1 text-sm text-slate-500">{{ $f === 'setor' ? 'Setor sampah anorganikmu ke mitra pengepul terdekat.' : 'Belanja barang bekas atau jual barangmu, aktivitasmu muncul di sini.' }}</p>
+                <p class="text-base font-semibold">{{ $f === 'setor' ? 'Setor belum tersedia' : 'Belum ada aktivitas di sini' }}</p>
+                <p class="mt-1 text-sm text-slate-500">{{ $f === 'setor' ? 'Belum ada riwayat setor sampah aktif.' : 'Belanja barang bekas atau jual barangmu, aktivitasmu muncul di sini.' }}</p>
                 <a href="{{ $f === 'setor' ? route('pengepul.index') : route('cari') }}" class="mt-5 inline-block rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white">{{ $f === 'setor' ? 'Cari mitra pengepul' : 'Mulai jelajah' }}</a>
             </div>
         @endforelse

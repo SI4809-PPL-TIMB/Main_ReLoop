@@ -132,6 +132,31 @@ class OrderSetor extends Model
         return $this->status === self::STATUS_MENUNGGU;
     }
 
+    public function isMenunggu(): bool
+    {
+        return $this->status === self::STATUS_MENUNGGU;
+    }
+
+    public function isSelesai(): bool
+    {
+        return $this->status === self::STATUS_SELESAI;
+    }
+
+    public function isDibatalkan(): bool
+    {
+        return in_array($this->status, [self::STATUS_DIBATALKAN, self::STATUS_DITOLAK]);
+    }
+
+    public function getBeratAsliAttribute(): ?float
+    {
+        return $this->berat_aktual;
+    }
+
+    public function getTotalFinalAttribute(): ?int
+    {
+        return $this->total_aktual;
+    }
+
     public function metodeLabel(): string
     {
         return self::METODE[$this->metode] ?? $this->metode;

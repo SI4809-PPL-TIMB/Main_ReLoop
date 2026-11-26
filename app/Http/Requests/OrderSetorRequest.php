@@ -48,6 +48,9 @@ class OrderSetorRequest extends FormRequest
         $validator->after(function ($validator) {
             /** @var MitraPengepul|null $mitra */
             $mitra = $this->route('mitra');
+            if (! ($mitra instanceof MitraPengepul)) {
+                $mitra = MitraPengepul::find($mitra);
+            }
 
             if (! $mitra || $mitra->status !== MitraPengepul::TERVERIFIKASI) {
                 $validator->errors()->add('mitra', 'Mitra pengepul tidak valid atau belum terverifikasi.');
