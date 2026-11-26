@@ -10,6 +10,7 @@ use App\Http\Controllers\KategorisasiController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\MitraPengaturanController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderSetorController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PengepulController;
 use App\Http\Controllers\ProfilController;
@@ -36,6 +37,11 @@ Route::middleware('auth')->group(function () {
     // 8.3 · Cari pengepul per daerah dan jenis sampah (PPLTIMB-150)
     Route::get('/pengepul', [PengepulController::class, 'index'])->name('pengepul.index');
     Route::get('/pengepul/{mitra}', [PengepulController::class, 'show'])->whereNumber('mitra')->name('pengepul.show');
+    // 9.1 · Buat order setor: Jemput atau Antar Sendiri (PPLTIMB-151)
+    Route::get('/pengepul/{mitra}/setor', [OrderSetorController::class, 'create'])->whereNumber('mitra')->name('setor.create');
+    Route::post('/pengepul/{mitra}/setor', [OrderSetorController::class, 'store'])->whereNumber('mitra')->name('setor.store');
+    Route::get('/setor/{orderNumber}', [OrderSetorController::class, 'show'])->name('setor.show');
+    Route::post('/setor/{orderNumber}/batal', [OrderSetorController::class, 'cancel'])->name('setor.batal');
     Route::get('/profil', [ProfilController::class, 'show'])->name('account');
     Route::get('/profil/ubah', [ProfilController::class, 'edit'])->name('account.edit');
     Route::match(['post', 'put'], '/profil', [ProfilController::class, 'update'])->name('account.update');

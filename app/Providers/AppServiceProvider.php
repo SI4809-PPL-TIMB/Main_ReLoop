@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Support\CustomMigrator;
+use App\Models\MitraPengepul;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\ViewErrorBag;
@@ -32,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Route::model('mitra', MitraPengepul::class);
+
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(5)
             ->by('login:'.hash('sha256', $request->ip()))
             ->response(function (Request $request, array $headers) {

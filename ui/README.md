@@ -102,4 +102,32 @@ Sesuai kriteria penerimaan PPLTIMB-150 (Story 8.3):
 5. **Hanya mitra terverifikasi** yang muncul; profil mitra yang belum terverifikasi tidak bisa dibuka.
 6. Dari Pilih Kategori › Daur Ulang langsung ke halaman ini (menggantikan `pengepul-sementara.html`).
 
-Tombol "Setor ke pengepul ini" masih nonaktif, disambungkan di 9.1.
+Tombol "Setor ke pengepul ini" disambungkan ke `order-setor.html` di 9.1.
+
+---
+
+# 9.1.1 Desain UI/UX order setor (PPLTIMB-169)
+
+Buka `order-setor.html` (form order setor) lalu lanjut ke `setor-status.html` (detail & status order setor).
+
+Sesuai kriteria penerimaan PPLTIMB-151 (Story 9.1):
+1. **Pemilihan Mitra & Jenis Sampah**:
+   - Mitra dan lapaknya ditampilkan di bagian atas form.
+   - Pilihan jenis sampah (kategori daur ulang: Plastik, Kertas, Logam, Kaca) yang diterima mitra bersangkutan lengkap dengan harga per kg.
+2. **Perkiraan Berat & Kalkulasi Estimasi**:
+   - Input perkiraan berat (kg) dengan quick chips (2 kg, 5 kg, 10 kg, 20 kg).
+   - Kalkulasi otomatis estimasi total pendapatan (`berat × harga_per_kg`).
+3. **Metode Penyerahan (Jemput vs Antar Sendiri)**:
+   - Opsi **Jemput** hanya aktif jika alamat customer berada di area layanan mitra (`mitra_area`). Jika di luar area, opsi otomatis dinonaktifkan dengan pesan informatif (`?area=0`).
+   - Opsi **Antar Sendiri** menampilkan alamat lapak dan jam operasional mitra.
+   - Input catatan patokan lokasi penjemputan.
+4. **Penguncian Harga & Tanpa Komisi**:
+   - Harga per kg dikunci saat order dibuat, tidak terpengaruh jika mitra mengubah harga di kemudian hari.
+   - Banner penegasan bebas komisi (pembayaran diterima penuh oleh customer sesuai hasil timbangan).
+5. **Status Linimasa (`setor-status.html`)**:
+   - Status awal: **Menunggu konfirmasi** dari pengepul.
+   - Linimasa 4 langkah: Menunggu → Diterima mitra → Ditimbang & Dibayar → Selesai (atau Dibatalkan).
+   - Aksi pembatalan order (modal konfirmasi) sebelum order diproses.
+   - Tombol chat pengepul dan rincian lengkap pesanan setoran.
+
+Gaya kartu, font Figtree, token warna `loop` & `brand`, responsif 420px selaras dengan design system `reloop-ecommerce-flow`.

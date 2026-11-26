@@ -161,4 +161,9 @@ class MitraPengepul extends Model
     {
         return $this->hasMany(MitraJam::class, 'mitra_id')->orderBy('hari');
     }
+
+    public function orderSetors(): HasMany
+    {
+        return $this->hasMany(OrderSetor::class, 'mitra_id');
+    }
 }

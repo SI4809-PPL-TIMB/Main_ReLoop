@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>ReLoop · Form Setor Sampah</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<div class="relative mx-auto min-h-screen max-w-[420px] overflow-x-hidden bg-white pb-36">
+
+  <!-- 9.1.1 · Form Setoran ke Pengepul (PPLTIMB-169) -->
+  <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-100 bg-white px-4 py-4">
+    <a href="profil-pengepul.html" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <h1 class="flex-1 text-xl font-bold">Setor Sampah</h1>
+    <span class="text-xs text-slate-400">* wajib</span>
+  </header>
+
+  <!-- Pengepul Info Singkat -->
+  <section class="flex items-center gap-3 border-b border-slate-100 bg-[#fbfdfa] px-4 py-3.5">
+    <img src="../public/assets/illust/collectors/hijau-lestari.png" class="size-12 shrink-0 rounded-xl object-contain bg-white p-1 border border-slate-200" alt="">
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-1.5">
+        <h2 class="truncate font-bold text-sm">Bank Sampah Hijau Lestari</h2>
+        <span class="text-brand-600 text-xs font-bold" title="Terverifikasi">✓</span>
+      </div>
+      <p class="text-xs text-slate-500 truncate">Lapak: Kukusan, Kec. Beji, Kota Depok</p>
+      <p class="text-xs font-semibold text-brand-700">★ 4.8 · Melayani Jemput &amp; Antar</p>
+    </div>
+  </section>
+
+  <form id="form-setor" data-go="setor-status.html?step=1" class="space-y-5 px-4 pt-4">
+    <!-- Pilihan Jenis Sampah (harga per kg dikunci saat order dibuat) -->
+    <fieldset>
+      <div class="flex items-baseline justify-between">
+        <legend class="text-sm font-semibold">Jenis Sampah *</legend>
+        <span class="text-xs text-slate-500">Harga per kg dikunci</span>
+      </div>
+
+      <div class="mt-2 grid grid-cols-2 gap-2.5" id="pilihan-jenis">
+        <label class="relative block cursor-pointer">
+          <input type="radio" name="jenis" value="plastik" data-harga="3500" data-label="Plastik" checked required class="peer sr-only">
+          <span class="flex flex-col gap-1 rounded-2xl border border-slate-200 p-3 transition peer-checked:border-ink peer-checked:bg-slate-50 peer-checked:ring-1 peer-checked:ring-ink">
+            <span class="flex items-center justify-between">
+              <span class="font-bold text-sm">Plastik</span>
+              <img src="../public/assets/illust/categories/plastik.png" class="size-7 object-contain" alt="">
+            </span>
+            <span class="text-xs text-slate-500">Botol, ember, kresek</span>
+            <span class="mt-1 font-bold text-brand-700 text-sm">Rp 3.500<span class="text-xs font-normal text-slate-500">/kg</span></span>
+          </span>
+        </label>
+
+        <label class="relative block cursor-pointer">
+          <input type="radio" name="jenis" value="kertas" data-harga="2000" data-label="Kertas" required class="peer sr-only">
+          <span class="flex flex-col gap-1 rounded-2xl border border-slate-200 p-3 transition peer-checked:border-ink peer-checked:bg-slate-50 peer-checked:ring-1 peer-checked:ring-ink">
+            <span class="flex items-center justify-between">
+              <span class="font-bold text-sm">Kertas &amp; Kardus</span>
+              <span class="grid size-7 place-items-center rounded-lg bg-loop-soft text-loop-dark text-xs font-bold">📄</span>
+            </span>
+            <span class="text-xs text-slate-500">Kardus, koran, buku</span>
+            <span class="mt-1 font-bold text-brand-700 text-sm">Rp 2.000<span class="text-xs font-normal text-slate-500">/kg</span></span>
+          </span>
+        </label>
+
+        <label class="relative block cursor-pointer">
+          <input type="radio" name="jenis" value="logam" data-harga="8000" data-label="Logam" required class="peer sr-only">
+          <span class="flex flex-col gap-1 rounded-2xl border border-slate-200 p-3 transition peer-checked:border-ink peer-checked:bg-slate-50 peer-checked:ring-1 peer-checked:ring-ink">
+            <span class="flex items-center justify-between">
+              <span class="font-bold text-sm">Logam &amp; Besi</span>
+              <span class="grid size-7 place-items-center rounded-lg bg-loop-soft text-loop-dark text-xs font-bold">⚙️</span>
+            </span>
+            <span class="text-xs text-slate-500">Kaleng, besi tua, seng</span>
+            <span class="mt-1 font-bold text-brand-700 text-sm">Rp 8.000<span class="text-xs font-normal text-slate-500">/kg</span></span>
+          </span>
+        </label>
+
+        <label class="relative block cursor-pointer">
+          <input type="radio" name="jenis" value="kaca" data-harga="500" data-label="Kaca" required class="peer sr-only">
+          <span class="flex flex-col gap-1 rounded-2xl border border-slate-200 p-3 transition peer-checked:border-ink peer-checked:bg-slate-50 peer-checked:ring-1 peer-checked:ring-ink">
+            <span class="flex items-center justify-between">
+              <span class="font-bold text-sm">Kaca</span>
+              <span class="grid size-7 place-items-center rounded-lg bg-loop-soft text-loop-dark text-xs font-bold">🍾</span>
+            </span>
+            <span class="text-xs text-slate-500">Botol sirup, kecap</span>
+            <span class="mt-1 font-bold text-brand-700 text-sm">Rp 500<span class="text-xs font-normal text-slate-500">/kg</span></span>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
+    <!-- Perkiraan Berat -->
+    <fieldset>
+      <div class="flex items-baseline justify-between">
+        <legend class="text-sm font-semibold">Perkiraan Berat *</legend>
+        <span class="text-xs text-slate-500">Ditimbang ulang saat setor</span>
+      </div>
+
+      <div class="mt-2 flex items-center rounded-2xl border border-slate-200 px-4 py-3 focus-within:border-ink">
+        <input id="berat" type="number" step="0.5" min="0.5" max="500" value="5" required inputmode="decimal" class="w-full text-xl font-bold outline-none" aria-label="Perkiraan berat dalam kilogram">
+        <span class="font-semibold text-slate-500">kg</span>
+      </div>
+
+      <!-- Quick Chips -->
+      <div id="berat-chips" class="mt-2 flex gap-2 text-xs font-semibold">
+        <button type="button" data-val="2" class="flex-1 rounded-xl border border-slate-200 py-2 hover:bg-slate-50">2 kg</button>
+        <button type="button" data-val="5" class="flex-1 rounded-xl border border-slate-200 py-2 hover:bg-slate-50 bg-slate-100">5 kg</button>
+        <button type="button" data-val="10" class="flex-1 rounded-xl border border-slate-200 py-2 hover:bg-slate-50">10 kg</button>
+        <button type="button" data-val="20" class="flex-1 rounded-xl border border-slate-200 py-2 hover:bg-slate-50">20 kg</button>
+      </div>
+    </fieldset>
+
+    <!-- Metode Penyerahan: Jemput atau Antar Sendiri -->
+    <fieldset id="metode-fs">
+      <legend class="text-sm font-semibold">Metode Penyerahan *</legend>
+
+      <div class="mt-2 flex flex-col gap-2.5">
+        <!-- Jemput: hanya aktif jika alamat di area layanan -->
+        <label id="opt-jemput" class="block cursor-pointer">
+          <input type="radio" name="metode" value="jemput" checked required class="peer sr-only">
+          <span class="flex items-start gap-3 rounded-2xl border border-slate-200 p-3.5 transition peer-checked:border-loop-dark/60 peer-checked:bg-loop-soft peer-checked:[&>i]:border-loop-dark peer-checked:[&>i]:bg-loop-dark peer-checked:[&>i]:shadow-[inset_0_0_0_3px_#f3fbe3]">
+            <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-slate-200 text-lg">🚚</span>
+            <span class="min-w-0 flex-1">
+              <b class="block text-sm">Jemput ke Rumah</b>
+              <span class="block text-xs text-slate-500 mt-0.5">Pengepul datang ke alamatmu sesuai jadwal</span>
+              <span id="jemput-area-badge" class="mt-1.5 inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                ✓ Alamatmu di area layanan (Kec. Beji)
+              </span>
+            </span>
+            <i class="size-5 shrink-0 rounded-full border-2 border-slate-300"></i>
+          </span>
+        </label>
+
+        <!-- Jemput Unavailable State (Demo via ?area=0) -->
+        <div id="opt-jemput-disabled" hidden class="opacity-60">
+          <div class="flex items-start gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-3.5 cursor-not-allowed">
+            <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-slate-200 text-lg opacity-70">🚚</span>
+            <div class="min-w-0 flex-1">
+              <b class="block text-sm text-slate-600">Jemput ke Rumah (Tidak Tersedia)</b>
+              <span class="block text-xs text-red-600 mt-0.5 font-medium">Alamatmu (Kec. Cibinong) di luar area layanan jemput mitra ini.</span>
+              <span class="block text-[11px] text-slate-500 mt-1">Mitra ini hanya melayani jemput di Kec. Beji, Pancoran Mas, Sukmajaya.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Antar Sendiri -->
+        <label id="opt-antar" class="block cursor-pointer">
+          <input type="radio" name="metode" value="antar" class="peer sr-only">
+          <span class="flex items-start gap-3 rounded-2xl border border-slate-200 p-3.5 transition peer-checked:border-loop-dark/60 peer-checked:bg-loop-soft peer-checked:[&>i]:border-loop-dark peer-checked:[&>i]:bg-loop-dark peer-checked:[&>i]:shadow-[inset_0_0_0_3px_#f3fbe3]">
+            <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-white border border-slate-200 text-lg">🏪</span>
+            <span class="min-w-0 flex-1">
+              <b class="block text-sm">Antar Sendiri ke Lapak</b>
+              <span class="block text-xs text-slate-500 mt-0.5">Bawa sampah ke lapak pada jam operasional</span>
+              <span class="block text-[11px] text-slate-500 mt-1">Buka hari ini: 08.00–16.00 WIB</span>
+            </span>
+            <i class="size-5 shrink-0 rounded-full border-2 border-slate-300"></i>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
+    <!-- Alamat & Catatan Penjemputan (Tampil jika metode jemput) -->
+    <section id="alamat-section" class="rounded-2xl border border-slate-200 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold">Alamat Penjemputan</h3>
+        <a href="lokasi.html" class="text-xs font-semibold text-brand-600">Ubah Lokasi</a>
+      </div>
+      <p class="text-sm font-medium text-slate-800">Jl. Margonda Raya No. 45, Kukusan, Kec. Beji, Kota Depok</p>
+      <label class="block">
+        <span class="text-xs font-medium text-slate-500">Patokan rumah / catatan untuk kurir (opsional)</span>
+        <input name="patokan" value="Pagar hitam depan pos satpam" placeholder="Contoh: Rumah cat hijau, pagar besi hitam" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-ink">
+      </label>
+    </section>
+
+    <!-- Banner Edukasi & Keamanan Reloop -->
+    <section class="flex gap-3 rounded-2xl bg-loop-soft p-4">
+      <svg class="size-6 shrink-0 text-loop-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 1 14-5.3L20 9"/><path d="M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-14 5.3L4 15"/><path d="M4 20v-5h5"/></svg>
+      <div class="text-xs text-slate-700 space-y-1">
+        <p class="font-bold text-ink">Bebas komisi &amp; harga terkunci</p>
+        <p>Harga per kg dikunci saat order dibuat. Kamu menerima pembayaran penuh sesuai berat hasil timbangan pengepul.</p>
+      </div>
+    </section>
+
+    <!-- Fixed Bottom Bar -->
+    <div class="fixed bottom-0 left-1/2 z-30 w-full max-w-[420px] -translate-x-1/2 border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+      <div class="mb-2 flex items-baseline justify-between">
+        <div>
+          <p class="text-xs text-slate-500">Estimasi Pendapatan</p>
+          <p id="total-estimasi" class="text-xl font-bold text-ink">Rp 17.500</p>
+        </div>
+        <div class="text-right text-xs text-slate-500">
+          <span id="detail-kalkulasi">5 kg × Rp 3.500</span>
+        </div>
+      </div>
+      <button type="submit" class="w-full rounded-full bg-ink py-3.5 font-semibold text-white">Kirim Order Setoran</button>
+    </div>
+  </form>
+</div>
+
+<script src="js/app.js?v=3"></script>
+<script>
+  const form = document.getElementById('form-setor');
+  const inputBerat = document.getElementById('berat');
+  const totalEstimasi = document.getElementById('total-estimasi');
+  const detailKalkulasi = document.getElementById('detail-kalkulasi');
+  const alamatSection = document.getElementById('alamat-section');
+
+  // Handle URL parameter ?area=0 untuk simulasi alamat di luar area layanan
+  if (params.get('area') === '0') {
+    document.getElementById('opt-jemput').hidden = true;
+    document.getElementById('opt-jemput-disabled').hidden = false;
+    document.querySelector('input[name="metode"][value="antar"]').checked = true;
+    alamatSection.hidden = true;
+  }
+
+  function hitungEstimasi() {
+    const selectedRadio = form.querySelector('input[name="jenis"]:checked');
+    const hargaPerKg = Number(selectedRadio?.dataset.harga || 3500);
+    const labelJenis = selectedRadio?.dataset.label || 'Plastik';
+    const berat = Math.max(0, Number(inputBerat.value) || 0);
+    const total = Math.round(hargaPerKg * berat);
+
+    totalEstimasi.textContent = rupiah(total);
+    detailKalkulasi.textContent = `${berat} kg × ${rupiah(hargaPerKg)}`;
+  }
+
+  // Event Listeners
+  form.addEventListener('change', (e) => {
+    if (e.target.name === 'jenis' || e.target.id === 'berat') {
+      hitungEstimasi();
+    }
+    if (e.target.name === 'metode') {
+      alamatSection.hidden = e.target.value !== 'jemput';
+    }
+  });
+
+  inputBerat.addEventListener('input', hitungEstimasi);
+
+  document.getElementById('berat-chips').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-val]');
+    if (!btn) return;
+    inputBerat.value = btn.dataset.val;
+    $$('#berat-chips button').forEach((b) => b.classList.toggle('bg-slate-100', b === btn));
+    hitungEstimasi();
+  });
+
+  hitungEstimasi();
+</script>
+</body>
+</html>

@@ -81,7 +81,11 @@
 
     {{-- 9.1 menyambungkan tombol ini ke form setoran. --}}
     <div class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[420px] border-t border-slate-200 bg-white px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
-        <button type="button" disabled class="w-full rounded-full bg-ink py-3.5 font-semibold text-white disabled:opacity-40">Setor ke pengepul ini</button>
-        <p class="mt-1.5 text-center text-xs text-slate-500">Setoran segera tersedia.</p>
+        @if ($mitra->harga->isNotEmpty())
+            <a href="{{ route('setor.create', $mitra) }}" class="block w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white transition-transform active:scale-[0.99]">Setor ke pengepul ini</a>
+        @else
+            <button type="button" disabled class="w-full rounded-full bg-ink py-3.5 font-semibold text-white disabled:opacity-40">Setor ke pengepul ini</button>
+            <p class="mt-1.5 text-center text-xs text-slate-500">Pengepul belum mengatur harga setoran.</p>
+        @endif
     </div>
 @endcomponent

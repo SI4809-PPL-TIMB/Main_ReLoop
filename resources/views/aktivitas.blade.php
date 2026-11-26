@@ -64,6 +64,50 @@
                                 <a href="{{ route('barang.edit', $l) }}" class="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">Lanjutkan</a>
                             </div>
                         </li>
+                    @elseif ($b['jenis'] === 'setor')
+                        @php
+                            $s = $b['order_setor'];
+                            $teksStatus = match($s->status) {
+                                \App\Models\OrderSetor::STATUS_MENUNGGU => 'Menunggu konfirmasi',
+                                \App\Models\OrderSetor::STATUS_DITERIMA => 'Diterima pengepul',
+                                \App\Models\OrderSetor::STATUS_DITIMBANG => 'Sedang ditimbang',
+                                \App\Models\OrderSetor::STATUS_SELESAI => 'Setoran selesai',
+                                default => 'Setoran dibatalkan',
+                            };
+                            $warnaStatus = match($s->status) {
+                                \App\Models\OrderSetor::STATUS_MENUNGGU, \App\Models\OrderSetor::STATUS_DITERIMA, \App\Models\OrderSetor::STATUS_DITIMBANG => 'text-amber-600',
+                                \App\Models\OrderSetor::STATUS_SELESAI => 'text-brand-700',
+                                default => 'text-slate-500',
+                            };
+                            $ikonStatus = match($s->status) {
+                                \App\Models\OrderSetor::STATUS_SELESAI => $ikonCek,
+                                \App\Models\OrderSetor::STATUS_DIBATALKAN => $ikonX,
+                                default => $ikonJam,
+                            };
+                            $slug = $s->category?->slug;
+                            $hasImg = $slug && file_exists(public_path('assets/illust/categories/'.$slug.'.png'));
+                        @endphp
+                        <li class="rounded-2xl border border-slate-200 p-4">
+                            <div class="flex gap-3">
+                                @if ($hasImg)
+                                    <img src="{{ asset('assets/illust/categories/'.$slug.'.png') }}" class="size-12 shrink-0 rounded-lg bg-slate-50 p-1 object-contain" width="48" height="48" alt="">
+                                @else
+                                    <span class="grid size-12 shrink-0 place-items-center rounded-lg bg-loop-soft text-lg">♻️</span>
+                                @endif
+                                <div class="min-w-0 flex-1 space-y-1">
+                                    <p class="truncate font-semibold">Setor {{ $s->category?->name }} · {{ $s->perkiraan_berat }} kg</p>
+                                    <p class="flex items-center gap-1.5 text-xs {{ $warnaStatus }}"><svg class="size-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{!! $ikonStatus !!}</svg>{{ $teksStatus }}</p>
+                                    <p class="flex items-center gap-1.5 text-xs text-slate-500"><svg class="size-3 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{!! $ikonOrang !!}</svg>Mitra: {{ $s->mitra?->nama_usaha }}</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+                                <div>
+                                    <p class="font-semibold">{{ $rupiah($s->total_final ?: $s->total_estimasi) }}</p>
+                                    <p class="text-[11px] text-slate-500">{{ $s->metodeLabel() }}</p>
+                                </div>
+                                <a href="{{ route('setor.show', $s->order_number) }}" class="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">Detail</a>
+                            </div>
+                        </li>
                     @else
                         @php
                             $o = $b['order'];
@@ -90,8 +134,8 @@
         @empty
             <div class="flex min-h-[calc(100dvh-270px)] flex-col items-center justify-center px-6 text-center">
                 <p class="text-base font-semibold">{{ $f === 'setor' ? 'Setor belum tersedia' : 'Belum ada aktivitas di sini' }}</p>
-                <p class="mt-1 text-sm text-slate-500">{{ $f === 'setor' ? 'Fitur setor sampah masih dalam pengembangan.' : 'Belanja barang bekas atau jual barangmu, aktivitasmu muncul di sini.' }}</p>
-                <a href="{{ route('cari') }}" class="mt-5 inline-block rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white">Mulai jelajah</a>
+                <p class="mt-1 text-sm text-slate-500">{{ $f === 'setor' ? 'Belum ada riwayat setor sampah aktif.' : 'Belanja barang bekas atau jual barangmu, aktivitasmu muncul di sini.' }}</p>
+                <a href="{{ $f === 'setor' ? route('pengepul.index') : route('cari') }}" class="mt-5 inline-block rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white">{{ $f === 'setor' ? 'Cari mitra pengepul' : 'Mulai jelajah' }}</a>
             </div>
         @endforelse
     </main>

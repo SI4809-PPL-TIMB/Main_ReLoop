@@ -147,4 +147,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class, 'reviewee_id');
     }
+
+    public function orderSetors(): HasMany
+    {
+        return $this->hasMany(OrderSetor::class);
+    }
 }
