@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ReLoop · Laporkan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Figtree', 'sans-serif'] },
+          colors: {
+            ink: '#15181c',
+            loop: { DEFAULT: '#9be600', dark: '#5f9200', soft: '#f3fbe3' }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#e9ebe8] text-ink antialiased">
+<!--
+  11.1.1 · Desain UI/UX Dialog Laporkan (PPLTIMB-152).
+  Mendukung lapor: barang, pengguna, pesanan.
+-->
+<div class="relative mx-auto min-h-screen max-w-[420px] bg-white p-4">
+  <header class="flex items-center gap-3 border-b border-slate-200 pb-4">
+    <a href="javascript:history.back()" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <h1 class="text-xl font-bold">Laporkan Masalah</h1>
+  </header>
+
+  <main class="mt-4 space-y-4">
+    <!-- Info Entitas yang Dilaporkan -->
+    <div id="target-info" class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
+      <div class="grid size-12 shrink-0 place-items-center rounded-xl bg-red-100 text-red-600 font-bold">
+        ⚠
+      </div>
+      <div class="min-w-0 flex-1">
+        <span id="target-type" class="inline-block rounded-md bg-slate-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-700">Barang</span>
+        <p id="target-title" class="truncate font-semibold text-sm mt-0.5">Meja Kayu Jati Kokoh</p>
+        <p id="target-sub" class="truncate text-xs text-slate-500">Penjual: Budi Santoso</p>
+      </div>
+    </div>
+
+    <!-- Pilihan Alasan -->
+    <form id="form-lapor" class="space-y-4">
+      <div>
+        <label class="block text-sm font-bold text-ink">Alasan Pelaporan *</label>
+        <p class="text-xs text-slate-500 mt-0.5">Pilih alasan utama yang paling sesuai dengan kendala</p>
+        
+        <div class="mt-2.5 space-y-2">
+          <label class="flex items-center gap-3 rounded-xl border border-slate-200 p-3 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="alasan" value="penipuan" class="size-4 text-ink focus:ring-ink" checked>
+            <span class="text-sm font-medium">Penipuan / Barang tidak sesuai</span>
+          </label>
+          <label class="flex items-center gap-3 rounded-xl border border-slate-200 p-3 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="alasan" value="barang_terlarang" class="size-4 text-ink focus:ring-ink">
+            <span class="text-sm font-medium">Barang terlarang / Ilegal / Berbahaya</span>
+          </label>
+          <label class="flex items-center gap-3 rounded-xl border border-slate-200 p-3 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="alasan" value="perilaku_buruk" class="size-4 text-ink focus:ring-ink">
+            <span class="text-sm font-medium">Pelecehan / Perilaku tidak sopan</span>
+          </label>
+          <label class="flex items-center gap-3 rounded-xl border border-slate-200 p-3 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="alasan" value="sengketa_transaksi" class="size-4 text-ink focus:ring-ink">
+            <span class="text-sm font-medium">Sengketa transaksi / Masalah dana</span>
+          </label>
+          <label class="flex items-center gap-3 rounded-xl border border-slate-200 p-3 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="alasan" value="lainnya" class="size-4 text-ink focus:ring-ink">
+            <span class="text-sm font-medium">Lainnya</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Keterangan Detail -->
+      <div>
+        <label for="keterangan" class="block text-sm font-bold text-ink">
+          Keterangan Tambahan *
+        </label>
+        <textarea id="keterangan" name="keterangan" rows="4" required maxlength="1000"
+          placeholder="Jelaskan detail kendala atau kronologi kejadian untuk membantu proses peninjauan oleh admin..."
+          class="mt-1.5 w-full rounded-2xl border border-slate-200 p-3.5 text-sm outline-none focus:border-ink focus:ring-1 focus:ring-ink"></textarea>
+      </div>
+
+      <!-- Banner Privasi & Kepastian -->
+      <div class="flex items-start gap-2.5 rounded-2xl bg-amber-50 border border-amber-200 p-3.5 text-xs text-amber-900">
+        <svg class="size-4 shrink-0 text-amber-600 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        <p>Laporanmu bersifat rahasia dan akan ditinjau langsung oleh tim moderasi Reloop. Pihak terlapor tidak akan mengetahui identitasmu.</p>
+      </div>
+
+      <!-- Tombol Aksi -->
+      <div class="pt-2">
+        <button type="submit" class="w-full rounded-full bg-red-600 py-3.5 text-center font-semibold text-white shadow-sm hover:bg-red-700 active:scale-95 transition">
+          Kirim Laporan
+        </button>
+      </div>
+    </form>
+  </main>
+</div>
+</body>
+</html>
