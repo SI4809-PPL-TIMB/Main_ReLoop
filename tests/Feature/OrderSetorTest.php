@@ -107,6 +107,9 @@ class OrderSetorTest extends TestCase
         $response->assertSee('Rp 3.500');
         $response->assertSee('Jemput ke Rumah');
         $response->assertSee('Antar Sendiri ke Lapak');
+        // Pastikan script interaktif (chips dan hitung otomatis) ter-render ke client
+        $response->assertSee('hitungEstimasi');
+        $response->assertSee('DOMContentLoaded');
     }
 
     public function test_form_setor_gagal_jika_mitra_belum_terverifikasi(): void

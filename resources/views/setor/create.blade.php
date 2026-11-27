@@ -232,92 +232,92 @@
             </button>
         </div>
     </form>
-@endcomponent
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('form-setor');
-    const inputBerat = document.getElementById('berat');
-    const totalEstimasi = document.getElementById('total-estimasi');
-    const detailKalkulasi = document.getElementById('detail-kalkulasi');
-    const alamatSection = document.getElementById('alamat-section');
+    @push('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('form-setor');
+        const inputBerat = document.getElementById('berat');
+        const totalEstimasi = document.getElementById('total-estimasi');
+        const detailKalkulasi = document.getElementById('detail-kalkulasi');
+        const alamatSection = document.getElementById('alamat-section');
 
-    function formatRupiah(num) {
-        return 'Rp ' + Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    }
-
-    function hitungEstimasi() {
-        const selectedRadio = form.querySelector('input[name="category_id"]:checked');
-        const hargaPerKg = selectedRadio ? Number(selectedRadio.dataset.harga) : 0;
-        const berat = Math.max(0, parseFloat(inputBerat.value) || 0);
-        const total = Math.round(hargaPerKg * berat);
-
-        if (hargaPerKg > 0 && berat > 0) {
-            totalEstimasi.textContent = formatRupiah(total);
-            detailKalkulasi.textContent = berat + ' kg × ' + formatRupiah(hargaPerKg);
-        } else {
-            totalEstimasi.textContent = 'Rp 0';
-            detailKalkulasi.textContent = selectedRadio ? (berat + ' kg × ' + formatRupiah(hargaPerKg)) : '-';
+        function formatRupiah(num) {
+            return 'Rp ' + Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
-    }
 
-    // Chips perkiraan berat (2kg, 5kg, 10kg, 20kg)
-    const chips = document.querySelectorAll('#berat-chips button');
-    chips.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            inputBerat.value = btn.dataset.val;
+        function hitungEstimasi() {
+            const selectedRadio = form.querySelector('input[name="category_id"]:checked');
+            const hargaPerKg = selectedRadio ? Number(selectedRadio.dataset.harga) : 0;
+            const berat = Math.max(0, parseFloat(inputBerat.value) || 0);
+            const total = Math.round(hargaPerKg * berat);
+
+            if (hargaPerKg > 0 && berat > 0) {
+                totalEstimasi.textContent = formatRupiah(total);
+                detailKalkulasi.textContent = berat + ' kg × ' + formatRupiah(hargaPerKg);
+            } else {
+                totalEstimasi.textContent = 'Rp 0';
+                detailKalkulasi.textContent = selectedRadio ? (berat + ' kg × ' + formatRupiah(hargaPerKg)) : '-';
+            }
+        }
+
+        // Chips perkiraan berat (2kg, 5kg, 10kg, 20kg)
+        const chips = document.querySelectorAll('#berat-chips button');
+        chips.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                inputBerat.value = btn.dataset.val;
+                chips.forEach(function (b) {
+                    b.classList.remove('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+                    b.classList.add('border-slate-200');
+                });
+                btn.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+                btn.classList.remove('border-slate-200');
+                hitungEstimasi();
+            });
+        });
+
+        // Highlight chip yang sesuai nilai awal
+        chips.forEach(function (btn) {
+            if (parseFloat(btn.dataset.val) === parseFloat(inputBerat.value)) {
+                btn.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+                btn.classList.remove('border-slate-200');
+            }
+        });
+
+        // Jenis sampah change
+        form.querySelectorAll('input[name="category_id"]').forEach(function (radio) {
+            radio.addEventListener('change', hitungEstimasi);
+        });
+
+        // Input berat manual
+        inputBerat.addEventListener('input', function () {
+            // Hapus highlight chip jika nilai diubah manual
             chips.forEach(function (b) {
                 b.classList.remove('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
                 b.classList.add('border-slate-200');
+                if (parseFloat(b.dataset.val) === parseFloat(inputBerat.value)) {
+                    b.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+                    b.classList.remove('border-slate-200');
+                }
             });
-            btn.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
-            btn.classList.remove('border-slate-200');
+            hitungEstimasi();
+        });
+
+        // Metode jemput/antar toggle
+        form.querySelectorAll('input[name="metode"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                if (alamatSection) {
+                    alamatSection.classList.toggle('hidden', radio.value !== 'jemput');
+                }
+            });
+        });
+
+        // Hitung saat halaman pertama kali load
+        // requestAnimationFrame memastikan semua radio sudah ter-render sebelum kalkulasi
+        requestAnimationFrame(function () {
             hitungEstimasi();
         });
     });
-
-    // Highlight chip yang sesuai nilai awal
-    chips.forEach(function (btn) {
-        if (parseFloat(btn.dataset.val) === parseFloat(inputBerat.value)) {
-            btn.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
-            btn.classList.remove('border-slate-200');
-        }
-    });
-
-    // Jenis sampah change
-    form.querySelectorAll('input[name="category_id"]').forEach(function (radio) {
-        radio.addEventListener('change', hitungEstimasi);
-    });
-
-    // Input berat manual
-    inputBerat.addEventListener('input', function () {
-        // Hapus highlight chip jika nilai diubah manual
-        chips.forEach(function (b) {
-            b.classList.remove('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
-            b.classList.add('border-slate-200');
-            if (parseFloat(b.dataset.val) === parseFloat(inputBerat.value)) {
-                b.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
-                b.classList.remove('border-slate-200');
-            }
-        });
-        hitungEstimasi();
-    });
-
-    // Metode jemput/antar toggle
-    form.querySelectorAll('input[name="metode"]').forEach(function (radio) {
-        radio.addEventListener('change', function () {
-            if (alamatSection) {
-                alamatSection.classList.toggle('hidden', radio.value !== 'jemput');
-            }
-        });
-    });
-
-    // Hitung saat halaman pertama kali load
-    // requestAnimationFrame memastikan semua radio sudah ter-render sebelum kalkulasi
-    requestAnimationFrame(function () {
-        hitungEstimasi();
-    });
-});
-</script>
-@endpush
+    </script>
+    @endpush
+@endcomponent
