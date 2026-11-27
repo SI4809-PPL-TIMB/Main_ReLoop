@@ -15,6 +15,7 @@
                 : ['Jadi pengepul mitra', '#', '<path d="M3 9 5 4h14l2 5M3 9h18v11H3zM9 20v-6h6v6"/>'],
         ],
         'Akun' => [
+            ['Laporan saya', route('laporan.index'), '<path d="M5 21V4h11l-1.5 4L16 12H5"/>'],
             ['Lokasi & alamat', route('lokasi', ['from' => 'profil']), '<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>'],
             ['Notifikasi', '#', '<path d="M6 16V10a6 6 0 0 1 12 0v6l2 2H4zM10 21h4M12 2v2"/>'],
             ['Bantuan', '#', '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .6-1.5 1-1.5 2.5M12 17h.01"/>'],
@@ -26,6 +27,7 @@
     if ($user->isAdmin()) {
         $grup = ['Admin' => [
             ['Kelola mitra pengepul', route('admin.mitra.index'), '<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z"/><path d="M9 12h6M12 9v6"/>'],
+            ['Moderasi & sengketa', route('admin.moderasi.index'), '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>'],
         ]] + $grup;
     }
 @endphp

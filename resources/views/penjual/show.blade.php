@@ -174,10 +174,12 @@
                 @endif
             </div>
 
-            <button type="button" data-soon class="mt-8 flex w-full items-center justify-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600">
-                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>
-                Laporkan penjual
-            </button>
+            @if (!auth()->check() || auth()->id() !== $user->id)
+                <a href="{{ route('lapor.create', ['tipe' => 'user', 'id' => $user->id]) }}" class="mt-8 flex w-full items-center justify-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600">
+                    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>
+                    Laporkan penjual
+                </a>
+            @endif
         </main>
     </div>
 

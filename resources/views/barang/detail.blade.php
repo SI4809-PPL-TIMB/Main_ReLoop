@@ -286,10 +286,12 @@
                 </section>
             @endif
 
-            <button type="button" data-soon class="mt-6 flex w-full items-center justify-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600">
-                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>
-                Laporkan barang ini
-            </button>
+            @if (!auth()->check() || auth()->id() !== $listing->user_id)
+                <a href="{{ route('lapor.create', ['tipe' => 'listing', 'id' => $listing->id]) }}" class="mt-6 flex w-full items-center justify-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600">
+                    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>
+                    Laporkan barang ini
+                </a>
+            @endif
         </main>
 
         {{-- Aksi. Chat (6.1), tawar (6.2), dan beli (7.1) belum ada: tombol sementara. --}}

@@ -346,7 +346,7 @@
                     </a>
                     <div class="mt-1 flex">
                         <button type="button" onclick="document.getElementById('modal-batal').showModal()" class="flex-1 py-2 text-center text-sm font-semibold text-slate-500 hover:text-red-600">Batalkan pesanan</button>
-                        <a href="https://wa.me/6281200000000?text=Halo%20Admin%20Reloop,%20saya%20butuh%20bantuan%20pesanan%20{{ $order->order_number }}" target="_blank" class="flex-1 py-2 text-center text-sm font-semibold text-red-500">Laporkan</a>
+                        <a href="{{ route('lapor.create', ['tipe' => 'order', 'id' => $order->id]) }}" class="flex-1 py-2 text-center text-sm font-semibold text-red-500">Laporkan</a>
                     </div>
                 @else
                     <button type="button" onclick="document.getElementById('modal-serah').showModal()" class="w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white shadow hover:bg-slate-800 transition">
@@ -363,7 +363,7 @@
                     <button type="button" onclick="document.getElementById('modal-konfirmasi').showModal()" class="w-full rounded-full bg-ink py-3.5 text-center font-semibold text-white shadow hover:bg-slate-800 transition">
                         Barang sudah diterima
                     </button>
-                    <a href="https://wa.me/6281200000000?text=Ada%20masalah%20dengan%20pesanan%20{{ $order->order_number }}" target="_blank" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-red-500">
+                    <a href="{{ route('lapor.create', ['tipe' => 'order', 'id' => $order->id]) }}" class="mt-1 block w-full py-2 text-center text-sm font-semibold text-red-500">
                         Ada masalah? Laporkan
                     </a>
                 @else
