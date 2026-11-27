@@ -224,6 +224,7 @@
 
 @push('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('form-setor');
     const inputBerat = document.getElementById('berat');
     const totalEstimasi = document.getElementById('total-estimasi');
@@ -236,43 +237,72 @@
 
     function hitungEstimasi() {
         const selectedRadio = form.querySelector('input[name="category_id"]:checked');
-        const hargaPerKg = Number(selectedRadio?.dataset.harga || 0);
+        const hargaPerKg = selectedRadio ? Number(selectedRadio.dataset.harga) : 0;
         const berat = Math.max(0, parseFloat(inputBerat.value) || 0);
         const total = Math.round(hargaPerKg * berat);
 
-        totalEstimasi.textContent = formatRupiah(total);
-        detailKalkulasi.textContent = `${berat} kg × ${formatRupiah(hargaPerKg)}`;
+        if (hargaPerKg > 0 && berat > 0) {
+            totalEstimasi.textContent = formatRupiah(total);
+            detailKalkulasi.textContent = berat + ' kg × ' + formatRupiah(hargaPerKg);
+        } else {
+            totalEstimasi.textContent = 'Rp 0';
+            detailKalkulasi.textContent = selectedRadio ? (berat + ' kg × ' + formatRupiah(hargaPerKg)) : '-';
+        }
     }
 
-    form.addEventListener('change', (e) => {
-        if (e.target.name === 'category_id' || e.target.id === 'berat') {
-            hitungEstimasi();
-        }
-        if (e.target.name === 'metode') {
-            if (alamatSection) {
-                if (e.target.value === 'jemput') {
-                    alamatSection.classList.remove('hidden');
-                } else {
-                    alamatSection.classList.add('hidden');
-                }
-            }
-        }
-    });
-
-    inputBerat.addEventListener('input', hitungEstimasi);
-
+    // Chips perkiraan berat (2kg, 5kg, 10kg, 20kg)
     const chips = document.querySelectorAll('#berat-chips button');
-    chips.forEach(btn => {
-        btn.addEventListener('click', () => {
+    chips.forEach(function (btn) {
+        btn.addEventListener('click', function () {
             inputBerat.value = btn.dataset.val;
-            chips.forEach(b => {
-                b.classList.remove('bg-slate-100', 'font-bold');
+            chips.forEach(function (b) {
+                b.classList.remove('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+                b.classList.add('border-slate-200');
             });
-            btn.classList.add('bg-slate-100', 'font-bold');
+            btn.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+            btn.classList.remove('border-slate-200');
             hitungEstimasi();
         });
     });
 
+    // Highlight chip yang sesuai nilai awal
+    chips.forEach(function (btn) {
+        if (parseFloat(btn.dataset.val) === parseFloat(inputBerat.value)) {
+            btn.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+            btn.classList.remove('border-slate-200');
+        }
+    });
+
+    // Jenis sampah change
+    form.querySelectorAll('input[name="category_id"]').forEach(function (radio) {
+        radio.addEventListener('change', hitungEstimasi);
+    });
+
+    // Input berat manual
+    inputBerat.addEventListener('input', function () {
+        // Hapus highlight chip jika nilai diubah manual
+        chips.forEach(function (b) {
+            b.classList.remove('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+            b.classList.add('border-slate-200');
+            if (parseFloat(b.dataset.val) === parseFloat(inputBerat.value)) {
+                b.classList.add('bg-slate-100', 'ring-1', 'ring-ink', 'border-ink');
+                b.classList.remove('border-slate-200');
+            }
+        });
+        hitungEstimasi();
+    });
+
+    // Metode jemput/antar toggle
+    form.querySelectorAll('input[name="metode"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            if (alamatSection) {
+                alamatSection.classList.toggle('hidden', radio.value !== 'jemput');
+            }
+        });
+    });
+
+    // Hitung saat halaman pertama kali load
     hitungEstimasi();
+});
 </script>
 @endpush
