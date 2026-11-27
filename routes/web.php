@@ -88,6 +88,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/pesanan/{orderNumber}/ulasan', [\App\Http\Controllers\ReviewController::class, 'create'])->name('ulasan.create');
     Route::post('/pesanan/{orderNumber}/ulasan', [\App\Http\Controllers\ReviewController::class, 'store'])->name('ulasan.store');
 
+    // 11.1 · Lapor masalah (pengguna)
+    Route::get('/laporan', [\App\Http\Controllers\ReportController::class, 'index'])->name('laporan.index');
+    Route::get('/laporkan', [\App\Http\Controllers\ReportController::class, 'create'])->name('lapor.create');
+    Route::post('/laporkan', [\App\Http\Controllers\ReportController::class, 'store'])->name('lapor.store');
+
     Route::get('/lokasi', [LokasiController::class, 'edit'])->name('lokasi');
     Route::post('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
     Route::post('/lokasi/gps', [LokasiController::class, 'gps'])->middleware('throttle:20,1')->name('lokasi.gps');
@@ -96,7 +101,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/keluar', [AuthController::class, 'destroy'])->name('logout');
 });
 
-// 8.1 · Data pengepul mitra (PPLTIMB-147). Halaman dibatasi sesuai peran akun.
+// 8.1 · Data pengepul mitra (PPLTIMB-147) & 11.1 · Moderasi Laporan (PPLTIMB-152)
 Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/mitra', [MitraController::class, 'index'])->name('mitra.index');
     Route::get('/mitra/tambah', [MitraController::class, 'create'])->name('mitra.create');
@@ -106,6 +111,14 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     Route::put('/mitra/{mitra}', [MitraController::class, 'update'])->name('mitra.update');
     Route::post('/mitra/{mitra}/verifikasi', [MitraController::class, 'verifikasi'])->name('mitra.verifikasi');
     Route::delete('/mitra/{mitra}', [MitraController::class, 'destroy'])->name('mitra.destroy');
+
+    // 11.1 · Moderasi & Sengketa Admin
+    Route::get('/moderasi', [\App\Http\Controllers\Admin\ModerasiController::class, 'index'])->name('moderasi.index');
+    Route::get('/moderasi/{report}', [\App\Http\Controllers\Admin\ModerasiController::class, 'show'])->name('moderasi.show');
+    Route::post('/moderasi/{report}/nonaktifkan-barang', [\App\Http\Controllers\Admin\ModerasiController::class, 'deactiveListing'])->name('moderasi.deactive_listing');
+    Route::post('/moderasi/{report}/nonaktifkan-akun', [\App\Http\Controllers\Admin\ModerasiController::class, 'deactiveUser'])->name('moderasi.deactive_user');
+    Route::post('/moderasi/{report}/putusan-sengketa', [\App\Http\Controllers\Admin\ModerasiController::class, 'resolveDispute'])->name('moderasi.resolve_dispute');
+    Route::post('/moderasi/{report}/abaikan', [\App\Http\Controllers\Admin\ModerasiController::class, 'dismiss'])->name('moderasi.dismiss');
 });
 
 Route::middleware(['auth', 'peran:pengepul'])->prefix('mitra')->name('mitra.')->group(function () {
