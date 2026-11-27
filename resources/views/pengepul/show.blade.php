@@ -6,12 +6,26 @@
     $jamPerHari = $mitra->jam->keyBy('hari');
     $hariIni = now()->dayOfWeekIso;
     // Kembali ke daftar dengan filter terakhir bila datang dari sana.
-    $kembali = str_starts_with(url()->previous(), route('pengepul.index')) && url()->previous() !== url()->current()
-        ? url()->previous() : route('pengepul.index');
+    // Jika datang dari form setor, back tetap ke daftar pengepul (hindari looping).
+    $prev = url()->previous();
+    $kembali = (str_starts_with($prev, route('pengepul.index')) && $prev !== url()->current())
+        ? $prev
+        : route('pengepul.index');
 @endphp
 
 @component('layouts.app', ['title' => 'Reloop · '.$mitra->nama_usaha])
-    <x-top-bar title="Profil Pengepul" :back="$kembali" />
+    {{-- Back via history.back() agar browser mengelola stack navigasi dengan benar --}}
+    <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-4">
+        <a href="{{ $kembali }}"
+           onclick="if(history.length > 1){ event.preventDefault(); history.back(); }"
+           aria-label="Kembali"
+           class="flex size-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-ink transition-colors hover:bg-slate-50">
+            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" />
+            </svg>
+        </a>
+        <h1 class="flex-1 truncate text-xl font-bold text-ink">Profil Pengepul</h1>
+    </header>
 
     <main class="space-y-5 px-4 pb-28 pt-5">
         <section class="flex gap-4">

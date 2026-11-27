@@ -8,7 +8,19 @@
 @endphp
 
 @component('layouts.app', ['title' => 'Reloop · Setor ke '.$mitra->nama_usaha])
-    <x-top-bar title="Setor Sampah" :back="route('pengepul.show', $mitra)" />
+    {{-- Back via history.back() agar tidak looping antara profil pengepul dan form setor --}}
+    <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-4">
+        <a href="{{ route('pengepul.show', $mitra) }}"
+           onclick="if(history.length > 1){ event.preventDefault(); history.back(); }"
+           aria-label="Kembali"
+           class="flex size-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-ink transition-colors hover:bg-slate-50">
+            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" />
+            </svg>
+        </a>
+        <h1 class="flex-1 truncate text-xl font-bold text-ink">Setor Sampah</h1>
+        <span class="text-xs text-slate-400">* wajib</span>
+    </header>
 
     <!-- Info Singkat Mitra -->
     <section class="flex items-center gap-3 border-b border-slate-100 bg-[#fbfdfa] px-4 py-3.5">
@@ -302,7 +314,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Hitung saat halaman pertama kali load
-    hitungEstimasi();
+    // requestAnimationFrame memastikan semua radio sudah ter-render sebelum kalkulasi
+    requestAnimationFrame(function () {
+        hitungEstimasi();
+    });
 });
 </script>
 @endpush
