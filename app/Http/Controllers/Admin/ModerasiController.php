@@ -102,7 +102,7 @@ class ModerasiController extends Controller
         }
 
         DB::transaction(function () use ($report, $user, $request) {
-            $user->update(['is_active' => false]);
+            $user->forceFill(['is_active' => false])->save();
 
             $report->update([
                 'status'       => Report::STATUS_RESOLVED,
