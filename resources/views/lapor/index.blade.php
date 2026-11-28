@@ -3,7 +3,7 @@
 
     <div class="relative mx-auto min-h-screen max-w-[420px] bg-white p-4 pb-20 shadow-sm">
         <header class="flex items-center gap-3 border-b border-slate-200 pb-4">
-            <a href="javascript:history.back()" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200 hover:bg-slate-50 transition">
+            <a href="{{ route('account') }}" aria-label="Kembali" class="grid size-10 place-items-center rounded-full border border-slate-200 hover:bg-slate-50 transition">
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </a>
             <h1 class="text-xl font-bold">Laporan Saya</h1>
@@ -11,8 +11,18 @@
 
         <main class="mt-4 space-y-3">
             @if (session('success'))
-                <div role="status" class="rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-800">
-                    {{ session('success') }}
+                <div role="status" class="rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-800 space-y-2.5">
+                    <p class="font-medium">{{ session('success') }}</p>
+                    <div class="flex items-center gap-2 pt-1 border-t border-emerald-200/60">
+                        <a href="{{ route('beranda') }}" class="inline-block rounded-lg bg-emerald-700 px-3 py-1 font-semibold text-[11px] text-white hover:bg-emerald-800 transition">Ke Beranda</a>
+                        <a href="{{ route('account') }}" class="inline-block rounded-lg border border-emerald-300 px-3 py-1 font-semibold text-[11px] text-emerald-800 hover:bg-emerald-100/50 transition">Ke Akun</a>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('info'))
+                <div role="status" class="rounded-2xl border border-sky-200 bg-sky-50 p-3.5 text-xs text-sky-800">
+                    {{ session('info') }}
                 </div>
             @endif
 
