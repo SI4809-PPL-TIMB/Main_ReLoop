@@ -47,6 +47,25 @@ class ReportController extends Controller
             return redirect()->back()->with('error', 'Tipe laporan tidak valid.');
         }
 
+        // Cegah pengguna melihat form lagi jika sudah ada laporan berstatus pending
+        $existingReport = Report::where('reporter_id', $request->user()->id)
+            ->where('reportable_type', $type)
+            ->where('reportable_id', $target->id)
+            ->where('status', Report::STATUS_PENDING)
+            ->first();
+
+        if ($existingReport) {
+            $label = match ($type) {
+                Report::TYPE_LISTING => 'barang',
+                Report::TYPE_USER    => 'pengguna',
+                Report::TYPE_ORDER   => 'pesanan',
+                default              => 'hal',
+            };
+
+            return redirect()->route('laporan.index')
+                ->with('info', "Kamu sudah melaporkan {$label} ini. Laporanmu saat ini sedang dalam proses peninjauan oleh admin.");
+        }
+
         return view('lapor.create', compact('type', 'target'));
     }
 
@@ -67,6 +86,18 @@ class ReportController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Cegah duplikasi laporan ganda saat masih pending
+        $existingReport = Report::where('reporter_id', $user->id)
+            ->where('reportable_type', $validated['reportable_type'])
+            ->where('reportable_id', $validated['reportable_id'])
+            ->where('status', Report::STATUS_PENDING)
+            ->first();
+
+        if ($existingReport) {
+            return redirect()->route('laporan.index')
+                ->with('info', 'Laporan kamu untuk hal ini sudah ada dan sedang dalam antrean peninjauan admin.');
+        }
 
         // Validasi keberadaan target
         if ($validated['reportable_type'] === Report::TYPE_LISTING) {

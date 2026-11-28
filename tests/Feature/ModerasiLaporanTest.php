@@ -374,4 +374,49 @@ class ModerasiLaporanTest extends TestCase
         $this->assertEquals(Report::ACTION_DISMISSED, $report->action_taken);
         $this->assertEquals('Laporan tidak terbukti melanggar ketentuan.', $report->admin_notes);
     }
+
+    public function test_pengguna_tidak_bisa_mengirim_laporan_duplikat_saat_masih_pending(): void
+    {
+        Report::create([
+            'reporter_id'     => $this->userPelapor->id,
+            'reportable_type' => 'listing',
+            'reportable_id'   => $this->listing->id,
+            'reason'          => 'penipuan',
+            'description'     => 'Laporan awal yang masih menunggu.',
+            'status'          => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->userPelapor)->post(route('lapor.store'), [
+            'reportable_type' => 'listing',
+            'reportable_id'   => $this->listing->id,
+            'reason'          => 'penipuan',
+            'description'     => 'Laporan kedua untuk barang yang sama.',
+        ]);
+
+        $response->assertRedirect(route('laporan.index'));
+        $response->assertSessionHas('info');
+
+        // Pastikan hanya ada 1 laporan di database, bukan 2
+        $this->assertCount(1, Report::where('reportable_type', 'listing')->where('reportable_id', $this->listing->id)->get());
+    }
+
+    public function test_form_lapor_otomatis_redirect_ke_laporan_jika_masih_pending(): void
+    {
+        Report::create([
+            'reporter_id'     => $this->userPelapor->id,
+            'reportable_type' => 'listing',
+            'reportable_id'   => $this->listing->id,
+            'reason'          => 'penipuan',
+            'description'     => 'Sudah dilaporkan sebelumnya.',
+            'status'          => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->userPelapor)->get(route('lapor.create', [
+            'tipe' => 'listing',
+            'id'   => $this->listing->id,
+        ]));
+
+        $response->assertRedirect(route('laporan.index'));
+        $response->assertSessionHas('info');
+    }
 }
